@@ -1,0 +1,273 @@
+{
+  "tiers": [
+    {
+      "id": "budget",
+      "name": "Budget",
+      "description": "Smart, cheap, and good enough.",
+      "exampleBrands": ["H&M", "Old Navy", "Target"],
+      "status": "coming_soon",
+      "accent": "#3B82F6"
+    },
+    {
+      "id": "mid",
+      "name": "Mid",
+      "description": "Pay a bit more where it matters.",
+      "exampleBrands": ["TODO", "TODO", "TODO"],
+      "status": "live",
+      "accent": "#10B981"
+    },
+    {
+      "id": "high",
+      "name": "High",
+      "description": "The best version of everything.",
+      "exampleBrands": ["Eight Sleep", "Vuori", "Uniqlo"],
+      "status": "coming_soon",
+      "accent": "#111827"
+    }
+  ],
+  "sections": ["Wear", "Home", "Tech", "Everyday"],
+  "categories": [
+    { "id": "tee", "name": "Everyday tee", "section": "Wear" },
+    { "id": "pants", "name": "Jeans / pants", "section": "Wear" },
+    { "id": "sneakers", "name": "Everyday sneakers", "section": "Wear" },
+    { "id": "layer", "name": "Hoodie / layer", "section": "Wear" },
+    { "id": "mattress", "name": "Mattress / bed", "section": "Home" },
+    { "id": "detergent", "name": "Laundry detergent", "section": "Home" },
+    { "id": "coffee", "name": "Coffee setup", "section": "Home" },
+    { "id": "laptop", "name": "Laptop", "section": "Tech" },
+    { "id": "headphones", "name": "Headphones", "section": "Tech" },
+    { "id": "bag", "name": "Daily bag", "section": "Everyday" }
+  ],
+  "picks": [
+    {
+      "tier": "mid",
+      "category": "tee",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "pants",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "sneakers",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "layer",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "mattress",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "detergent",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "coffee",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "laptop",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "headphones",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    },
+    {
+      "tier": "mid",
+      "category": "bag",
+      "main": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO: one line, under 90 characters"
+      },
+      "alt": {
+        "brand": "TODO",
+        "name": "TODO",
+        "price": 0,
+        "currency": "USD",
+        "url": "https://TODO",
+        "image": "/images/placeholder.svg",
+        "why": "TODO",
+        "when": "TODO: e.g. If you want it cheaper"
+      }
+    }
+  ]
+}
