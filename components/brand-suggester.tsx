@@ -14,7 +14,7 @@ function Result({ outcome }: { outcome: SuggestOutcome }) {
         You shop like{" "}
         <Link
           href={`/${outcome.tier.id}`}
-          className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+          className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
         >
           {outcome.tier.name}
           <span aria-hidden="true"> →</span>
@@ -31,7 +31,7 @@ function Result({ outcome }: { outcome: SuggestOutcome }) {
             {" — see "}
             <Link
               href={`/${outcome.fallback.id}`}
-              className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+              className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
             >
               {outcome.fallback.name}
             </Link>{" "}
@@ -53,7 +53,7 @@ function Result({ outcome }: { outcome: SuggestOutcome }) {
           {tier.status === "live" ? (
             <Link
               href={`/${tier.id}`}
-              className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+              className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
             >
               {tier.name}
             </Link>
@@ -67,7 +67,7 @@ function Result({ outcome }: { outcome: SuggestOutcome }) {
           {" — see "}
           <Link
             href={`/${outcome.fallback.id}`}
-            className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+            className="text-signal underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
             {outcome.fallback.name}
           </Link>{" "}
@@ -125,7 +125,7 @@ export function BrandSuggester({ chips, tiers }: { chips: SuggestChip[]; tiers: 
               type="button"
               aria-pressed={on}
               onClick={() => toggle(chip.slug)}
-              className={`inline-flex min-h-11 items-center rounded-full px-4 text-[13px] leading-none transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal ${
+              className={`inline-flex min-h-11 items-center rounded-full px-4 text-[13px] leading-none transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal ${
                 on ? "bg-ink text-white" : "bg-paper text-ink ring-1 ring-inset ring-line hover:bg-field"
               }`}
             >

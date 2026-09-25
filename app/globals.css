@@ -87,9 +87,25 @@
   color: #141414;
 }
 
-.content-focus:focus {
-  outline: 2px solid var(--color-signal);
-  outline-offset: -2px;
+/* No tap flash or click box. Keyboard focus keeps a thin ring (utilities set colour/offset). */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* <main> takes focus after navigation for screen readers; never draw a box around the page. */
+.content-focus:focus,
+.content-focus:focus-visible {
+  outline: none;
 }
 
 .compare-scroll {
@@ -123,7 +139,7 @@
 }
 
 .switcher-scroll:focus-visible {
-  outline: 2px solid var(--color-signal);
+  outline: 1.5px solid var(--color-signal);
   outline-offset: 2px;
   border-radius: 999px;
 }
@@ -359,7 +375,14 @@
   }
 }
 
-/* Quiet "Pick coming" tiles keep their compact height beside tall picked cards. */
-.kit-card[data-empty] {
-  align-self: start;
+
+/* Reserved photo square for products without a pick. */
+.empty-plate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-field) no-repeat center / 24px 24px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4d4d4' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='2.5'/%3E%3Ccircle cx='9' cy='10' r='1.6'/%3E%3Cpath d='m4.5 17.5 5-4.5 3.5 3 2.5-2 4 3.5'/%3E%3C/svg%3E");
 }

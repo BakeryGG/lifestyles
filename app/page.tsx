@@ -20,10 +20,11 @@ export default function HomePage() {
     name: tier.name,
     status: tier.status,
   }));
+  // Every lifestyle is browsable, so the suggester links straight to its match.
   const suggestTiers = catalog.tiers.map((tier) => ({
     id: tier.id,
     name: tier.name,
-    status: tier.status,
+    status: "live" as const,
     basedOn: tier.basedOn ?? null,
   }));
 

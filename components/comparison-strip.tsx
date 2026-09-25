@@ -16,10 +16,9 @@ export function ComparisonStrip({
   rows: CompareRow[];
   srcSets: Record<string, string | undefined>;
 }) {
-  const soon = new Set(tiers.filter((tier) => tier.status !== "live").map((tier) => tier.id));
   const minWidth = `${Math.max(18, 9 + tiers.length * 11)}rem`;
   return (
-    <HScroll label="Compare primary lifestyles" className="compare-scroll mt-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal">
+    <HScroll label="Compare primary lifestyles" className="compare-scroll mt-5 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal">
       <table className="compare-table" style={{ minWidth }}>
         <caption className="sr-only">
           Main picks compared across primary lifestyles
@@ -36,23 +35,13 @@ export function ComparisonStrip({
                 scope="col"
                 className="border-b border-line py-2 pr-4 text-left align-bottom font-normal"
               >
-                {tier.status === "live" ? (
-                  <Link
-                    href={`/${tier.id}`}
-                    className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
-                  >
-                    <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-signal" />
-                    {tier.name}
-                  </Link>
-                ) : (
-                  <span className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-muted">
-                    {tier.name}
-                    <span aria-hidden="true" className="text-[11px]">
-                      Soon
-                    </span>
-                    <span className="sr-only">, coming soon</span>
-                  </span>
-                )}
+                <Link
+                  href={`/${tier.id}`}
+                  className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
+                >
+                  {tier.status === "live" ? <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-signal" /> : null}
+                  {tier.name}
+                </Link>
               </th>
             ))}
           </tr>
@@ -70,7 +59,7 @@ export function ComparisonStrip({
               {row.cells.map((cell) => (
                 <td
                   key={cell.tierId}
-                  className={`border-b border-line py-3 pr-4 align-middle ${soon.has(cell.tierId) ? "compare-soon" : ""}`}
+                  className="border-b border-line py-3 pr-4 align-middle"
                 >
                   {cell.empty ? (
                     <span className="flex items-center gap-3">

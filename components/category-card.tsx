@@ -27,27 +27,6 @@ export function CategoryCard({
   pick: Pick<PresentedPick, "main"> | null;
   priority: "high" | "eager" | "lazy";
 }) {
-  if (!pick) {
-    return (
-      <button
-        type="button"
-        id={`card-${id}`}
-        data-pick={id}
-        aria-haspopup="dialog"
-        className="group flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col justify-between gap-3 rounded-2xl border border-line/70 px-3.5 py-3 text-left transition-colors duration-[380ms] ease-catalog hover:border-ink/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
-      >
-        <span className="text-[13px] leading-5 text-ink">{name}</span>
-        <span className="flex items-center justify-between gap-2 text-[12px] leading-4 text-muted">
-          <span>
-            <span className="sr-only">{section}, </span>Pick coming
-          </span>
-          <span aria-hidden="true" className="opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <ArrowUpRight />
-          </span>
-        </span>
-      </button>
-    );
-  }
   const brand = pick ? displayText(pick.main.brand) : null;
   const productName = pick ? displayText(pick.main.name) : null;
   const price = pick ? formatPrice(pick.main.price, pick.main.currency) : null;
@@ -60,7 +39,7 @@ export function CategoryCard({
       id={`card-${id}`}
       data-pick={id}
       aria-haspopup="dialog"
-      className="group flex h-full w-full min-w-0 cursor-pointer flex-col text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      className="group flex h-full w-full min-w-0 cursor-pointer flex-col text-left focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
       <span className="relative block aspect-square w-full overflow-hidden rounded-2xl bg-field transition-colors duration-[380ms] ease-catalog group-hover:bg-[#efefef]">
         {pick ? (
@@ -82,18 +61,22 @@ export function CategoryCard({
         </span>
       </span>
       <span className="flex flex-col gap-1 px-0.5 pt-3 pb-1">
-        <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">{meta}</span>
-        <span className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 text-[13px] leading-5 text-ink">{title}</span>
-          {price ? (
-            <span className="shrink-0 font-mono text-[13px] leading-5 text-ink">{price}</span>
-          ) : (
-            <span className="shrink-0 font-mono text-[13px] leading-5 text-muted">
-              <span aria-hidden="true">—</span>
-              <span className="sr-only">Price coming</span>
+        {pick ? (
+          <>
+            <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">{meta}</span>
+            <span className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0 text-[13px] leading-5 text-ink">{title}</span>
+              {price ? <span className="shrink-0 font-mono text-[13px] leading-5 text-ink">{price}</span> : null}
             </span>
-          )}
-        </span>
+          </>
+        ) : (
+          <>
+            <span className="text-[13px] leading-5 text-ink">{name}</span>
+            <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">
+              <span className="sr-only">{section}, </span>Pick coming
+            </span>
+          </>
+        )}
       </span>
     </button>
   );

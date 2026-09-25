@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { withBasePath } from "@/lib/base-path";
 import "./globals.css";
+import { SiteFooter } from "@/components/site-footer";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -42,11 +43,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a
           href="#content"
           data-skip-link=""
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-40 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-full focus:bg-ink focus:px-4 focus:text-[13px] focus:text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-signal"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-40 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-full focus:bg-ink focus:px-4 focus:text-[13px] focus:text-white focus:outline focus:outline-[1.5px] focus:outline-offset-2 focus:outline-signal"
         >
           Skip to content
         </a>
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

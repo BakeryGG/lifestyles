@@ -16,7 +16,7 @@ export default function NotFound() {
       <p className="mt-4 text-[15px] leading-6 text-muted">That address does not match a lifestyle.</p>
       <Link
         href="/"
-        className="mt-8 inline-flex min-h-11 items-center text-[14px] text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+        className="mt-8 inline-flex min-h-11 items-center text-[14px] text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-4 focus-visible:outline-signal"
       >
         Back to Lifestyles
       </Link>

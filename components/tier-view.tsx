@@ -1,5 +1,4 @@
 import { ViewTransition } from "react";
-import Link from "next/link";
 import { KitGrid, type GridGroup } from "./kit-grid";
 import { KitFilter } from "./kit-filter";
 import { LifestyleSwitcher, type SwitcherLifestyle } from "./lifestyle-switcher";
@@ -41,14 +40,12 @@ export function TierView({
   groups,
   views,
   defaultView,
-  liveTiers,
 }: {
   tier: Pick<Tier, "id" | "name" | "description" | "status">;
   tiers: SwitcherLifestyle[];
   groups: TierGroupView[];
   views: KitView[];
   defaultView: string;
-  liveTiers: { id: string; name: string }[];
 }) {
   const eagerIds = groups
     .flatMap((group) => group.categories)
@@ -88,23 +85,6 @@ export function TierView({
         <main id="content" tabIndex={-1} className="content-focus scroll-mt-16">
           <div id="kit" className="kit-root" data-view={defaultView} data-default-view={defaultView}>
             <div className="mx-auto max-w-[1440px] px-4 pt-6 pb-1 sm:px-6 lg:px-8">
-              {tier.status !== "live" ? (
-                <p className="mb-3 max-w-2xl text-[14px] leading-6 text-pretty text-muted">
-                  <span className="text-ink">{tier.name} is coming soon.</span> The products below match the other lifestyles.
-                  {liveTiers.map((item) => (
-                    <span key={item.id}>
-                      {" "}
-                      <Link
-                        href={`/${item.id}`}
-                        className="text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
-                      >
-                        See the {item.name} kit
-                      </Link>
-                      .
-                    </span>
-                  ))}
-                </p>
-              ) : null}
               <h1 className="text-[1.25rem] leading-7 font-normal tracking-[-0.02em] text-ink" aria-live="polite">
                 {views.map((view) => (
                   <span key={view.id} data-kit-summary={view.id} className="kit-summary">
@@ -125,7 +105,7 @@ export function TierView({
                           data-chip={view.id}
                           data-picked-count={view.picked}
                           aria-current={view.id === defaultView ? "true" : undefined}
-                          className="inline-flex h-11 items-center gap-1.5 rounded-full border border-line px-4 text-[13px] leading-5 whitespace-nowrap text-ink transition-colors duration-300 ease-catalog hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+                          className="inline-flex h-11 items-center gap-1.5 rounded-full border border-line px-4 text-[13px] leading-5 whitespace-nowrap text-ink transition-colors duration-300 ease-catalog hover:border-ink focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
                         >
                           {view.name}
                           <span className="font-mono text-[11px] opacity-60">{view.count}</span>
@@ -139,7 +119,7 @@ export function TierView({
                   data-picked-toggle
                   aria-pressed="false"
                   aria-label="Only picked"
-                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-2 text-[13px] text-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal sm:gap-2 sm:px-3 aria-pressed:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-2 text-[13px] text-muted hover:text-ink focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal sm:gap-2 sm:px-3 aria-pressed:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span aria-hidden="true" className="picked-dot h-2 w-2 rounded-full border border-current" />
                   <span className="sm:hidden">Picked</span>

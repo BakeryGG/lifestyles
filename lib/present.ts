@@ -93,18 +93,13 @@ function joinNames(names: string[]): string {
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
-/** Status pill copy, from tier names and statuses. No hard-coded tier ids. */
+/** Status pill copy, from tier names and statuses. Every lifestyle is browsable; this only hints at progress. */
 export function liveStatusLine(tiers: Pick<Tier, "name" | "status">[]): string {
   const live = tiers.filter((tier) => tier.status === "live").map((tier) => tier.name);
-  const soon = tiers.filter((tier) => tier.status !== "live").map((tier) => tier.name);
-  const liveText =
-    live.length === 0
-      ? "No lifestyle is live yet"
-      : live.length === 1
-        ? `${live[0]} is live`
-        : `${joinNames(live)} are live`;
-  if (soon.length === 0) return liveText;
-  return `${liveText} · ${joinNames(soon)} coming soon`;
+  const count = `${tiers.length} ${tiers.length === 1 ? "lifestyle" : "lifestyles"}`;
+  if (live.length === tiers.length) return count;
+  if (live.length === 0) return `${count} · picks rolling in`;
+  return `${count} · picks rolling in, starting with ${joinNames(live)}`;
 }
 
 export type LandingTierCard = {

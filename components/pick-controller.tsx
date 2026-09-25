@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, ty
 import { useSearchParams } from "next/navigation";
 import type { PresentedPick } from "@/lib/present";
 import { PickDrawer } from "./pick-drawer";
+import { focusQuietly } from "@/lib/input-modality";
 
 type DrawerCategory = {
   id: string;
@@ -221,7 +222,7 @@ export function PickController({
       rect.right <= window.innerWidth + 1;
     // The card's scroll-margin makes scrollIntoView nudge a card that is already on screen.
     if (!inView) card.scrollIntoView({ block: "nearest", inline: "nearest" });
-    card.focus({ preventScroll: true });
+    focusQuietly(card);
   }, [shownId]);
 
   useEffect(() => {

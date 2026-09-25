@@ -9,6 +9,7 @@ import {
   type ShownAlt,
   type ShownProduct,
 } from "@/lib/present";
+import { focusQuietly } from "@/lib/input-modality";
 import { EmptyPlate } from "./empty-plate";
 import { ProductImage } from "./product-image";
 
@@ -50,7 +51,7 @@ function BuyControl({ product }: { product: ShownProduct | ShownAlt }) {
       href={product.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full bg-ink px-4 text-[14px] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full bg-ink px-4 text-[14px] text-white focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
       Buy
       <ExternalIcon />
@@ -143,7 +144,7 @@ function AltRow({ product, categoryName }: { product: ShownAlt; categoryName: st
             href={product.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-flex min-h-11 items-center gap-1.5 self-start text-[13px] text-ink underline decoration-line underline-offset-4 hover:decoration-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+            className="mt-1 inline-flex min-h-11 items-center gap-1.5 self-start text-[13px] text-ink underline decoration-line underline-offset-4 hover:decoration-ink focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
             Buy
             <ExternalIcon />
@@ -159,24 +160,15 @@ function AltRow({ product, categoryName }: { product: ShownAlt; categoryName: st
 
 function EmptyComparison({ tierName, categoryName }: { tierName: string; categoryName: string }) {
   return (
-    <div>
-      <p className="max-w-md text-[14px] leading-5 text-pretty text-muted">
-        The {tierName} pick for {categoryName} is still being chosen.
-      </p>
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {(
-          [
-            ["Our pick", "text-signal"],
-            ["Alternative", "text-muted"],
-          ] as const
-        ).map(([label, tone]) => (
-          <div key={label} className="min-w-0">
-            <p className={`mb-2 text-[12px] leading-4 ${tone}`}>{label}</p>
-            <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
-              <EmptyPlate label="Pick coming" />
-            </div>
-          </div>
-        ))}
+    <div className="mx-auto flex w-full max-w-md flex-col gap-4 lg:mx-0 lg:max-w-none lg:flex-row lg:items-start lg:gap-6">
+      <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl lg:w-[17rem]">
+        <EmptyPlate />
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="text-[12px] leading-4 text-muted">Pick coming</p>
+        <p className="max-w-md text-[14px] leading-5 text-pretty text-muted">
+          The {tierName} pick for {categoryName} is still being chosen.
+        </p>
       </div>
     </div>
   );
@@ -214,7 +206,7 @@ export function PickDrawer({
   });
 
   useLayoutEffect(() => {
-    closeRef.current?.focus({ preventScroll: true });
+    focusQuietly(closeRef.current);
 
     function scrollByKey(key: string) {
       const scroller = scrollerRef.current;
@@ -269,7 +261,7 @@ export function PickDrawer({
       const list = items();
       if (list.length === 0) {
         event.preventDefault();
-        closeRef.current?.focus({ preventScroll: true });
+        focusQuietly(closeRef.current);
         return;
       }
       const first = list[0];
@@ -320,7 +312,7 @@ export function PickDrawer({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-field text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-field text-ink focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -332,7 +324,7 @@ export function PickDrawer({
           tabIndex={canBuy ? -1 : 0}
           role={canBuy ? undefined : "region"}
           aria-label={canBuy ? undefined : "Pick details"}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-signal lg:px-8 lg:pb-8"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-[-2px] focus-visible:outline-signal lg:px-8 lg:pb-8"
         >
           {pick == null ? (
             <EmptyComparison tierName={tierName} categoryName={categoryName} />

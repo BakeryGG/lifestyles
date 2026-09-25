@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
 import type { Tier } from "@/lib/schema";
+import { focusQuietly } from "@/lib/input-modality";
 
 export type SwitcherLifestyle = Pick<Tier, "id" | "name" | "status" | "group">;
 
 const segment =
-  "switcher-segment inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-[12px] leading-none tracking-[-0.01em] whitespace-nowrap transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:px-3 min-[400px]:text-[13px]";
+  "switcher-segment inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-[12px] leading-none tracking-[-0.01em] whitespace-nowrap transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:px-3 min-[400px]:text-[13px]";
 
 /** "?cat=kitchen" while a category chip is active, so switching lifestyles keeps the filter. */
 function useCatQuery(): string {
@@ -28,38 +29,13 @@ function useCatQuery(): string {
   return query;
 }
 
-function SoonCue() {
-  return (
-    <>
-      <span aria-hidden="true" className="text-[10px] leading-none tracking-normal">
-        Soon
-      </span>
-      <span className="sr-only">, coming soon</span>
-    </>
-  );
-}
-
 function Segment({ lifestyle, current }: { lifestyle: SwitcherLifestyle; current: boolean }) {
-  const soon = lifestyle.status !== "live";
   const query = useCatQuery();
-  const className = `${segment} ${current ? "bg-ink text-white" : soon ? "text-muted" : "text-ink"}`;
-  const inner = (
-    <>
-      {lifestyle.name}
-      {soon ? <SoonCue /> : null}
-      {current ? <span className="sr-only">, current page</span> : null}
-    </>
-  );
-  if (soon) {
-    return (
-      <span aria-current={current ? "page" : undefined} className={`${className} cursor-default`}>
-        {inner}
-      </span>
-    );
-  }
+  const className = `${segment} ${current ? "bg-ink text-white" : "text-ink"}`;
   return (
     <Link href={`/${lifestyle.id}${query}`} aria-current={current ? "page" : undefined} className={className}>
-      {inner}
+      {lifestyle.name}
+      {current ? <span className="sr-only">, current page</span> : null}
     </Link>
   );
 }
@@ -77,7 +53,6 @@ function MoreLifestyles({
   const menuRef = useRef<HTMLUListElement>(null);
   const menuId = useId();
   const active = lifestyles.find((lifestyle) => lifestyle.id === currentId) ?? null;
-  const soon = active?.status !== "live";
 
   useEffect(() => {
     if (!open) return;
@@ -104,7 +79,7 @@ function MoreLifestyles({
     if (!open) return;
     const current = menuRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
     const first = menuRef.current?.querySelector<HTMLElement>("[data-menu-item]");
-    (current ?? first)?.focus();
+    focusQuietly(current ?? first);
   }, [open]);
 
   function onMenuKey(event: KeyboardEvent<HTMLUListElement>) {
@@ -121,7 +96,7 @@ function MoreLifestyles({
   }
 
   const itemClass =
-    "flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-left text-[13px] leading-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-signal";
+    "flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-left text-[13px] leading-5 focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-[-2px] focus-visible:outline-signal";
 
   function onBlur(event: FocusEvent<HTMLDivElement>) {
     const next = event.relatedTarget;
@@ -138,12 +113,11 @@ function MoreLifestyles({
         aria-haspopup="menu"
         aria-controls={menuId}
         onClick={() => setOpen((value) => !value)}
-        className={`inline-flex h-11 max-w-[7.25rem] min-w-11 items-center justify-center gap-1 rounded-full px-3 text-[12px] leading-none tracking-[-0.01em] transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:max-w-[9.5rem] min-[400px]:text-[13px] sm:max-w-[14rem] ${
+        className={`inline-flex h-11 max-w-[7.25rem] min-w-11 items-center justify-center gap-1 rounded-full px-3 text-[12px] leading-none tracking-[-0.01em] transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:max-w-[9.5rem] min-[400px]:text-[13px] sm:max-w-[14rem] ${
           active ? "bg-ink text-white" : "bg-field text-ink"
         }`}
       >
         <span className="truncate">{active ? active.name : "More"}</span>
-        {active && soon ? <SoonCue /> : null}
         {active ? <span className="sr-only">, current page</span> : <span className="sr-only"> lifestyles</span>}
         <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" className="shrink-0">
           <path d="M2 4l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
@@ -160,30 +134,12 @@ function MoreLifestyles({
         >
           {lifestyles.map((lifestyle) => {
             const current = lifestyle.id === currentId;
-            const disabled = lifestyle.status !== "live";
             const label = (
               <>
                 <span className="min-w-0 truncate">{lifestyle.name}</span>
-                {disabled ? <SoonCue /> : null}
                 {current ? <span className="sr-only">, current page</span> : null}
               </>
             );
-            if (disabled) {
-              return (
-                <li key={lifestyle.id} role="none">
-                  <span
-                    role="menuitem"
-                    aria-disabled="true"
-                    aria-current={current ? "page" : undefined}
-                    data-menu-item=""
-                    tabIndex={-1}
-                    className={`${itemClass} cursor-default text-muted`}
-                  >
-                    {label}
-                  </span>
-                </li>
-              );
-            }
             return (
               <li key={lifestyle.id} role="none">
                 <Link

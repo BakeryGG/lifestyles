@@ -47,9 +47,6 @@ export default async function TierRoute({
   if (!tier) notFound();
 
   const groups = withImageSources(groupsForTier(catalog, tier.id));
-  const liveTiers = catalog.tiers
-    .filter((item) => item.status === "live" && item.id !== tier.id)
-    .map((item) => ({ id: item.id, name: item.name }));
   const view = {
     tier: { id: tier.id, name: tier.name, description: tier.description, status: tier.status },
     tiers: catalog.tiers.map((item) => ({
@@ -61,7 +58,6 @@ export default async function TierRoute({
     groups,
     views: kitViews(catalog, tier),
     defaultView: defaultViewId(catalog),
-    liveTiers,
   };
 
   const categories = groups

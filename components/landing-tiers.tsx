@@ -29,8 +29,7 @@ function columnClass(count: number, hero: boolean): string {
 }
 
 function CardBody({ card, hero }: { card: LandingTierCard; hero: boolean }) {
-  const live = card.status === "live";
-  const tone = live ? "text-ink" : "text-muted";
+  const tone = "text-ink";
   const Title = hero ? "h2" : "h3";
   return (
     <>
@@ -44,13 +43,9 @@ function CardBody({ card, hero }: { card: LandingTierCard; hero: boolean }) {
       <p className={`${hero ? "mt-6" : "mt-4"} text-[13px] leading-5 text-muted`}>{card.anchorLine}</p>
       <p className={`mt-1 text-[13px] leading-5 ${tone}`}>{card.kitLine}</p>
       <div className={`mt-auto ${hero ? "pt-8" : "pt-6"}`}>
-        {live ? (
-          <span className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-[13px] text-white">
-            See the kit <span aria-hidden="true">→</span>
-          </span>
-        ) : (
-          <p className="inline-flex min-h-11 items-center text-[13px] leading-5 text-muted">Coming soon</p>
-        )}
+        <span className="inline-flex min-h-11 items-center rounded-full bg-ink px-4 text-[13px] text-white">
+          See the kit <span aria-hidden="true">→</span>
+        </span>
       </div>
     </>
   );
@@ -61,24 +56,13 @@ function CardGrid({ cards, hero }: { cards: LandingTierCard[]; hero: boolean }) 
   return (
     <ul className={`grid list-none items-stretch gap-3 ${columnClass(cards.length, hero)}`}>
       {cards.map((card) => {
-        const live = card.status === "live";
-        const surface = hero
-          ? "bg-field"
-          : "bg-paper ring-1 ring-inset ring-line";
-        const className = live
-          ? `group flex h-full flex-col rounded-2xl transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal ${surface} ${hero ? "p-6 hover:bg-[#efefef] sm:p-7" : "p-5 hover:bg-field"}`
-          : `flex h-full cursor-default flex-col rounded-2xl ${surface} ${hero ? "p-6 sm:p-7" : "p-5"}`;
+        const surface = hero ? "bg-field" : "bg-paper ring-1 ring-inset ring-line";
+        const className = `group flex h-full flex-col rounded-2xl transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal ${surface} ${hero ? "p-6 hover:bg-[#efefef] sm:p-7" : "p-5 hover:bg-field"}`;
         return (
           <li key={card.id} className="flex min-w-0">
-            {live ? (
-              <Link href={`/${card.id}`} className={className}>
-                <CardBody card={card} hero={hero} />
-              </Link>
-            ) : (
-              <div className={className}>
-                <CardBody card={card} hero={hero} />
-              </div>
-            )}
+            <Link href={`/${card.id}`} className={className}>
+              <CardBody card={card} hero={hero} />
+            </Link>
           </li>
         );
       })}
