@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TierView } from "@/components/tier-view";
 import { loadCatalog, srcSetFor } from "@/lib/catalog";
-import { groupsForTier, kitPicks, kitSummary, type TierGroupView } from "@/lib/present";
+import { defaultViewId, groupsForTier, kitViews, type TierGroupView } from "@/lib/present";
 
 export function generateStaticParams() {
   return loadCatalog().tiers.map((tier) => ({ tier: tier.id }));
@@ -53,33 +53,29 @@ export default async function TierRoute({
     .filter((item) => item.status === "live" && item.id !== tier.id)
     .map((item) => ({ id: item.id, name: item.name }));
   const view = {
-    tier: {
-      id: tier.id,
-      name: tier.name,
-      description: tier.description,
-      status: tier.status,
-    },
+    tier: { id: tier.id, name: tier.name, description: tier.description, status: tier.status },
     tiers: catalog.tiers.map((item) => ({
       id: item.id,
       name: item.name,
       status: item.status,
-      group: item.group,
+      group: item.group ?? "primary",
     })),
     groups,
-    summary: kitSummary(tier, catalog.categories.length, kitPicks(catalog, tier.id)),
+    views: kitViews(catalog, tier),
+    defaultView: defaultViewId(catalog),
     liveTiers,
   };
 
-  const categories = groups.flatMap((group) =>
-    group.categories.map((category) => ({
-      id: category.id,
-      name: category.name,
+  const categories = groups
+    .flatMap((group) => group.categories.map((product) => ({ group, product })))
+    .map(({ group, product }, index) => ({
+      id: product.id,
+      name: product.name,
       section: group.section,
-      number: category.number,
-      pick: category.pick,
-      inheritedFromName: category.inheritedFromName,
-    })),
-  );
+      number: index + 1,
+      pick: product.pick,
+      inheritedFromName: product.inheritedFromName,
+    }));
   const { TierShell } = await import("@/components/tier-shell");
   return (
     <TierShell live tierName={tier.name} accent={tier.accent} categories={categories}>

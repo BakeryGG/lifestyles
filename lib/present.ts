@@ -126,14 +126,14 @@ function resolvedPicks(catalog: Catalog, tierId: string): CatalogPick[] {
 }
 
 export function landingTierCards(catalog: Catalog): LandingTierCard[] {
-  const anchor = catalog.categories.find((category) => category.id === catalog.landing.anchorCategory);
+  const anchor = catalog.products.find((product) => product.id === catalog.landing.anchorProduct);
   const anchorName = anchor?.name ?? "Pick";
   return catalog.tiers.map((tier) => {
     const resolved = effectivePicks(catalog, tier.id);
     const picks = [...resolved.values()]
       .map((entry) => entry.pick)
       .filter((pick): pick is CatalogPick => pick != null);
-    const anchorPick = resolved.get(catalog.landing.anchorCategory)?.pick ?? null;
+    const anchorPick = resolved.get(catalog.landing.anchorProduct)?.pick ?? null;
     const anchorReal = anchorPick && isRealProduct(anchorPick.main) ? anchorPick.main : null;
     const anchorLine = anchorReal
       ? `Typical ${anchorName.toLowerCase()}: ${formatPrice(anchorReal.price, anchorReal.currency)}`
@@ -147,14 +147,14 @@ export function landingTierCards(catalog: Catalog): LandingTierCard[] {
       group: tier.group,
       brands: tierBrandList(tier),
       anchorLine,
-      kitLine: landingKitLine(catalog.categories.length, picks),
+      kitLine: landingKitLine(catalog.products.length, picks),
     };
   });
 }
 
 /** Primary lifestyles, in file order. Falls back to every lifestyle when none are primary. */
 export function comparisonTiers(catalog: Catalog): Tier[] {
-  const primary = catalog.tiers.filter((tier) => tier.group === "primary");
+  const primary = catalog.tiers.filter((tier) => tier.group !== "secondary");
   return primary.length > 0 ? primary : [...catalog.tiers];
 }
 
@@ -174,15 +174,25 @@ export type CompareRow = {
   cells: CompareCell[];
 };
 
+/** landing.compareProducts, else featured products, else the first few by order. */
+export function compareProductIds(catalog: Catalog): string[] {
+  if (catalog.landing.compareProducts.length > 0) return catalog.landing.compareProducts;
+  const featured = catalog.products.filter((product) => product.categories.includes(FEATURED_ID));
+  return (featured.length > 0 ? featured : catalog.products).slice(0, 6).map((product) => product.id);
+}
+
+export const FEATURED_ID = "featured";
+
 export function comparisonRows(catalog: Catalog): CompareRow[] {
   const columns = comparisonTiers(catalog);
   const resolved = new Map(columns.map((tier) => [tier.id, effectivePicks(catalog, tier.id)]));
-  return catalog.landing.compareCategories.map((categoryId) => {
-    const category = catalog.categories.find((item) => item.id === categoryId);
+  const tagName = new Map(catalog.categories.map((tag) => [tag.id, tag.name]));
+  return compareProductIds(catalog).map((categoryId) => {
+    const product = catalog.products.find((item) => item.id === categoryId);
     return {
       categoryId,
-      categoryName: category?.name ?? categoryId,
-      section: category?.section ?? "",
+      categoryName: product?.name ?? categoryId,
+      section: product ? (tagName.get(product.primaryCategory) ?? "") : "",
       cells: columns.map((tier) => {
         const pick = resolved.get(tier.id)?.get(categoryId)?.pick ?? null;
         if (!pick || !isRealProduct(pick.main)) {
@@ -373,7 +383,7 @@ export function priceHintsFor(catalog: Catalog, tierId: string, categoryId: stri
   const hints: PriceHint[] = [];
   for (const other of catalog.tiers) {
     if (other.id === tierId) continue;
-    const own = catalog.picks.find((pick) => pick.tier === other.id && pick.category === categoryId);
+    const own = catalog.picks.find((pick) => pick.tier === other.id && pick.product === categoryId);
     if (!own || !isRealProduct(own.main)) continue;
     if (currentOwner === other.id || currentEntry?.pick === own) continue;
     hints.push({
@@ -389,8 +399,9 @@ export function priceHintsFor(catalog: Catalog, tierId: string, categoryId: stri
 export type TierCategoryView = {
   id: string;
   name: string;
-  /** 1-based position in catalog category order. */
-  number: number;
+  /** Tag ids this product carries (primary first). */
+  tags: string[];
+  primaryName: string;
   pick: PresentedPick | null;
   /** Set when the shown pick is inherited. The drawer may say "Same as {name}". */
   inheritedFromName: string | null;
@@ -398,46 +409,91 @@ export type TierCategoryView = {
 };
 
 export type TierGroupView = {
+  /** Primary category (tag) id and name. */
+  id: string;
   section: string;
-  /** Index of this label in `catalog.sections`. Heading ids use it, not a slug. */
   sectionIndex: number;
   categories: TierCategoryView[];
 };
 
+/** Every product, grouped by primaryCategory in tag order, products by order. */
 export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[] {
   const resolved = effectivePicks(catalog, tierId);
   const nameById = new Map(catalog.tiers.map((tier) => [tier.id, tier.name]));
-  const numberById = new Map(catalog.categories.map((category, index) => [category.id, index + 1]));
+  const tags = [...catalog.categories].sort((a, b) => a.order - b.order);
+  const products = [...catalog.products].sort((a, b) => a.order - b.order);
 
-  return catalog.sections
-    .map((section, sectionIndex) => ({
-      section,
+  return tags
+    .map((tag, sectionIndex) => ({
+      id: tag.id,
+      section: tag.name,
       sectionIndex,
-      categories: catalog.categories
-        .filter((category) => category.section === section)
-        .map((category) => {
-          const number = numberById.get(category.id) ?? 0;
-          const hints = priceHintsFor(catalog, tierId, category.id);
-          const entry = resolved.get(category.id);
+      categories: products
+        .filter((product) => product.primaryCategory === tag.id)
+        .map((product): TierCategoryView => {
+          const hints = priceHintsFor(catalog, tierId, product.id);
+          const entry = resolved.get(product.id);
           const pick = entry?.pick;
-          const inheritedFromName = entry?.inheritedFrom ? (nameById.get(entry.inheritedFrom) ?? null) : null;
+          const base = { id: product.id, name: product.name, tags: product.categories, primaryName: tag.name, hints };
           if (!pick || !isRealProduct(pick.main)) {
-            return { id: category.id, name: category.name, number, pick: null, inheritedFromName: null, hints };
+            return { ...base, pick: null, inheritedFromName: null };
           }
           return {
-            id: category.id,
-            name: category.name,
-            number,
-            hints,
-            inheritedFromName,
-            pick: {
-              main: pick.main,
-              alt: isRealProduct(pick.alt) ? pick.alt : null,
-            },
+            ...base,
+            inheritedFromName: entry?.inheritedFrom ? (nameById.get(entry.inheritedFrom) ?? null) : null,
+            pick: { main: pick.main, alt: isRealProduct(pick.alt) ? pick.alt : null },
           };
         }),
     }))
     .filter((group) => group.categories.length > 0);
+}
+
+export type KitView = { id: string; name: string; count: number; picked: number; summary: string };
+
+function viewSummary(lead: string, noun: string, count: number, picks: CatalogPick[]): string {
+  const priced = picks.filter((pick) => isRealProduct(pick.main));
+  const things = `${count} ${noun}${count === 1 ? "" : "s"}`;
+  if (priced.length === 0) return `${lead}: ${things}, prices coming`;
+  const currencies = new Set(priced.map((pick) => pick.main.currency));
+  if (currencies.size !== 1) return `${lead}: ${things}, prices coming`;
+  const total = priced.reduce((sum, pick) => sum + (Object.is(pick.main.price, -0) ? 0 : pick.main.price), 0);
+  const money = formatPrice(total, priced[0]!.main.currency);
+  if (priced.length >= count) return `${lead}: ${things}, about ${money}`;
+  return `${lead}: ${priced.length} of ${things} picked, about ${money}`;
+}
+
+/** One summary per chip: "featured", "all", then every tag with products. */
+export function kitViews(catalog: Catalog, tier: Pick<Tier, "id" | "name">): KitView[] {
+  const resolved = effectivePicks(catalog, tier.id);
+  const picksFor = (ids: string[]) =>
+    ids.map((id) => resolved.get(id)?.pick).filter((pick): pick is CatalogPick => pick != null && isRealProduct(pick.main));
+  const lead = `Your ${tier.name} kit`;
+  const views: KitView[] = [];
+  const allIds = catalog.products.map((product) => product.id);
+  const tags = [...catalog.categories].sort((a, b) => a.order - b.order);
+  for (const tag of tags) {
+    const ids = catalog.products.filter((product) => product.categories.includes(tag.id)).map((product) => product.id);
+    if (ids.length === 0) continue;
+    const picks = picksFor(ids);
+    const featured = tag.id === FEATURED_ID;
+    views.push({
+      id: tag.id,
+      name: tag.name,
+      count: ids.length,
+      picked: picks.length,
+      summary: viewSummary(featured ? lead : `${tag.name}`, featured ? "featured pick" : "pick", ids.length, picks),
+    });
+  }
+  const allPicks = picksFor(allIds);
+  const all: KitView = { id: "all", name: "All", count: allIds.length, picked: allPicks.length, summary: viewSummary(lead, "pick", allIds.length, allPicks) };
+  const featuredIndex = views.findIndex((view) => view.id === FEATURED_ID);
+  views.splice(featuredIndex >= 0 ? featuredIndex + 1 : 0, 0, all);
+  return views;
+}
+
+/** Featured when any product carries the tag, else All. */
+export function defaultViewId(catalog: Catalog): string {
+  return catalog.products.some((product) => product.categories.includes(FEATURED_ID)) ? FEATURED_ID : "all";
 }
 
 export function kitPicks(catalog: Catalog, tierId: string): CatalogPick[] {

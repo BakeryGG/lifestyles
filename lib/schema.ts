@@ -1,13 +1,27 @@
+/**
+ * catalog.json v2 schema (tags + product types). Mirrors lifestyles-sheets/lib/schema-v2.ts exactly
+ * (CONTRACT.md), so the sheet converter output drops straight in.
+ */
 import { z } from "zod";
-import { isBuyableUrl, isHttpUrl, isPlaceholderBrand, isUnfinishedCopy } from "./copy";
-import { sectionHeadingId } from "./section-id";
 
-const slug = z
-  .string()
-  .regex(
-    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-    "Expected a lowercase slug (letters, numbers, and hyphens)",
-  );
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export type CatalogIssue = { path: PropertyKey[]; message: string };
+
+export const FEATURED_PRIMARY_MESSAGE = "Featured can't be a primary category";
+
+const slug = z.string().trim().superRefine((value, ctx) => {
+  if (value.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Required" });
+    return;
+  }
+  if (!SLUG_RE.test(value)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Expected a lowercase slug (letters, numbers, and hyphens)",
+    });
+  }
+});
 
 const text = z.string().trim().min(1, "Required");
 
@@ -15,22 +29,9 @@ const singleLine = text
   .max(90, "Expected at most 90 characters")
   .refine((value) => !/[\r\n]/.test(value), "Expected a single line");
 
-const currency = z
-  .string()
-  .regex(/^[A-Z]{3}$/, "Expected a 3-letter ISO currency code")
-  .refine((code) => {
-    try {
-      return Intl.supportedValuesOf("currency").includes(code);
-    } catch {
-      return false;
-    }
-  }, "Expected a valid ISO currency code");
-
-const imagePath = z
-  .string()
-  .min(1, "Required")
-  .regex(/^\/images\/[A-Za-z0-9._/-]+$/, "Expected an image path starting with /images/")
-  .refine((value) => !value.includes(".."), "Expected an image path without '..'");
+const whoForText = text
+  .max(140, "Expected at most 140 characters")
+  .refine((value) => !/[\r\n]/.test(value), "Expected a single line");
 
 function priceIssue(value: number): string | null {
   if (!Number.isFinite(value)) return "Expected a finite number";
@@ -48,7 +49,72 @@ const price = z.number().superRefine((value, ctx) => {
   ctx.addIssue({ code: z.ZodIssueCode.custom, message });
 });
 
+const currency = z.string().trim().superRefine((value, ctx) => {
+  if (value.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Required" });
+    return;
+  }
+  if (!/^[A-Z]{3}$/.test(value)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Expected a 3-letter currency code" });
+  }
+});
+
+const imagePath = z.string().trim().superRefine((value, ctx) => {
+  if (value.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Required" });
+    return;
+  }
+  if (!/^\/images\/[A-Za-z0-9._/-]+$/.test(value)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Expected an image path starting with /images/",
+    });
+  }
+});
+
+const order = z.number().int("Expected a whole number");
+
+const tierSchema = z
+  .object({
+    id: slug,
+    name: text,
+    description: text,
+    whoFor: whoForText.optional(),
+    exampleBrands: z.array(text),
+    brandChips: z.array(text).optional(),
+    status: z.enum(["live", "coming_soon"], {
+      errorMap: () => ({ message: "Expected live or coming_soon" }),
+    }),
+    accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
+    group: z
+      .enum(["primary", "secondary"], {
+        errorMap: () => ({ message: "Expected primary or secondary" }),
+      })
+      .optional(),
+    basedOn: slug.optional(),
+  })
+  .strict();
+
+const categorySchema = z
+  .object({
+    id: slug,
+    name: text,
+    order,
+    description: text.optional(),
+  })
+  .strict();
+
 const productSchema = z
+  .object({
+    id: slug,
+    name: text,
+    primaryCategory: slug,
+    categories: z.array(slug).min(1, "Expected at least one category"),
+    order,
+  })
+  .strict();
+
+const itemSchema = z
   .object({
     brand: text,
     name: text,
@@ -60,188 +126,255 @@ const productSchema = z
   })
   .strict();
 
-const altSchema = productSchema
+const altSchema = itemSchema
   .extend({
     when: singleLine,
   })
   .strict();
 
-const whoFor = z
-  .string()
-  .trim()
-  .min(1, "Required")
-  .max(140, "Expected at most 140 characters")
-  .refine((value) => !/[\r\n]/.test(value), "Expected a single line");
-
-const tierSchema = z
+const pickSchema = z
   .object({
-    id: slug,
-    name: text,
-    description: text,
-    whoFor: whoFor.optional(),
-    exampleBrands: z.array(text),
-    brandChips: z.array(text).optional(),
-    status: z.enum(["live", "coming_soon"]),
-    /** Another tier id this lifestyle inherits empty categories from. Optional. */
-    basedOn: slug.optional(),
-    /** Landing and switcher placement. Omitted means primary. */
-    group: z.enum(["primary", "secondary"]).default("primary"),
-    accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
+    tier: slug,
+    product: slug,
+    main: itemSchema,
+    alt: altSchema,
   })
   .strict();
 
 const landingSchema = z
   .object({
-    anchorCategory: slug,
-    compareCategories: z.array(slug).min(1, "Expected at least one category"),
-  })
-  .strict();
-
-const categorySchema = z
-  .object({
-    id: slug,
-    name: text,
-    section: text,
-  })
-  .strict();
-
-const pickSchema = z
-  .object({
-    tier: text,
-    category: text,
-    main: productSchema,
-    alt: altSchema,
+    anchorProduct: slug,
+    compareProducts: z.array(slug).min(1, "Expected at least one product"),
   })
   .strict();
 
 export const catalogSchema = z
   .object({
     tiers: z.array(tierSchema).min(1, "Expected at least one tier"),
-    sections: z.array(text).min(1, "Expected at least one section"),
-    categories: z.array(categorySchema),
+    categories: z.array(categorySchema).min(1, "Expected at least one category"),
+    products: z.array(productSchema),
     landing: landingSchema,
     picks: z.array(pickSchema),
   })
   .strict();
 
-export type CatalogIssue = { path: PropertyKey[]; message: string };
+export type Catalog = z.infer<typeof catalogSchema>;
+export type Tier = Catalog["tiers"][number];
+export type Category = Catalog["categories"][number];
+export type ProductType = Catalog["products"][number];
+export type CatalogPick = Catalog["picks"][number];
+export type Item = CatalogPick["main"];
+export type AltItem = CatalogPick["alt"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function trimmedString(value: unknown): string | null {
+function trimmed(value: unknown): string | null {
   if (typeof value !== "string") return null;
-  return value.trim();
+  const textValue = value.trim();
+  return textValue.length > 0 ? textValue : null;
 }
 
+export function unknownCategoryMessage(id: string, known: readonly string[]): string {
+  return `Unknown category ${JSON.stringify(id)} (known: ${known.join(", ")})`;
+}
+
+export function unknownProductMessage(id: string): string {
+  return `Unknown product ${JSON.stringify(id)}`;
+}
+
+export function unknownLifestyleMessage(id: string): string {
+  return `Unknown lifestyle ${JSON.stringify(id)}`;
+}
+
+/**
+ * basedOn must name another lifestyle. Self-links and cycles are reported on the
+ * earliest tier in the cycle (the one that appears first in `tiers`).
+ */
+export function basedOnIssues(data: unknown): CatalogIssue[] {
+  if (!isRecord(data) || !Array.isArray(data.tiers)) return [];
+  const tiers = data.tiers;
+  const issues: CatalogIssue[] = [];
+  const idAt = new Map<string, number>();
+
+  tiers.forEach((tier, index) => {
+    if (!isRecord(tier) || typeof tier.id !== "string" || tier.id.length === 0) return;
+    if (!idAt.has(tier.id)) idAt.set(tier.id, index);
+  });
+
+  const basedOnAt = (index: number): string | null => {
+    const tier = tiers[index];
+    if (!isRecord(tier)) return null;
+    return trimmed(tier.basedOn);
+  };
+
+  tiers.forEach((tier, index) => {
+    if (!isRecord(tier)) return;
+    const basedOn = basedOnAt(index);
+    if (!basedOn) return;
+    const id = typeof tier.id === "string" ? tier.id : "";
+    if (id && basedOn === id) {
+      issues.push({
+        path: ["tiers", index, "basedOn"],
+        message: "Lifestyle cannot be based on itself",
+      });
+      return;
+    }
+    if (!idAt.has(basedOn)) {
+      issues.push({
+        path: ["tiers", index, "basedOn"],
+        message: unknownLifestyleMessage(basedOn),
+      });
+    }
+  });
+
+  const reported = new Set<string>();
+  for (let start = 0; start < tiers.length; start += 1) {
+    const startTier = tiers[start];
+    if (!isRecord(startTier) || typeof startTier.id !== "string" || startTier.id.length === 0) continue;
+    const firstHop = basedOnAt(start);
+    if (!firstHop || firstHop === startTier.id || !idAt.has(firstHop)) continue;
+
+    const pathIds = [startTier.id];
+    const seen = new Map<string, number>([[startTier.id, 0]]);
+    let cursor: string | null = firstHop;
+    let guard = 0;
+    while (cursor && guard < tiers.length + 1) {
+      guard += 1;
+      if (seen.has(cursor)) {
+        const cycle = pathIds.slice(seen.get(cursor)!);
+        const canonical = [...cycle].sort().join("\0");
+        if (!reported.has(canonical)) {
+          reported.add(canonical);
+          let firstId = cycle[0]!;
+          let firstIndex = idAt.get(firstId)!;
+          for (const id of cycle) {
+            const index = idAt.get(id)!;
+            if (index < firstIndex) {
+              firstIndex = index;
+              firstId = id;
+            }
+          }
+          const rotation = cycle.indexOf(firstId);
+          const rotated = cycle.slice(rotation).concat(cycle.slice(0, rotation));
+          issues.push({
+            path: ["tiers", firstIndex, "basedOn"],
+            message: `basedOn cycle: ${rotated.join(" -> ")} -> ${firstId}`,
+          });
+        }
+        break;
+      }
+      const index = idAt.get(cursor);
+      if (index === undefined) break;
+      const next = basedOnAt(index);
+      pathIds.push(cursor);
+      seen.set(cursor, pathIds.length - 1);
+      if (!next || next === cursor) break;
+      cursor = next;
+    }
+  }
+
+  return issues;
+}
+
+function duplicateId(
+  issues: CatalogIssue[],
+  items: unknown[],
+  key: "tiers" | "categories" | "products",
+  label: string,
+): Map<string, number> {
+  const firstIndex = new Map<string, number>();
+  items.forEach((item, index) => {
+    if (!isRecord(item) || typeof item.id !== "string" || item.id.length === 0) return;
+    const previous = firstIndex.get(item.id);
+    if (previous !== undefined) {
+      issues.push({
+        path: [key, index, "id"],
+        message: `Duplicate ${label} id ${JSON.stringify(item.id)} (also at ${key}[${previous}].id)`,
+      });
+    } else {
+      firstIndex.set(item.id, index);
+    }
+  });
+  return firstIndex;
+}
+
+/** Cross-references: ids, tags, featured, landing, picks, basedOn. */
 export function referenceIssues(data: unknown): CatalogIssue[] {
   if (!isRecord(data)) return [];
   const issues: CatalogIssue[] = [];
   const tiers = Array.isArray(data.tiers) ? data.tiers : [];
-  const sections = Array.isArray(data.sections) ? data.sections : [];
   const categories = Array.isArray(data.categories) ? data.categories : [];
+  const products = Array.isArray(data.products) ? data.products : [];
   const picks = Array.isArray(data.picks) ? data.picks : [];
 
-  const tierIds = new Map<string, number>();
-  tiers.forEach((tier, index) => {
-    if (!isRecord(tier) || typeof tier.id !== "string" || tier.id.length === 0) return;
-    const id = tier.id;
-    const previous = tierIds.get(id);
-    if (previous !== undefined) {
-      issues.push({
-        path: ["tiers", index, "id"],
-        message: `Duplicate tier id ${JSON.stringify(id)} (also at tiers[${previous}].id)`,
-      });
-    } else {
-      tierIds.set(id, index);
-    }
-  });
+  const tierIds = duplicateId(issues, tiers, "tiers", "lifestyle");
+  const categoryFirst = duplicateId(issues, categories, "categories", "category");
+  const productIds = duplicateId(issues, products, "products", "product");
+  const knownCategories = [...categoryFirst.keys()];
+  const categoryIds = new Set(knownCategories);
 
-  issues.push(...basedOnIssues(tiers, tierIds));
-
-  const sectionExact = new Map<string, number>();
-  const sectionFold = new Map<string, number>();
-  const headingIds = new Map<string, number>();
-  sections.forEach((section, index) => {
-    if (typeof section !== "string") return;
-    const name = section.trim();
-    if (!name) return;
-    const fold = name.toLowerCase();
-    const exactPrevious = sectionExact.get(name);
-    const foldPrevious = sectionFold.get(fold);
-    const previous = exactPrevious ?? foldPrevious;
-    if (previous !== undefined) {
+  products.forEach((product, index) => {
+    if (!isRecord(product)) return;
+    const primary = typeof product.primaryCategory === "string" ? product.primaryCategory : "";
+    if (primary === "featured") {
       issues.push({
-        path: ["sections", index],
-        message: `Duplicate section ${JSON.stringify(name)} (also at sections[${previous}])`,
+        path: ["products", index, "primaryCategory"],
+        message: FEATURED_PRIMARY_MESSAGE,
       });
-    } else {
-      sectionExact.set(name, index);
-      sectionFold.set(fold, index);
-    }
-    const headingId = sectionHeadingId(index);
-    const idPrevious = headingIds.get(headingId);
-    if (idPrevious !== undefined) {
+    } else if (primary && !categoryIds.has(primary)) {
       issues.push({
-        path: ["sections", index],
-        message: `Duplicate section heading id ${JSON.stringify(headingId)} (also at sections[${idPrevious}])`,
+        path: ["products", index, "primaryCategory"],
+        message: unknownCategoryMessage(primary, knownCategories),
       });
-    } else {
-      headingIds.set(headingId, index);
     }
-  });
-
-  const categoryIds = new Map<string, number>();
-  categories.forEach((category, index) => {
-    if (!isRecord(category)) return;
-    if (typeof category.id === "string" && category.id.length > 0) {
-      const id = category.id;
-      const previous = categoryIds.get(id);
-      if (previous !== undefined) {
+    if (!Array.isArray(product.categories)) return;
+    const seen = new Set<string>();
+    let containsPrimary = false;
+    product.categories.forEach((value, categoryIndex) => {
+      if (typeof value !== "string" || value.length === 0) return;
+      if (value === primary) containsPrimary = true;
+      if (seen.has(value)) {
         issues.push({
-          path: ["categories", index, "id"],
-          message: `Duplicate category id ${JSON.stringify(id)} (also at categories[${previous}].id)`,
+          path: ["products", index, "categories", categoryIndex],
+          message: `Duplicate category ${JSON.stringify(value)}`,
         });
       } else {
-        categoryIds.set(id, index);
+        seen.add(value);
       }
-    }
-    if (typeof category.section === "string" && category.section.trim() && !sectionExact.has(category.section.trim())) {
+      if (!categoryIds.has(value)) {
+        issues.push({
+          path: ["products", index, "categories", categoryIndex],
+          message: unknownCategoryMessage(value, knownCategories),
+        });
+      }
+    });
+    if (primary && !containsPrimary) {
       issues.push({
-        path: ["categories", index, "section"],
-        message: `Unknown section ${JSON.stringify(category.section.trim())}`,
+        path: ["products", index, "categories"],
+        message: "categories must include primaryCategory",
       });
     }
   });
 
   const landing = data.landing;
   if (isRecord(landing)) {
-    const anchor = typeof landing.anchorCategory === "string" ? landing.anchorCategory : null;
-    if (anchor && !categoryIds.has(anchor)) {
+    const anchor = typeof landing.anchorProduct === "string" ? landing.anchorProduct : "";
+    if (anchor && !productIds.has(anchor)) {
       issues.push({
-        path: ["landing", "anchorCategory"],
-        message: `Unknown category ${JSON.stringify(anchor)}`,
+        path: ["landing", "anchorProduct"],
+        message: unknownProductMessage(anchor),
       });
     }
-    if (Array.isArray(landing.compareCategories)) {
-      const seen = new Map<string, number>();
-      landing.compareCategories.forEach((value, index) => {
+    if (Array.isArray(landing.compareProducts)) {
+      landing.compareProducts.forEach((value, index) => {
         if (typeof value !== "string" || value.length === 0) return;
-        if (!categoryIds.has(value)) {
+        if (!productIds.has(value)) {
           issues.push({
-            path: ["landing", "compareCategories", index],
-            message: `Unknown category ${JSON.stringify(value)}`,
+            path: ["landing", "compareProducts", index],
+            message: unknownProductMessage(value),
           });
-        }
-        const previous = seen.get(value);
-        if (previous !== undefined) {
-          issues.push({
-            path: ["landing", "compareCategories", index],
-            message: `Duplicate category ${JSON.stringify(value)} (also at landing.compareCategories[${previous}])`,
-          });
-        } else {
-          seen.set(value, index);
         }
       });
     }
@@ -250,27 +383,27 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
   const pickKeys = new Map<string, number>();
   picks.forEach((pick, index) => {
     if (!isRecord(pick)) return;
-    const tier = typeof pick.tier === "string" ? pick.tier.trim() : null;
-    const category = typeof pick.category === "string" ? pick.category.trim() : null;
+    const tier = typeof pick.tier === "string" ? pick.tier : "";
+    const product = typeof pick.product === "string" ? pick.product : "";
     if (tier && !tierIds.has(tier)) {
       issues.push({
         path: ["picks", index, "tier"],
-        message: `Unknown tier ${JSON.stringify(tier)}`,
+        message: unknownLifestyleMessage(tier),
       });
     }
-    if (category && !categoryIds.has(category)) {
+    if (product && !productIds.has(product)) {
       issues.push({
-        path: ["picks", index, "category"],
-        message: `Unknown category ${JSON.stringify(category)}`,
+        path: ["picks", index, "product"],
+        message: unknownProductMessage(product),
       });
     }
-    if (tier && category) {
-      const key = `${tier}::${category}`;
+    if (tier && product) {
+      const key = `${tier}\0${product}`;
       const previous = pickKeys.get(key);
       if (previous !== undefined) {
         issues.push({
           path: ["picks", index],
-          message: `Duplicate pick for tier ${JSON.stringify(tier)} and category ${JSON.stringify(category)} (also at picks[${previous}])`,
+          message: `Duplicate pick for lifestyle ${JSON.stringify(tier)} and product ${JSON.stringify(product)} (also at picks[${previous}])`,
         });
       } else {
         pickKeys.set(key, index);
@@ -278,157 +411,9 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
     }
   });
 
+  issues.push(...basedOnIssues(data));
   return issues;
 }
-
-/**
- * `basedOn` must name another tier, never itself, and must not cycle.
- * A cycle is reported from each lifestyle that participates, with the walk
- * that returns to a repeated id: `cycle organic → mid → organic`.
- */
-function basedOnIssues(tiers: unknown[], tierIds: Map<string, number>): CatalogIssue[] {
-  const issues: CatalogIssue[] = [];
-  const basedOnOf = new Map<string, string>();
-
-  tiers.forEach((tier, index) => {
-    if (!isRecord(tier) || typeof tier.id !== "string" || tier.id.length === 0) return;
-    if (!Object.prototype.hasOwnProperty.call(tier, "basedOn")) return;
-    const basedOn = tier.basedOn;
-    if (typeof basedOn !== "string" || basedOn.length === 0) return;
-    if (!tierIds.has(basedOn)) {
-      issues.push({
-        path: ["tiers", index, "basedOn"],
-        message: `Unknown tier ${JSON.stringify(basedOn)}`,
-      });
-      return;
-    }
-    if (basedOn === tier.id) {
-      issues.push({
-        path: ["tiers", index, "basedOn"],
-        message: "cannot reference itself",
-      });
-      return;
-    }
-    basedOnOf.set(tier.id, basedOn);
-  });
-
-  for (const start of basedOnOf.keys()) {
-    const path = [start];
-    const seen = new Set<string>([start]);
-    let current = basedOnOf.get(start);
-    while (current) {
-      path.push(current);
-      if (seen.has(current)) {
-        const cycleStart = path.indexOf(current);
-        const cycle = path.slice(cycleStart);
-        const index = tierIds.get(start);
-        if (index !== undefined) {
-          issues.push({
-            path: ["tiers", index, "basedOn"],
-            message: `cycle ${cycle.join(" → ")}`,
-          });
-        }
-        break;
-      }
-      seen.add(current);
-      current = basedOnOf.get(current);
-    }
-  }
-
-  return issues;
-}
-
-function productContentIssues(
-  product: unknown,
-  path: PropertyKey[],
-  issues: CatalogIssue[],
-  fields: ("name" | "why" | "when")[],
-): { brand: string | null; currency: string | null; real: boolean } {
-  if (!isRecord(product)) return { brand: null, currency: null, real: false };
-  const brand = trimmedString(product.brand);
-  const real = brand != null && !isPlaceholderBrand(brand);
-  if (real) {
-    for (const field of fields) {
-      const value = trimmedString(product[field]);
-      if (value != null && isUnfinishedCopy(value)) {
-        issues.push({
-          path: [...path, field],
-          message: "is still TODO but brand is set",
-        });
-      }
-    }
-  }
-  const url = trimmedString(product.url);
-  if (url && !isHttpUrl(url)) {
-    issues.push({
-      path: [...path, "url"],
-      message: "Expected an http(s) URL",
-    });
-  } else if (real && url && !isBuyableUrl(url)) {
-    issues.push({
-      path: [...path, "url"],
-      message: "Expected a retailer http(s) URL",
-    });
-  }
-  const currencyCode = trimmedString(product.currency);
-  return { brand, currency: currencyCode, real };
-}
-
-/** Cross-field checks that must surface beside type errors. */
-export function contentIssues(data: unknown): CatalogIssue[] {
-  if (!isRecord(data) || !Array.isArray(data.picks)) return [];
-  const issues: CatalogIssue[] = [];
-  const byTier = new Map<string, Set<string>>();
-
-  data.picks.forEach((pick, index) => {
-    if (!isRecord(pick)) return;
-    const main = productContentIssues(pick.main, ["picks", index, "main"], issues, ["name", "why"]);
-    const alt = productContentIssues(pick.alt, ["picks", index, "alt"], issues, ["name", "why", "when"]);
-    if (alt.real && !main.real) {
-      issues.push({
-        path: ["picks", index, "alt", "brand"],
-        message: "alternative is set while the main brand is still TODO",
-      });
-    }
-    if (!main.real || !main.currency) return;
-    const tier = trimmedString(pick.tier);
-    if (!tier) return;
-    const codes = byTier.get(tier) ?? new Set<string>();
-    codes.add(main.currency);
-    byTier.set(tier, codes);
-  });
-
-  for (const [tier, codes] of byTier) {
-    if (codes.size < 2) continue;
-    issues.push({
-      path: ["picks"],
-      message: `Tier ${JSON.stringify(tier)} uses more than one currency (${[...codes].sort((a, b) => a.localeCompare(b)).join(", ")})`,
-    });
-  }
-
-  return issues;
-}
-
-export function collectCatalogIssues(data: unknown, extras: CatalogIssue[] = []): CatalogIssue[] {
-  const result = catalogSchema.safeParse(data);
-  const issues: CatalogIssue[] = [];
-  if (!result.success) {
-    for (const issue of result.error.issues) {
-      issues.push({ path: issue.path, message: issue.message });
-    }
-  }
-  issues.push(...referenceIssues(data));
-  issues.push(...contentIssues(data));
-  issues.push(...extras);
-  return issues;
-}
-
-export type Catalog = z.infer<typeof catalogSchema>;
-export type Tier = Catalog["tiers"][number];
-export type Category = Catalog["categories"][number];
-export type CatalogPick = Catalog["picks"][number];
-export type Product = CatalogPick["main"];
-export type AltProduct = CatalogPick["alt"];
 
 export function formatIssuePath(path: PropertyKey[]): string {
   if (path.length === 0) return "(root)";
@@ -449,14 +434,37 @@ export function formatCatalogError(issues: CatalogIssue[]): string {
   return `catalog.json is invalid:\n${lines.join("\n")}`;
 }
 
-export function parseCatalog(data: unknown, extras: CatalogIssue[] = []): Catalog {
-  const issues = collectCatalogIssues(data, extras);
-  if (issues.length > 0) {
-    throw new Error(formatCatalogError(issues));
-  }
+function dedupeIssues(issues: CatalogIssue[]): CatalogIssue[] {
+  const seen = new Set<string>();
+  return issues.filter((issue) => {
+    const key = `${JSON.stringify(issue.path)}\0${issue.message}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function collectCatalogIssues(data: unknown, extras: CatalogIssue[] = []): CatalogIssue[] {
+  const issues: CatalogIssue[] = [];
   const result = catalogSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(formatCatalogError(collectCatalogIssues(data, extras)));
+    for (const issue of result.error.issues) {
+      issues.push({ path: issue.path, message: issue.message });
+    }
   }
+  issues.push(...referenceIssues(data));
+  issues.push(...extras);
+  return dedupeIssues(issues);
+}
+
+export function parseCatalog(data: unknown, extras: CatalogIssue[] = []): Catalog {
+  const issues = collectCatalogIssues(data, extras);
+  if (issues.length > 0) throw new Error(formatCatalogError(issues));
+  const result = catalogSchema.safeParse(data);
+  if (!result.success) throw new Error(formatCatalogError(collectCatalogIssues(data, extras)));
   return result.data;
 }
+
+/** Site aliases. */
+export type Product = Item;
+export type AltProduct = AltItem;

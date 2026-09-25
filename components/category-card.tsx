@@ -2,9 +2,9 @@ import { displayText, formatPrice, type PresentedPick, type PriceHint } from "@/
 import { EmptyPlate } from "./empty-plate";
 import { ProductImage } from "./product-image";
 
-/** Slot width: 5 / 4 / 3 / 2 columns inside the tier frame. */
+/** Slot width: 6 / 4 / 3 / 2 columns inside the tier frame. */
 const CARD_SIZES =
-  "(min-width: 1280px) calc((min(100vw, 1440px) - 96px) / 5), (min-width: 1024px) calc((min(100vw, 1440px) - 88px) / 4), (min-width: 768px) calc((100vw - 64px) / 3), calc((100vw - 40px) / 2)";
+  "(min-width: 1280px) calc((min(100vw, 1440px) - 104px) / 6), (min-width: 1024px) calc((min(100vw, 1440px) - 88px) / 4), (min-width: 768px) calc((100vw - 64px) / 3), calc((100vw - 40px) / 2)";
 
 function ArrowUpRight() {
   return (
@@ -41,6 +41,27 @@ export function CategoryCard({
   hints: PriceHint[];
   priority: "high" | "eager" | "lazy";
 }) {
+  if (!pick) {
+    return (
+      <button
+        type="button"
+        id={`card-${id}`}
+        data-pick={id}
+        aria-haspopup="dialog"
+        className="group flex h-full min-h-[5.5rem] w-full min-w-0 cursor-pointer flex-col justify-between gap-3 rounded-2xl border border-line/70 px-3.5 py-3 text-left transition-colors duration-[380ms] ease-catalog hover:border-ink/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
+        <span className="text-[13px] leading-5 text-ink">{name}</span>
+        <span className="flex items-center justify-between gap-2 text-[12px] leading-4 text-muted">
+          <span>
+            <span className="sr-only">{section}, </span>Pick coming
+          </span>
+          <span aria-hidden="true" className="opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <ArrowUpRight />
+          </span>
+        </span>
+      </button>
+    );
+  }
   const brand = pick ? displayText(pick.main.brand) : null;
   const productName = pick ? displayText(pick.main.name) : null;
   const price = pick ? formatPrice(pick.main.price, pick.main.currency) : null;

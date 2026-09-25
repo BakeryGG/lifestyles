@@ -5,305 +5,2607 @@
       "name": "Budget",
       "description": "Smart, cheap, and good enough.",
       "whoFor": "For people who want good-enough and cheap",
-      "exampleBrands": ["H&M", "Old Navy", "Target"],
-      "brandChips": ["H&M", "Old Navy", "Target"],
+      "exampleBrands": [
+        "H&M",
+        "Old Navy",
+        "Target"
+      ],
+      "brandChips": [
+        "H&M",
+        "Old Navy",
+        "Target"
+      ],
       "status": "coming_soon",
-      "group": "primary",
-      "accent": "#3B82F6"
+      "accent": "#3B82F6",
+      "group": "primary"
     },
     {
       "id": "mid",
       "name": "Mid",
       "description": "Pay a bit more where it matters.",
       "whoFor": "For people who spend a little more where it shows",
-      "exampleBrands": ["TODO", "TODO", "TODO"],
+      "exampleBrands": [
+        "TODO",
+        "TODO",
+        "TODO"
+      ],
       "status": "live",
-      "group": "primary",
-      "accent": "#10B981"
+      "accent": "#10B981",
+      "group": "primary"
     },
     {
       "id": "premium",
       "name": "Premium",
       "description": "The best version of everything.",
       "whoFor": "For people who want the best version of the everyday",
-      "exampleBrands": ["Eight Sleep", "Vuori", "Uniqlo"],
-      "brandChips": ["Eight Sleep", "Vuori", "Uniqlo"],
+      "exampleBrands": [
+        "Eight Sleep",
+        "Vuori",
+        "Uniqlo"
+      ],
+      "brandChips": [
+        "Eight Sleep",
+        "Vuori",
+        "Uniqlo"
+      ],
       "status": "coming_soon",
-      "group": "primary",
-      "accent": "#111827"
+      "accent": "#111827",
+      "group": "primary"
     },
     {
       "id": "organic",
       "name": "Organic",
       "description": "Organic, low-chemical picks for everything you use.",
-      "whoFor": "For people who want organic, low-chemical everyday things",
-      "exampleBrands": ["TODO", "TODO", "TODO"],
-      "brandChips": ["TODO", "TODO", "TODO"],
+      "exampleBrands": [
+        "TODO"
+      ],
       "status": "coming_soon",
+      "accent": "#65A30D",
       "group": "secondary",
-      "basedOn": "mid",
-      "accent": "#2F6B4F"
+      "basedOn": "mid"
     },
     {
       "id": "money-no-object",
       "name": "Money is no object",
-      "description": "The absolute best, whatever it costs.",
-      "whoFor": "For people who want the best and will pay for it",
-      "exampleBrands": ["TODO", "TODO", "TODO"],
-      "brandChips": ["TODO", "TODO", "TODO"],
+      "description": "The top option in every category, regardless of price.",
+      "exampleBrands": [
+        "TODO"
+      ],
       "status": "coming_soon",
+      "accent": "#A16207",
       "group": "secondary",
-      "basedOn": "premium",
-      "accent": "#1A1A1A"
+      "basedOn": "premium"
     }
   ],
-  "sections": ["Wear", "Home", "Tech", "Everyday"],
   "categories": [
-    { "id": "tee", "name": "Everyday tee", "section": "Wear" },
-    { "id": "pants", "name": "Jeans / pants", "section": "Wear" },
-    { "id": "sneakers", "name": "Everyday sneakers", "section": "Wear" },
-    { "id": "layer", "name": "Hoodie / layer", "section": "Wear" },
-    { "id": "mattress", "name": "Mattress / bed", "section": "Home" },
-    { "id": "detergent", "name": "Laundry detergent", "section": "Home" },
-    { "id": "coffee", "name": "Coffee setup", "section": "Home" },
-    { "id": "laptop", "name": "Laptop", "section": "Tech" },
-    { "id": "headphones", "name": "Headphones", "section": "Tech" },
-    { "id": "bag", "name": "Daily bag", "section": "Everyday" }
+    {
+      "id": "featured",
+      "name": "Featured",
+      "order": 0,
+      "description": "Hand-picked products shown first on the site. Add 'featured' to a product's categories to include it."
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing & shoes",
+      "order": 10
+    },
+    {
+      "id": "accessories",
+      "name": "Accessories",
+      "order": 20
+    },
+    {
+      "id": "bedroom",
+      "name": "Bedroom & sleep",
+      "order": 30
+    },
+    {
+      "id": "bath",
+      "name": "Bath",
+      "order": 40
+    },
+    {
+      "id": "kitchen",
+      "name": "Kitchen",
+      "order": 50
+    },
+    {
+      "id": "coffee",
+      "name": "Coffee & drinks",
+      "order": 60
+    },
+    {
+      "id": "cleaning",
+      "name": "Cleaning & laundry",
+      "order": 70
+    },
+    {
+      "id": "home",
+      "name": "Home",
+      "order": 80
+    },
+    {
+      "id": "appliances",
+      "name": "Appliances",
+      "order": 90
+    },
+    {
+      "id": "personal-care",
+      "name": "Personal care",
+      "order": 100
+    },
+    {
+      "id": "grooming",
+      "name": "Grooming",
+      "order": 110
+    },
+    {
+      "id": "wellness",
+      "name": "Health & wellness",
+      "order": 120
+    },
+    {
+      "id": "fitness",
+      "name": "Fitness",
+      "order": 130
+    },
+    {
+      "id": "tech",
+      "name": "Tech",
+      "order": 140
+    },
+    {
+      "id": "home-office",
+      "name": "Home office",
+      "order": 150
+    },
+    {
+      "id": "travel",
+      "name": "Travel & bags",
+      "order": 160
+    },
+    {
+      "id": "outdoors",
+      "name": "Outdoors",
+      "order": 170
+    },
+    {
+      "id": "car",
+      "name": "Car",
+      "order": 180
+    },
+    {
+      "id": "kids",
+      "name": "Kids & baby",
+      "order": 190
+    },
+    {
+      "id": "pets",
+      "name": "Pets",
+      "order": 200
+    },
+    {
+      "id": "entertaining",
+      "name": "Entertaining",
+      "order": 210
+    }
+  ],
+  "products": [
+    {
+      "id": "tee",
+      "name": "Everyday tee",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "featured"
+      ],
+      "order": 1001
+    },
+    {
+      "id": "button-down-shirt",
+      "name": "Button-down shirt",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1002
+    },
+    {
+      "id": "sweater",
+      "name": "Sweater",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1003
+    },
+    {
+      "id": "layer",
+      "name": "Hoodie / layer",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "featured"
+      ],
+      "order": 1004
+    },
+    {
+      "id": "blazer",
+      "name": "Blazer",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1005
+    },
+    {
+      "id": "winter-coat",
+      "name": "Winter coat",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1006
+    },
+    {
+      "id": "rain-jacket",
+      "name": "Rain jacket",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "outdoors",
+        "travel"
+      ],
+      "order": 1007
+    },
+    {
+      "id": "pants",
+      "name": "Jeans / pants",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "featured"
+      ],
+      "order": 1008
+    },
+    {
+      "id": "shorts",
+      "name": "Shorts",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1009
+    },
+    {
+      "id": "leggings",
+      "name": "Leggings",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "fitness"
+      ],
+      "order": 1010
+    },
+    {
+      "id": "dress",
+      "name": "Everyday dress",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1011
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "outdoors"
+      ],
+      "order": 1012
+    },
+    {
+      "id": "underwear",
+      "name": "Underwear",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1013
+    },
+    {
+      "id": "socks",
+      "name": "Socks",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1014
+    },
+    {
+      "id": "bra",
+      "name": "Bra",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1015
+    },
+    {
+      "id": "sports-bra",
+      "name": "Sports bra",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "fitness"
+      ],
+      "order": 1016
+    },
+    {
+      "id": "sneakers",
+      "name": "Everyday sneakers",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "featured"
+      ],
+      "order": 1017
+    },
+    {
+      "id": "running-shoes",
+      "name": "Running shoes",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "fitness"
+      ],
+      "order": 1018
+    },
+    {
+      "id": "dress-shoes",
+      "name": "Dress shoes",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1019
+    },
+    {
+      "id": "boots",
+      "name": "Boots",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1020
+    },
+    {
+      "id": "hiking-boots",
+      "name": "Hiking boots",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "outdoors"
+      ],
+      "order": 1021
+    },
+    {
+      "id": "sandals",
+      "name": "Sandals",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing",
+        "outdoors"
+      ],
+      "order": 1022
+    },
+    {
+      "id": "sunglasses",
+      "name": "Sunglasses",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "outdoors"
+      ],
+      "order": 2001
+    },
+    {
+      "id": "watch",
+      "name": "Watch",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories"
+      ],
+      "order": 2002
+    },
+    {
+      "id": "belt",
+      "name": "Belt",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "clothing"
+      ],
+      "order": 2003
+    },
+    {
+      "id": "wallet",
+      "name": "Wallet",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories"
+      ],
+      "order": 2004
+    },
+    {
+      "id": "phone-case",
+      "name": "Phone case",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "tech"
+      ],
+      "order": 2005
+    },
+    {
+      "id": "hat",
+      "name": "Hat",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "outdoors"
+      ],
+      "order": 2006
+    },
+    {
+      "id": "scarf",
+      "name": "Scarf",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories"
+      ],
+      "order": 2007
+    },
+    {
+      "id": "gloves",
+      "name": "Gloves",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "outdoors"
+      ],
+      "order": 2008
+    },
+    {
+      "id": "tie",
+      "name": "Tie",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories"
+      ],
+      "order": 2009
+    },
+    {
+      "id": "umbrella",
+      "name": "Umbrella",
+      "primaryCategory": "accessories",
+      "categories": [
+        "accessories",
+        "travel"
+      ],
+      "order": 2010
+    },
+    {
+      "id": "mattress",
+      "name": "Mattress / bed",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "home",
+        "featured"
+      ],
+      "order": 3001
+    },
+    {
+      "id": "mattress-topper",
+      "name": "Mattress topper",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3002
+    },
+    {
+      "id": "mattress-protector",
+      "name": "Mattress protector",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3003
+    },
+    {
+      "id": "bed-frame",
+      "name": "Bed frame",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "home"
+      ],
+      "order": 3004
+    },
+    {
+      "id": "dresser",
+      "name": "Dresser",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "home"
+      ],
+      "order": 3005
+    },
+    {
+      "id": "nightstand",
+      "name": "Nightstand",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "home"
+      ],
+      "order": 3006
+    },
+    {
+      "id": "pillow",
+      "name": "Pillow",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3007
+    },
+    {
+      "id": "sheet-set",
+      "name": "Sheet set",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3008
+    },
+    {
+      "id": "comforter",
+      "name": "Comforter",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3009
+    },
+    {
+      "id": "weighted-blanket",
+      "name": "Weighted blanket",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "wellness"
+      ],
+      "order": 3010
+    },
+    {
+      "id": "blackout-curtains",
+      "name": "Blackout curtains",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "home"
+      ],
+      "order": 3011
+    },
+    {
+      "id": "bedside-lamp",
+      "name": "Bedside lamp",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom"
+      ],
+      "order": 3012
+    },
+    {
+      "id": "white-noise-machine",
+      "name": "White noise machine",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "wellness"
+      ],
+      "order": 3013
+    },
+    {
+      "id": "pajamas",
+      "name": "Pajamas",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "clothing"
+      ],
+      "order": 3014
+    },
+    {
+      "id": "slippers",
+      "name": "Slippers",
+      "primaryCategory": "bedroom",
+      "categories": [
+        "bedroom",
+        "clothing"
+      ],
+      "order": 3015
+    },
+    {
+      "id": "bath-towels",
+      "name": "Bath towels",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4001
+    },
+    {
+      "id": "bath-mat",
+      "name": "Bath mat",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4002
+    },
+    {
+      "id": "shower-curtain",
+      "name": "Shower curtain",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4003
+    },
+    {
+      "id": "showerhead",
+      "name": "Showerhead",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4004
+    },
+    {
+      "id": "bidet",
+      "name": "Bidet",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4005
+    },
+    {
+      "id": "grab-bar",
+      "name": "Grab bar",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath",
+        "wellness"
+      ],
+      "order": 4006
+    },
+    {
+      "id": "robe",
+      "name": "Robe",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath",
+        "bedroom",
+        "clothing"
+      ],
+      "order": 4007
+    },
+    {
+      "id": "vanity-mirror",
+      "name": "Vanity mirror",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath",
+        "grooming"
+      ],
+      "order": 4008
+    },
+    {
+      "id": "bathroom-scale",
+      "name": "Bathroom scale",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath",
+        "wellness",
+        "fitness"
+      ],
+      "order": 4009
+    },
+    {
+      "id": "toilet-paper",
+      "name": "Toilet paper",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4010
+    },
+    {
+      "id": "plunger",
+      "name": "Plunger",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath"
+      ],
+      "order": 4011
+    },
+    {
+      "id": "toilet-brush",
+      "name": "Toilet brush",
+      "primaryCategory": "bath",
+      "categories": [
+        "bath",
+        "cleaning"
+      ],
+      "order": 4012
+    },
+    {
+      "id": "chefs-knife",
+      "name": "Chef's knife",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5001
+    },
+    {
+      "id": "cutting-board",
+      "name": "Cutting board",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5002
+    },
+    {
+      "id": "frying-pan",
+      "name": "Frying pan",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5003
+    },
+    {
+      "id": "saucepan",
+      "name": "Saucepan",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5004
+    },
+    {
+      "id": "dutch-oven",
+      "name": "Dutch oven",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5005
+    },
+    {
+      "id": "sheet-pan",
+      "name": "Sheet pan",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5006
+    },
+    {
+      "id": "mixing-bowls",
+      "name": "Mixing bowls",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5007
+    },
+    {
+      "id": "cooking-utensils",
+      "name": "Cooking utensils",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5008
+    },
+    {
+      "id": "oven-mitts",
+      "name": "Oven mitts",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5009
+    },
+    {
+      "id": "measuring-cups",
+      "name": "Measuring cups",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5010
+    },
+    {
+      "id": "colander",
+      "name": "Colander",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5011
+    },
+    {
+      "id": "dish-rack",
+      "name": "Dish rack",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "cleaning"
+      ],
+      "order": 5012
+    },
+    {
+      "id": "food-storage-containers",
+      "name": "Food storage containers",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5013
+    },
+    {
+      "id": "dinnerware",
+      "name": "Dinnerware",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "entertaining"
+      ],
+      "order": 5014
+    },
+    {
+      "id": "flatware",
+      "name": "Flatware",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "entertaining"
+      ],
+      "order": 5015
+    },
+    {
+      "id": "drinking-glasses",
+      "name": "Drinking glasses",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "entertaining"
+      ],
+      "order": 5016
+    },
+    {
+      "id": "water-filter-pitcher",
+      "name": "Water filter pitcher",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen"
+      ],
+      "order": 5017
+    },
+    {
+      "id": "dish-towels",
+      "name": "Dish towels",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "cleaning"
+      ],
+      "order": 5018
+    },
+    {
+      "id": "kitchen-trash-can",
+      "name": "Kitchen trash can",
+      "primaryCategory": "kitchen",
+      "categories": [
+        "kitchen",
+        "cleaning"
+      ],
+      "order": 5019
+    },
+    {
+      "id": "coffee",
+      "name": "Coffee setup",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "kitchen",
+        "featured"
+      ],
+      "order": 6001
+    },
+    {
+      "id": "drip-coffee-maker",
+      "name": "Drip coffee maker",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "appliances",
+        "kitchen"
+      ],
+      "order": 6002
+    },
+    {
+      "id": "espresso-machine",
+      "name": "Espresso machine",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "appliances",
+        "kitchen"
+      ],
+      "order": 6003
+    },
+    {
+      "id": "coffee-grinder",
+      "name": "Coffee grinder",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "appliances",
+        "kitchen"
+      ],
+      "order": 6004
+    },
+    {
+      "id": "french-press",
+      "name": "French press",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "kitchen"
+      ],
+      "order": 6005
+    },
+    {
+      "id": "pour-over-kettle",
+      "name": "Pour-over kettle",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "appliances",
+        "kitchen"
+      ],
+      "order": 6006
+    },
+    {
+      "id": "travel-mug",
+      "name": "Travel mug",
+      "primaryCategory": "coffee",
+      "categories": [
+        "coffee",
+        "travel"
+      ],
+      "order": 6007
+    },
+    {
+      "id": "detergent",
+      "name": "Laundry detergent",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning",
+        "featured"
+      ],
+      "order": 7001
+    },
+    {
+      "id": "stain-remover",
+      "name": "Stain remover",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7002
+    },
+    {
+      "id": "laundry-hamper",
+      "name": "Laundry hamper",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning",
+        "bedroom"
+      ],
+      "order": 7003
+    },
+    {
+      "id": "drying-rack",
+      "name": "Drying rack",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7004
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning",
+        "appliances"
+      ],
+      "order": 7005
+    },
+    {
+      "id": "ironing-board",
+      "name": "Ironing board",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7006
+    },
+    {
+      "id": "all-purpose-cleaner",
+      "name": "All-purpose cleaner",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7007
+    },
+    {
+      "id": "dish-soap",
+      "name": "Dish soap",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning",
+        "kitchen"
+      ],
+      "order": 7008
+    },
+    {
+      "id": "broom",
+      "name": "Broom",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7009
+    },
+    {
+      "id": "mop",
+      "name": "Mop",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7010
+    },
+    {
+      "id": "trash-bags",
+      "name": "Trash bags",
+      "primaryCategory": "cleaning",
+      "categories": [
+        "cleaning"
+      ],
+      "order": 7011
+    },
+    {
+      "id": "sofa",
+      "name": "Sofa",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8001
+    },
+    {
+      "id": "armchair",
+      "name": "Armchair",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8002
+    },
+    {
+      "id": "coffee-table",
+      "name": "Coffee table",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8003
+    },
+    {
+      "id": "dining-table",
+      "name": "Dining table",
+      "primaryCategory": "home",
+      "categories": [
+        "home",
+        "entertaining"
+      ],
+      "order": 8004
+    },
+    {
+      "id": "dining-chairs",
+      "name": "Dining chairs",
+      "primaryCategory": "home",
+      "categories": [
+        "home",
+        "entertaining"
+      ],
+      "order": 8005
+    },
+    {
+      "id": "media-console",
+      "name": "Media console",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8006
+    },
+    {
+      "id": "bookshelf",
+      "name": "Bookshelf",
+      "primaryCategory": "home",
+      "categories": [
+        "home",
+        "home-office"
+      ],
+      "order": 8007
+    },
+    {
+      "id": "area-rug",
+      "name": "Area rug",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8008
+    },
+    {
+      "id": "floor-lamp",
+      "name": "Floor lamp",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8009
+    },
+    {
+      "id": "curtains",
+      "name": "Curtains",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8010
+    },
+    {
+      "id": "throw-pillows",
+      "name": "Throw pillows",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8011
+    },
+    {
+      "id": "full-length-mirror",
+      "name": "Full-length mirror",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8012
+    },
+    {
+      "id": "doormat",
+      "name": "Doormat",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8013
+    },
+    {
+      "id": "hangers",
+      "name": "Hangers",
+      "primaryCategory": "home",
+      "categories": [
+        "home",
+        "bedroom"
+      ],
+      "order": 8014
+    },
+    {
+      "id": "storage-bins",
+      "name": "Storage bins",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8015
+    },
+    {
+      "id": "tool-set",
+      "name": "Tool set",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8016
+    },
+    {
+      "id": "smoke-alarm",
+      "name": "Smoke alarm",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8017
+    },
+    {
+      "id": "carbon-monoxide-alarm",
+      "name": "Carbon monoxide alarm",
+      "primaryCategory": "home",
+      "categories": [
+        "home"
+      ],
+      "order": 8018
+    },
+    {
+      "id": "fire-extinguisher",
+      "name": "Fire extinguisher",
+      "primaryCategory": "home",
+      "categories": [
+        "home",
+        "kitchen"
+      ],
+      "order": 8019
+    },
+    {
+      "id": "refrigerator",
+      "name": "Refrigerator",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9001
+    },
+    {
+      "id": "stove",
+      "name": "Stove",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9002
+    },
+    {
+      "id": "dishwasher",
+      "name": "Dishwasher",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9003
+    },
+    {
+      "id": "microwave",
+      "name": "Microwave",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9004
+    },
+    {
+      "id": "washer-dryer",
+      "name": "Washer / dryer",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "cleaning",
+        "home"
+      ],
+      "order": 9005
+    },
+    {
+      "id": "vacuum",
+      "name": "Vacuum",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home",
+        "cleaning"
+      ],
+      "order": 9006
+    },
+    {
+      "id": "robot-vacuum",
+      "name": "Robot vacuum",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home",
+        "cleaning"
+      ],
+      "order": 9007
+    },
+    {
+      "id": "air-purifier",
+      "name": "Air purifier",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9008
+    },
+    {
+      "id": "humidifier",
+      "name": "Humidifier",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9009
+    },
+    {
+      "id": "dehumidifier",
+      "name": "Dehumidifier",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9010
+    },
+    {
+      "id": "fan",
+      "name": "Fan",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9011
+    },
+    {
+      "id": "air-conditioner",
+      "name": "Air conditioner",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9012
+    },
+    {
+      "id": "space-heater",
+      "name": "Space heater",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "home"
+      ],
+      "order": 9013
+    },
+    {
+      "id": "blender",
+      "name": "Blender",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9014
+    },
+    {
+      "id": "stand-mixer",
+      "name": "Stand mixer",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9015
+    },
+    {
+      "id": "toaster-oven",
+      "name": "Toaster oven",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9016
+    },
+    {
+      "id": "air-fryer",
+      "name": "Air fryer",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9017
+    },
+    {
+      "id": "slow-cooker",
+      "name": "Slow cooker",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9018
+    },
+    {
+      "id": "pressure-cooker",
+      "name": "Pressure cooker",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9019
+    },
+    {
+      "id": "rice-cooker",
+      "name": "Rice cooker",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen"
+      ],
+      "order": 9020
+    },
+    {
+      "id": "electric-kettle",
+      "name": "Electric kettle",
+      "primaryCategory": "appliances",
+      "categories": [
+        "appliances",
+        "kitchen",
+        "coffee"
+      ],
+      "order": 9021
+    },
+    {
+      "id": "body-wash",
+      "name": "Body wash",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care",
+        "bath"
+      ],
+      "order": 10001
+    },
+    {
+      "id": "hand-soap",
+      "name": "Hand soap",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care",
+        "bath"
+      ],
+      "order": 10002
+    },
+    {
+      "id": "deodorant",
+      "name": "Deodorant",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10003
+    },
+    {
+      "id": "shampoo",
+      "name": "Shampoo",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care",
+        "grooming"
+      ],
+      "order": 10004
+    },
+    {
+      "id": "face-wash",
+      "name": "Face wash",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10005
+    },
+    {
+      "id": "face-moisturizer",
+      "name": "Face moisturizer",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10006
+    },
+    {
+      "id": "body-lotion",
+      "name": "Body lotion",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10007
+    },
+    {
+      "id": "sunscreen",
+      "name": "Sunscreen",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care",
+        "outdoors"
+      ],
+      "order": 10008
+    },
+    {
+      "id": "period-products",
+      "name": "Period products",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10009
+    },
+    {
+      "id": "toothbrush",
+      "name": "Toothbrush",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10010
+    },
+    {
+      "id": "electric-toothbrush",
+      "name": "Electric toothbrush",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care",
+        "grooming",
+        "appliances"
+      ],
+      "order": 10011
+    },
+    {
+      "id": "toothpaste",
+      "name": "Toothpaste",
+      "primaryCategory": "personal-care",
+      "categories": [
+        "personal-care"
+      ],
+      "order": 10012
+    },
+    {
+      "id": "hairbrush",
+      "name": "Hairbrush",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming"
+      ],
+      "order": 11001
+    },
+    {
+      "id": "hair-dryer",
+      "name": "Hair dryer",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming",
+        "bath",
+        "appliances"
+      ],
+      "order": 11002
+    },
+    {
+      "id": "flat-iron",
+      "name": "Flat iron",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming",
+        "appliances"
+      ],
+      "order": 11003
+    },
+    {
+      "id": "razor",
+      "name": "Razor",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming"
+      ],
+      "order": 11004
+    },
+    {
+      "id": "shaving-cream",
+      "name": "Shaving cream",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming"
+      ],
+      "order": 11005
+    },
+    {
+      "id": "beard-trimmer",
+      "name": "Beard trimmer",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming",
+        "appliances"
+      ],
+      "order": 11006
+    },
+    {
+      "id": "fragrance",
+      "name": "Fragrance",
+      "primaryCategory": "grooming",
+      "categories": [
+        "grooming"
+      ],
+      "order": 11007
+    },
+    {
+      "id": "daily-vitamins",
+      "name": "Daily vitamins",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12001
+    },
+    {
+      "id": "pain-reliever",
+      "name": "Pain reliever",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12002
+    },
+    {
+      "id": "first-aid-kit",
+      "name": "First aid kit",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12003
+    },
+    {
+      "id": "thermometer",
+      "name": "Thermometer",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12004
+    },
+    {
+      "id": "blood-pressure-monitor",
+      "name": "Blood pressure monitor",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12005
+    },
+    {
+      "id": "heating-pad",
+      "name": "Heating pad",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness"
+      ],
+      "order": 12006
+    },
+    {
+      "id": "massage-gun",
+      "name": "Massage gun",
+      "primaryCategory": "wellness",
+      "categories": [
+        "wellness",
+        "fitness"
+      ],
+      "order": 12007
+    },
+    {
+      "id": "yoga-mat",
+      "name": "Yoga mat",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness"
+      ],
+      "order": 13001
+    },
+    {
+      "id": "dumbbells",
+      "name": "Dumbbells",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness"
+      ],
+      "order": 13002
+    },
+    {
+      "id": "resistance-bands",
+      "name": "Resistance bands",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness"
+      ],
+      "order": 13003
+    },
+    {
+      "id": "pull-up-bar",
+      "name": "Pull-up bar",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness"
+      ],
+      "order": 13004
+    },
+    {
+      "id": "foam-roller",
+      "name": "Foam roller",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness",
+        "wellness"
+      ],
+      "order": 13005
+    },
+    {
+      "id": "reusable-water-bottle",
+      "name": "Reusable water bottle",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness",
+        "outdoors",
+        "travel"
+      ],
+      "order": 13006
+    },
+    {
+      "id": "gym-bag",
+      "name": "Gym bag",
+      "primaryCategory": "fitness",
+      "categories": [
+        "fitness",
+        "travel"
+      ],
+      "order": 13007
+    },
+    {
+      "id": "phone",
+      "name": "Phone",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech"
+      ],
+      "order": 14001
+    },
+    {
+      "id": "laptop",
+      "name": "Laptop",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "home-office",
+        "featured"
+      ],
+      "order": 14002
+    },
+    {
+      "id": "tablet",
+      "name": "Tablet",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech"
+      ],
+      "order": 14003
+    },
+    {
+      "id": "headphones",
+      "name": "Headphones",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "featured",
+        "travel"
+      ],
+      "order": 14004
+    },
+    {
+      "id": "earbuds",
+      "name": "Earbuds",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "travel"
+      ],
+      "order": 14005
+    },
+    {
+      "id": "smartwatch",
+      "name": "Smartwatch",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "fitness",
+        "accessories"
+      ],
+      "order": 14006
+    },
+    {
+      "id": "e-reader",
+      "name": "E-reader",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech"
+      ],
+      "order": 14007
+    },
+    {
+      "id": "tv",
+      "name": "TV",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "home",
+        "entertaining"
+      ],
+      "order": 14008
+    },
+    {
+      "id": "soundbar",
+      "name": "Soundbar",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "home",
+        "entertaining"
+      ],
+      "order": 14009
+    },
+    {
+      "id": "streaming-stick",
+      "name": "Streaming stick",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "home"
+      ],
+      "order": 14010
+    },
+    {
+      "id": "portable-speaker",
+      "name": "Portable speaker",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "entertaining",
+        "outdoors"
+      ],
+      "order": 14011
+    },
+    {
+      "id": "camera",
+      "name": "Camera",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "travel"
+      ],
+      "order": 14012
+    },
+    {
+      "id": "wireless-router",
+      "name": "Wireless router",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "home",
+        "home-office"
+      ],
+      "order": 14013
+    },
+    {
+      "id": "phone-charger",
+      "name": "Phone charger",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech"
+      ],
+      "order": 14014
+    },
+    {
+      "id": "power-bank",
+      "name": "Power bank",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech",
+        "travel"
+      ],
+      "order": 14015
+    },
+    {
+      "id": "desk",
+      "name": "Desk",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "home"
+      ],
+      "order": 15001
+    },
+    {
+      "id": "office-chair",
+      "name": "Office chair",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "home"
+      ],
+      "order": 15002
+    },
+    {
+      "id": "monitor",
+      "name": "Monitor",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15003
+    },
+    {
+      "id": "keyboard",
+      "name": "Keyboard",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15004
+    },
+    {
+      "id": "mouse",
+      "name": "Mouse",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15005
+    },
+    {
+      "id": "laptop-stand",
+      "name": "Laptop stand",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15006
+    },
+    {
+      "id": "webcam",
+      "name": "Webcam",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15007
+    },
+    {
+      "id": "printer",
+      "name": "Printer",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15008
+    },
+    {
+      "id": "desk-lamp",
+      "name": "Desk lamp",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office"
+      ],
+      "order": 15009
+    },
+    {
+      "id": "surge-protector",
+      "name": "Surge protector",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "home"
+      ],
+      "order": 15010
+    },
+    {
+      "id": "bag",
+      "name": "Daily bag",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel",
+        "accessories",
+        "featured"
+      ],
+      "order": 16001
+    },
+    {
+      "id": "carry-on-suitcase",
+      "name": "Carry-on suitcase",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel"
+      ],
+      "order": 16002
+    },
+    {
+      "id": "checked-suitcase",
+      "name": "Checked suitcase",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel"
+      ],
+      "order": 16003
+    },
+    {
+      "id": "packing-cubes",
+      "name": "Packing cubes",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel"
+      ],
+      "order": 16004
+    },
+    {
+      "id": "toiletry-bag",
+      "name": "Toiletry bag",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel",
+        "personal-care"
+      ],
+      "order": 16005
+    },
+    {
+      "id": "travel-pillow",
+      "name": "Travel pillow",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel"
+      ],
+      "order": 16006
+    },
+    {
+      "id": "travel-adapter",
+      "name": "Travel adapter",
+      "primaryCategory": "travel",
+      "categories": [
+        "travel",
+        "tech"
+      ],
+      "order": 16007
+    },
+    {
+      "id": "bicycle",
+      "name": "Bicycle",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors",
+        "fitness"
+      ],
+      "order": 17001
+    },
+    {
+      "id": "bike-helmet",
+      "name": "Bike helmet",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors",
+        "fitness"
+      ],
+      "order": 17002
+    },
+    {
+      "id": "tent",
+      "name": "Tent",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17003
+    },
+    {
+      "id": "sleeping-bag",
+      "name": "Sleeping bag",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17004
+    },
+    {
+      "id": "camp-stove",
+      "name": "Camp stove",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17005
+    },
+    {
+      "id": "headlamp",
+      "name": "Headlamp",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17006
+    },
+    {
+      "id": "cooler",
+      "name": "Cooler",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors",
+        "entertaining"
+      ],
+      "order": 17007
+    },
+    {
+      "id": "grill",
+      "name": "Grill",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors",
+        "entertaining"
+      ],
+      "order": 17008
+    },
+    {
+      "id": "hammock",
+      "name": "Hammock",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17009
+    },
+    {
+      "id": "patio-set",
+      "name": "Patio set",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors",
+        "home"
+      ],
+      "order": 17010
+    },
+    {
+      "id": "lawn-mower",
+      "name": "Lawn mower",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17011
+    },
+    {
+      "id": "garden-hose",
+      "name": "Garden hose",
+      "primaryCategory": "outdoors",
+      "categories": [
+        "outdoors"
+      ],
+      "order": 17012
+    },
+    {
+      "id": "car-charger",
+      "name": "Car charger",
+      "primaryCategory": "car",
+      "categories": [
+        "car",
+        "tech"
+      ],
+      "order": 18001
+    },
+    {
+      "id": "phone-mount",
+      "name": "Phone mount",
+      "primaryCategory": "car",
+      "categories": [
+        "car",
+        "tech"
+      ],
+      "order": 18002
+    },
+    {
+      "id": "dash-cam",
+      "name": "Dash cam",
+      "primaryCategory": "car",
+      "categories": [
+        "car",
+        "tech"
+      ],
+      "order": 18003
+    },
+    {
+      "id": "jumper-cables",
+      "name": "Jumper cables",
+      "primaryCategory": "car",
+      "categories": [
+        "car"
+      ],
+      "order": 18004
+    },
+    {
+      "id": "car-emergency-kit",
+      "name": "Car emergency kit",
+      "primaryCategory": "car",
+      "categories": [
+        "car"
+      ],
+      "order": 18005
+    },
+    {
+      "id": "car-floor-mats",
+      "name": "Car floor mats",
+      "primaryCategory": "car",
+      "categories": [
+        "car"
+      ],
+      "order": 18006
+    },
+    {
+      "id": "trunk-organizer",
+      "name": "Trunk organizer",
+      "primaryCategory": "car",
+      "categories": [
+        "car"
+      ],
+      "order": 18007
+    },
+    {
+      "id": "car-seat",
+      "name": "Car seat",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "car"
+      ],
+      "order": 19001
+    },
+    {
+      "id": "car-booster-seat",
+      "name": "Car booster seat",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "car"
+      ],
+      "order": 19002
+    },
+    {
+      "id": "stroller",
+      "name": "Stroller",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "travel"
+      ],
+      "order": 19003
+    },
+    {
+      "id": "baby-carrier",
+      "name": "Baby carrier",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids"
+      ],
+      "order": 19004
+    },
+    {
+      "id": "diaper-bag",
+      "name": "Diaper bag",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "travel"
+      ],
+      "order": 19005
+    },
+    {
+      "id": "crib",
+      "name": "Crib",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "bedroom"
+      ],
+      "order": 19006
+    },
+    {
+      "id": "crib-mattress",
+      "name": "Crib mattress",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "bedroom"
+      ],
+      "order": 19007
+    },
+    {
+      "id": "baby-monitor",
+      "name": "Baby monitor",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "tech"
+      ],
+      "order": 19008
+    },
+    {
+      "id": "changing-pad",
+      "name": "Changing pad",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids"
+      ],
+      "order": 19009
+    },
+    {
+      "id": "diapers",
+      "name": "Diapers",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids"
+      ],
+      "order": 19010
+    },
+    {
+      "id": "baby-bottles",
+      "name": "Baby bottles",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "kitchen"
+      ],
+      "order": 19011
+    },
+    {
+      "id": "high-chair",
+      "name": "High chair",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "kitchen"
+      ],
+      "order": 19012
+    },
+    {
+      "id": "baby-gate",
+      "name": "Baby gate",
+      "primaryCategory": "kids",
+      "categories": [
+        "kids",
+        "home"
+      ],
+      "order": 19013
+    },
+    {
+      "id": "dog-food",
+      "name": "Dog food",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20001
+    },
+    {
+      "id": "cat-food",
+      "name": "Cat food",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20002
+    },
+    {
+      "id": "pet-bowls",
+      "name": "Pet bowls",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20003
+    },
+    {
+      "id": "leash",
+      "name": "Leash",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20004
+    },
+    {
+      "id": "collar",
+      "name": "Collar",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20005
+    },
+    {
+      "id": "pet-bed",
+      "name": "Pet bed",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20006
+    },
+    {
+      "id": "dog-crate",
+      "name": "Dog crate",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20007
+    },
+    {
+      "id": "litter-box",
+      "name": "Litter box",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20008
+    },
+    {
+      "id": "cat-litter",
+      "name": "Cat litter",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets"
+      ],
+      "order": 20009
+    },
+    {
+      "id": "pet-carrier",
+      "name": "Pet carrier",
+      "primaryCategory": "pets",
+      "categories": [
+        "pets",
+        "travel"
+      ],
+      "order": 20010
+    },
+    {
+      "id": "wine-glasses",
+      "name": "Wine glasses",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining",
+        "kitchen"
+      ],
+      "order": 21001
+    },
+    {
+      "id": "pitcher",
+      "name": "Pitcher",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining",
+        "kitchen"
+      ],
+      "order": 21002
+    },
+    {
+      "id": "serving-platter",
+      "name": "Serving platter",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining",
+        "kitchen"
+      ],
+      "order": 21003
+    },
+    {
+      "id": "cocktail-shaker",
+      "name": "Cocktail shaker",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining"
+      ],
+      "order": 21004
+    },
+    {
+      "id": "tablecloth",
+      "name": "Tablecloth",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining"
+      ],
+      "order": 21005
+    },
+    {
+      "id": "candles",
+      "name": "Candles",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining",
+        "home"
+      ],
+      "order": 21006
+    },
+    {
+      "id": "board-game",
+      "name": "Board game",
+      "primaryCategory": "entertaining",
+      "categories": [
+        "entertaining"
+      ],
+      "order": 21007
+    }
   ],
   "landing": {
-    "anchorCategory": "tee",
-    "compareCategories": ["tee", "sneakers", "mattress", "headphones"]
+    "anchorProduct": "tee",
+    "compareProducts": [
+      "tee",
+      "sneakers",
+      "mattress",
+      "headphones"
+    ]
   },
-  "picks": [
-    {
-      "tier": "mid",
-      "category": "tee",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "pants",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "sneakers",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "layer",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "mattress",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "detergent",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "coffee",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "laptop",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "headphones",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    },
-    {
-      "tier": "mid",
-      "category": "bag",
-      "main": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO: one line, under 90 characters"
-      },
-      "alt": {
-        "brand": "TODO",
-        "name": "TODO",
-        "price": 0,
-        "currency": "USD",
-        "url": "https://TODO",
-        "image": "/images/placeholder.svg",
-        "why": "TODO",
-        "when": "TODO: e.g. If you want it cheaper"
-      }
-    }
-  ]
+  "picks": []
 }
