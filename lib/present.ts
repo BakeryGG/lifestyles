@@ -1,4 +1,5 @@
 import { isBuyableUrl, isPlaceholderBrand, isUnfinishedCopy } from "./copy";
+import { effectivePicks, type EffectivePick } from "./effective";
 import type { AltProduct, Catalog, CatalogPick, Product, Tier } from "./schema";
 
 export { isBuyableUrl, isPlaceholderBrand, isUnfinishedCopy };
@@ -97,7 +98,11 @@ export function liveStatusLine(tiers: Pick<Tier, "name" | "status">[]): string {
   const live = tiers.filter((tier) => tier.status === "live").map((tier) => tier.name);
   const soon = tiers.filter((tier) => tier.status !== "live").map((tier) => tier.name);
   const liveText =
-    live.length === 0 ? "No tier is live yet" : live.length === 1 ? `${live[0]} is live` : `${joinNames(live)} are live`;
+    live.length === 0
+      ? "No lifestyle is live yet"
+      : live.length === 1
+        ? `${live[0]} is live`
+        : `${joinNames(live)} are live`;
   if (soon.length === 0) return liveText;
   return `${liveText} · ${joinNames(soon)} coming soon`;
 }
@@ -108,17 +113,27 @@ export type LandingTierCard = {
   description: string;
   whoFor: string | null;
   status: Tier["status"];
+  group: Tier["group"];
   brands: string[];
   anchorLine: string;
   kitLine: string;
 };
 
+function resolvedPicks(catalog: Catalog, tierId: string): CatalogPick[] {
+  return [...effectivePicks(catalog, tierId).values()]
+    .map((entry) => entry.pick)
+    .filter((pick): pick is CatalogPick => pick != null && isRealProduct(pick.main));
+}
+
 export function landingTierCards(catalog: Catalog): LandingTierCard[] {
   const anchor = catalog.categories.find((category) => category.id === catalog.landing.anchorCategory);
   const anchorName = anchor?.name ?? "Pick";
   return catalog.tiers.map((tier) => {
-    const picks = catalog.picks.filter((pick) => pick.tier === tier.id);
-    const anchorPick = picks.find((pick) => pick.category === catalog.landing.anchorCategory);
+    const resolved = effectivePicks(catalog, tier.id);
+    const picks = [...resolved.values()]
+      .map((entry) => entry.pick)
+      .filter((pick): pick is CatalogPick => pick != null);
+    const anchorPick = resolved.get(catalog.landing.anchorCategory)?.pick ?? null;
     const anchorReal = anchorPick && isRealProduct(anchorPick.main) ? anchorPick.main : null;
     const anchorLine = anchorReal
       ? `Typical ${anchorName.toLowerCase()}: ${formatPrice(anchorReal.price, anchorReal.currency)}`
@@ -129,11 +144,18 @@ export function landingTierCards(catalog: Catalog): LandingTierCard[] {
       description: tier.description,
       whoFor: tier.whoFor ?? null,
       status: tier.status,
+      group: tier.group,
       brands: tierBrandList(tier),
       anchorLine,
       kitLine: landingKitLine(catalog.categories.length, picks),
     };
   });
+}
+
+/** Primary lifestyles, in file order. Falls back to every lifestyle when none are primary. */
+export function comparisonTiers(catalog: Catalog): Tier[] {
+  const primary = catalog.tiers.filter((tier) => tier.group === "primary");
+  return primary.length > 0 ? primary : [...catalog.tiers];
 }
 
 export type CompareCell = {
@@ -153,14 +175,16 @@ export type CompareRow = {
 };
 
 export function comparisonRows(catalog: Catalog): CompareRow[] {
+  const columns = comparisonTiers(catalog);
+  const resolved = new Map(columns.map((tier) => [tier.id, effectivePicks(catalog, tier.id)]));
   return catalog.landing.compareCategories.map((categoryId) => {
     const category = catalog.categories.find((item) => item.id === categoryId);
     return {
       categoryId,
       categoryName: category?.name ?? categoryId,
       section: category?.section ?? "",
-      cells: catalog.tiers.map((tier) => {
-        const pick = catalog.picks.find((item) => item.tier === tier.id && item.category === categoryId);
+      cells: columns.map((tier) => {
+        const pick = resolved.get(tier.id)?.get(categoryId)?.pick ?? null;
         if (!pick || !isRealProduct(pick.main)) {
           return { tierId: tier.id, empty: true, brand: null, name: null, price: null, image: null };
         }
@@ -227,7 +251,31 @@ export function parseBrandParam(value: string | null): string[] {
   return out;
 }
 
-export type SuggestTierRef = { id: string; name: string; status: Tier["status"] };
+export type SuggestTierRef = {
+  id: string;
+  name: string;
+  status: Tier["status"];
+  basedOn?: string | null;
+};
+
+/** Nearest live lifestyle along `basedOn`, if that ancestor is live. */
+export function liveBasedOn(tiers: SuggestTierRef[], tier: SuggestTierRef): SuggestTierRef | null {
+  const byId = new Map(tiers.map((item) => [item.id, item]));
+  const seen = new Set<string>([tier.id]);
+  let nextId = tier.basedOn ?? null;
+  while (nextId && !seen.has(nextId)) {
+    seen.add(nextId);
+    const next = byId.get(nextId);
+    if (!next) return null;
+    if (next.status === "live") return next;
+    nextId = next.basedOn ?? null;
+  }
+  return null;
+}
+
+function soonFallback(tiers: SuggestTierRef[], tier: SuggestTierRef): SuggestTierRef | null {
+  return liveBasedOn(tiers, tier) ?? tiers.find((item) => item.status === "live") ?? null;
+}
 
 export type SuggestOutcome =
   | { kind: "empty" }
@@ -249,16 +297,16 @@ export function suggestOutcome(tiers: SuggestTierRef[], chips: SuggestChip[], sl
   const max = Math.max(0, ...counts.values());
   if (max === 0) return { kind: "empty" };
   const leaders = tiers.filter((tier) => counts.get(tier.id) === max);
-  const live = tiers.find((tier) => tier.status === "live") ?? null;
   const first = leaders[0];
   if (leaders.length === 1 && first) {
-    if (first.status !== "live") return { kind: "soon", tier: first, fallback: live };
+    if (first.status !== "live") return { kind: "soon", tier: first, fallback: soonFallback(tiers, first) };
     return { kind: "match", tier: first };
   }
   const liveLeaders = leaders.filter((tier) => tier.status === "live");
   const liveLeader = liveLeaders[0];
   if (liveLeaders.length === 1 && liveLeader) return { kind: "match", tier: liveLeader };
-  return { kind: "tie", tiers: leaders, fallback: live };
+  const tieLead = leaders.find((tier) => tier.status !== "live") ?? first;
+  return { kind: "tie", tiers: leaders, fallback: tieLead ? soonFallback(tiers, tieLead) : null };
 }
 
 export type ShownProduct = Product & { srcSet?: string };
@@ -277,25 +325,62 @@ export type PriceHint = {
   direction: "upgrade" | "save" | "other";
 };
 
-/** Real main picks other tiers have for this category. Empty when every other tier is still TODO. */
+function hintDirection(
+  current: Product | null,
+  other: Product,
+): PriceHint["direction"] {
+  if (!current || current.currency !== other.currency) return "other";
+  if (other.price > current.price) return "upgrade";
+  if (other.price < current.price) return "save";
+  return "other";
+}
+
+function ownerId(entry: EffectivePick | undefined, tierId: string): string | null {
+  if (!entry?.pick || !isRealProduct(entry.pick.main)) return null;
+  return entry.inheritedFrom ?? tierId;
+}
+
+/**
+ * Price hints for one card.
+ * A lifestyle with `basedOn` is compared only to that base's effective pick.
+ * If this card inherited that same pick, there is no hint.
+ * Otherwise, hints use other lifestyles' own real mains (not inherited copies).
+ */
 export function priceHintsFor(catalog: Catalog, tierId: string, categoryId: string): PriceHint[] {
-  const current = catalog.picks.find((pick) => pick.tier === tierId && pick.category === categoryId);
-  const currentReal = current && isRealProduct(current.main) ? current.main : null;
+  const tier = catalog.tiers.find((item) => item.id === tierId);
+  if (!tier) return [];
+  const currentEntry = effectivePicks(catalog, tierId).get(categoryId);
+  const currentReal = currentEntry?.pick && isRealProduct(currentEntry.pick.main) ? currentEntry.pick.main : null;
+  const currentOwner = ownerId(currentEntry, tierId);
+
+  if (tier.basedOn) {
+    const baseTier = catalog.tiers.find((item) => item.id === tier.basedOn);
+    if (!baseTier) return [];
+    const baseEntry = effectivePicks(catalog, baseTier.id).get(categoryId);
+    const baseOwner = ownerId(baseEntry, baseTier.id);
+    if (currentOwner && baseOwner && currentOwner === baseOwner) return [];
+    if (!baseEntry?.pick || !isRealProduct(baseEntry.pick.main)) return [];
+    return [
+      {
+        tierId: baseTier.id,
+        tierName: baseTier.name,
+        text: `${baseTier.name}: ${formatPrice(baseEntry.pick.main.price, baseEntry.pick.main.currency)}`,
+        direction: hintDirection(currentReal, baseEntry.pick.main),
+      },
+    ];
+  }
+
   const hints: PriceHint[] = [];
-  for (const tier of catalog.tiers) {
-    if (tier.id === tierId) continue;
-    const pick = catalog.picks.find((item) => item.tier === tier.id && item.category === categoryId);
-    if (!pick || !isRealProduct(pick.main)) continue;
-    let direction: PriceHint["direction"] = "other";
-    if (currentReal && currentReal.currency === pick.main.currency) {
-      if (pick.main.price > currentReal.price) direction = "upgrade";
-      else if (pick.main.price < currentReal.price) direction = "save";
-    }
+  for (const other of catalog.tiers) {
+    if (other.id === tierId) continue;
+    const own = catalog.picks.find((pick) => pick.tier === other.id && pick.category === categoryId);
+    if (!own || !isRealProduct(own.main)) continue;
+    if (currentOwner === other.id || currentEntry?.pick === own) continue;
     hints.push({
-      tierId: tier.id,
-      tierName: tier.name,
-      text: `${tier.name}: ${formatPrice(pick.main.price, pick.main.currency)}`,
-      direction,
+      tierId: other.id,
+      tierName: other.name,
+      text: `${other.name}: ${formatPrice(own.main.price, own.main.currency)}`,
+      direction: hintDirection(currentReal, own.main),
     });
   }
   return hints;
@@ -307,6 +392,8 @@ export type TierCategoryView = {
   /** 1-based position in catalog category order. */
   number: number;
   pick: PresentedPick | null;
+  /** Set when the shown pick is inherited. The drawer may say "Same as {name}". */
+  inheritedFromName: string | null;
   hints: PriceHint[];
 };
 
@@ -318,9 +405,8 @@ export type TierGroupView = {
 };
 
 export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[] {
-  const byCategory = new Map(
-    catalog.picks.filter((pick) => pick.tier === tierId).map((pick) => [pick.category, pick]),
-  );
+  const resolved = effectivePicks(catalog, tierId);
+  const nameById = new Map(catalog.tiers.map((tier) => [tier.id, tier.name]));
   const numberById = new Map(catalog.categories.map((category, index) => [category.id, index + 1]));
 
   return catalog.sections
@@ -332,15 +418,18 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
         .map((category) => {
           const number = numberById.get(category.id) ?? 0;
           const hints = priceHintsFor(catalog, tierId, category.id);
-          const pick = byCategory.get(category.id);
+          const entry = resolved.get(category.id);
+          const pick = entry?.pick;
+          const inheritedFromName = entry?.inheritedFrom ? (nameById.get(entry.inheritedFrom) ?? null) : null;
           if (!pick || !isRealProduct(pick.main)) {
-            return { id: category.id, name: category.name, number, pick: null, hints };
+            return { id: category.id, name: category.name, number, pick: null, inheritedFromName: null, hints };
           }
           return {
             id: category.id,
             name: category.name,
             number,
             hints,
+            inheritedFromName,
             pick: {
               main: pick.main,
               alt: isRealProduct(pick.alt) ? pick.alt : null,
@@ -349,4 +438,8 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
         }),
     }))
     .filter((group) => group.categories.length > 0);
+}
+
+export function kitPicks(catalog: Catalog, tierId: string): CatalogPick[] {
+  return resolvedPicks(catalog, tierId);
 }

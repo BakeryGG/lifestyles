@@ -8,6 +8,7 @@
       "exampleBrands": ["H&M", "Old Navy", "Target"],
       "brandChips": ["H&M", "Old Navy", "Target"],
       "status": "coming_soon",
+      "group": "primary",
       "accent": "#3B82F6"
     },
     {
@@ -17,6 +18,7 @@
       "whoFor": "For people who spend a little more where it shows",
       "exampleBrands": ["TODO", "TODO", "TODO"],
       "status": "live",
+      "group": "primary",
       "accent": "#10B981"
     },
     {
@@ -27,7 +29,32 @@
       "exampleBrands": ["Eight Sleep", "Vuori", "Uniqlo"],
       "brandChips": ["Eight Sleep", "Vuori", "Uniqlo"],
       "status": "coming_soon",
+      "group": "primary",
       "accent": "#111827"
+    },
+    {
+      "id": "organic",
+      "name": "Organic",
+      "description": "Organic, low-chemical picks for everything you use.",
+      "whoFor": "For people who want organic, low-chemical everyday things",
+      "exampleBrands": ["TODO", "TODO", "TODO"],
+      "brandChips": ["TODO", "TODO", "TODO"],
+      "status": "coming_soon",
+      "group": "secondary",
+      "basedOn": "mid",
+      "accent": "#2F6B4F"
+    },
+    {
+      "id": "money-no-object",
+      "name": "Money is no object",
+      "description": "The absolute best, whatever it costs.",
+      "whoFor": "For people who want the best and will pay for it",
+      "exampleBrands": ["TODO", "TODO", "TODO"],
+      "brandChips": ["TODO", "TODO", "TODO"],
+      "status": "coming_soon",
+      "group": "secondary",
+      "basedOn": "premium",
+      "accent": "#1A1A1A"
     }
   ],
   "sections": ["Wear", "Home", "Tech", "Everyday"],

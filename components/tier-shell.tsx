@@ -13,6 +13,7 @@ type ControllerProps = {
     section: string;
     number: number;
     pick: PresentedPick | null;
+    inheritedFromName: string | null;
   }[];
   children: ReactNode;
 };

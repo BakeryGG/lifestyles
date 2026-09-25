@@ -82,6 +82,10 @@ const tierSchema = z
     exampleBrands: z.array(text),
     brandChips: z.array(text).optional(),
     status: z.enum(["live", "coming_soon"]),
+    /** Another tier id this lifestyle inherits empty categories from. Optional. */
+    basedOn: slug.optional(),
+    /** Landing and switcher placement. Omitted means primary. */
+    group: z.enum(["primary", "secondary"]).default("primary"),
     accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
   })
   .strict();
@@ -153,6 +157,8 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
       tierIds.set(id, index);
     }
   });
+
+  issues.push(...basedOnIssues(tiers, tierIds));
 
   const sectionExact = new Map<string, number>();
   const sectionFold = new Map<string, number>();
@@ -271,6 +277,63 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
       }
     }
   });
+
+  return issues;
+}
+
+/**
+ * `basedOn` must name another tier, never itself, and must not cycle.
+ * A cycle is reported from each lifestyle that participates, with the walk
+ * that returns to a repeated id: `cycle organic → mid → organic`.
+ */
+function basedOnIssues(tiers: unknown[], tierIds: Map<string, number>): CatalogIssue[] {
+  const issues: CatalogIssue[] = [];
+  const basedOnOf = new Map<string, string>();
+
+  tiers.forEach((tier, index) => {
+    if (!isRecord(tier) || typeof tier.id !== "string" || tier.id.length === 0) return;
+    if (!Object.prototype.hasOwnProperty.call(tier, "basedOn")) return;
+    const basedOn = tier.basedOn;
+    if (typeof basedOn !== "string" || basedOn.length === 0) return;
+    if (!tierIds.has(basedOn)) {
+      issues.push({
+        path: ["tiers", index, "basedOn"],
+        message: `Unknown tier ${JSON.stringify(basedOn)}`,
+      });
+      return;
+    }
+    if (basedOn === tier.id) {
+      issues.push({
+        path: ["tiers", index, "basedOn"],
+        message: "cannot reference itself",
+      });
+      return;
+    }
+    basedOnOf.set(tier.id, basedOn);
+  });
+
+  for (const start of basedOnOf.keys()) {
+    const path = [start];
+    const seen = new Set<string>([start]);
+    let current = basedOnOf.get(start);
+    while (current) {
+      path.push(current);
+      if (seen.has(current)) {
+        const cycleStart = path.indexOf(current);
+        const cycle = path.slice(cycleStart);
+        const index = tierIds.get(start);
+        if (index !== undefined) {
+          issues.push({
+            path: ["tiers", index, "basedOn"],
+            message: `cycle ${cycle.join(" → ")}`,
+          });
+        }
+        break;
+      }
+      seen.add(current);
+      current = basedOnOf.get(current);
+    }
+  }
 
   return issues;
 }

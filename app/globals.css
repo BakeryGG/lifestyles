@@ -93,15 +93,54 @@
 }
 
 .compare-scroll {
+  max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
 }
 
 .compare-table {
   width: 100%;
-  min-width: 44rem;
   border-collapse: separate;
   border-spacing: 0;
+}
+
+.compare-table th,
+.compare-table td {
+  scroll-snap-align: start;
+}
+
+.switcher-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.switcher-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.switcher-scroll:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.switcher-fade[data-right="true"] .switcher-scroll {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2.4rem), transparent);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2.4rem), transparent);
+}
+
+.switcher-fade[data-left="true"]:not([data-right="true"]) .switcher-scroll {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 1.35rem);
+  mask-image: linear-gradient(90deg, transparent, #000 1.35rem);
+}
+
+.switcher-fade[data-left="true"][data-right="true"] .switcher-scroll {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 1.35rem, #000 calc(100% - 2.4rem), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 1.35rem, #000 calc(100% - 2.4rem), transparent);
 }
 
 .compare-sticky {
@@ -109,6 +148,22 @@
   left: 0;
   z-index: 1;
   background: #ffffff;
+}
+
+.compare-soon,
+.compare-soon .text-ink {
+  color: var(--color-muted);
+}
+
+.compare-more {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 1.75rem;
+  pointer-events: none;
+  background: linear-gradient(270deg, #ffffff 15%, rgb(255 255 255 / 0));
 }
 
 /* One card tree. Below 1280px, sections stack in catalog order.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EmptyPlate } from "./empty-plate";
+import { HScroll } from "./h-scroll";
 import { ProductImage } from "./product-image";
 import type { CompareRow } from "@/lib/present";
 import type { Tier } from "@/lib/schema";
@@ -15,10 +16,15 @@ export function ComparisonStrip({
   rows: CompareRow[];
   srcSets: Record<string, string | undefined>;
 }) {
+  const soon = new Set(tiers.filter((tier) => tier.status !== "live").map((tier) => tier.id));
+  const minWidth = `${Math.max(18, 9 + tiers.length * 11)}rem`;
   return (
-    <div className="compare-scroll mt-5">
-      <table className="compare-table">
-        <caption className="sr-only">Main picks compared across tiers</caption>
+    <HScroll label="Compare primary lifestyles" className="compare-scroll mt-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal">
+      <table className="compare-table" style={{ minWidth }}>
+        <caption className="sr-only">
+          Main picks compared across primary lifestyles
+          {tiers.length === 1 ? ". Only one primary lifestyle is in the catalog." : ""}
+        </caption>
         <thead>
           <tr>
             <th scope="col" className="compare-sticky border-b border-line py-2 pr-4 text-left align-bottom">
@@ -39,8 +45,11 @@ export function ComparisonStrip({
                     {tier.name}
                   </Link>
                 ) : (
-                  <span className="inline-flex min-h-11 items-center text-[13px] text-muted">
+                  <span className="inline-flex min-h-11 items-center gap-1.5 text-[13px] text-muted">
                     {tier.name}
+                    <span aria-hidden="true" className="text-[11px]">
+                      Soon
+                    </span>
                     <span className="sr-only">, coming soon</span>
                   </span>
                 )}
@@ -59,7 +68,10 @@ export function ComparisonStrip({
                 <span className="block text-[13px] leading-5 text-ink">{row.categoryName}</span>
               </th>
               {row.cells.map((cell) => (
-                <td key={cell.tierId} className="border-b border-line py-3 pr-4 align-middle">
+                <td
+                  key={cell.tierId}
+                  className={`border-b border-line py-3 pr-4 align-middle ${soon.has(cell.tierId) ? "compare-soon" : ""}`}
+                >
                   {cell.empty ? (
                     <span className="flex items-center gap-3">
                       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
@@ -96,6 +108,6 @@ export function ComparisonStrip({
           ))}
         </tbody>
       </table>
-    </div>
+    </HScroll>
   );
 }

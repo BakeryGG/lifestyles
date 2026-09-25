@@ -11,6 +11,7 @@ type DrawerCategory = {
   section: string;
   number: number;
   pick: PresentedPick | null;
+  inheritedFromName: string | null;
 };
 
 const EXIT_MS = 160;
@@ -332,6 +333,7 @@ export function PickController({
           number={shown.number}
           tierName={tierName}
           pick={shown.pick}
+          inheritedFromName={shown.inheritedFromName}
           accent={accent}
           closing={closing && activeId == null}
           onClose={closePick}

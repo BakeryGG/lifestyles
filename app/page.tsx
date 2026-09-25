@@ -3,7 +3,7 @@ import { ComparisonStrip } from "@/components/comparison-strip";
 import { LandingTiers } from "@/components/landing-tiers";
 import { Wordmark } from "@/components/wordmark";
 import { loadCatalog, srcSetFor } from "@/lib/catalog";
-import { comparisonRows, landingTierCards, liveStatusLine, suggestChips } from "@/lib/present";
+import { comparisonRows, comparisonTiers, landingTierCards, liveStatusLine, suggestChips } from "@/lib/present";
 
 export default function HomePage() {
   const catalog = loadCatalog();
@@ -15,10 +15,16 @@ export default function HomePage() {
       srcSets[`${cell.tierId}:${row.categoryId}`] = srcSetFor(cell.image);
     }
   }
-  const tiers = catalog.tiers.map((tier) => ({
+  const tiers = comparisonTiers(catalog).map((tier) => ({
     id: tier.id,
     name: tier.name,
     status: tier.status,
+  }));
+  const suggestTiers = catalog.tiers.map((tier) => ({
+    id: tier.id,
+    name: tier.name,
+    status: tier.status,
+    basedOn: tier.basedOn ?? null,
   }));
 
   return (
@@ -30,7 +36,7 @@ export default function HomePage() {
       </header>
       <main id="content" tabIndex={-1} className="content-focus mx-auto w-full max-w-[1120px] scroll-mt-16 px-4 pb-24 sm:px-8">
         <div className="flex flex-col items-center pt-12 text-center sm:pt-20">
-          <p className="inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-[13px] text-muted ring-1 ring-inset ring-line">
+          <p className="inline-flex min-h-9 max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full px-3 py-1.5 text-center text-[13px] leading-5 text-muted ring-1 ring-inset ring-line">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-signal" />
             {liveStatusLine(catalog.tiers)}
           </p>
@@ -44,7 +50,7 @@ export default function HomePage() {
           <h2 className="text-[1.5rem] leading-none font-normal tracking-[-0.02em] text-ink">Side by side</h2>
           <ComparisonStrip tiers={tiers} rows={rows} srcSets={srcSets} />
         </section>
-        <BrandSuggester chips={suggestChips(catalog)} tiers={tiers} />
+        <BrandSuggester chips={suggestChips(catalog)} tiers={suggestTiers} />
       </main>
     </>
   );

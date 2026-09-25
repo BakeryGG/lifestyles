@@ -6,7 +6,7 @@ import { parseBrandParam, suggestOutcome, type SuggestChip, type SuggestOutcome,
 
 function Result({ outcome }: { outcome: SuggestOutcome }) {
   if (outcome.kind === "empty") {
-    return <span className="text-muted">Your closest tier shows up here.</span>;
+    return <span className="text-muted">Your closest lifestyle shows up here.</span>;
   }
   if (outcome.kind === "match") {
     return (
@@ -139,7 +139,7 @@ export function BrandSuggester({ chips, tiers }: { chips: SuggestChip[]; tiers: 
       </p>
       <noscript>
         <p className="mt-4 text-[13px] leading-6 text-muted">
-          Brand matching runs in the browser. You can still open a tier above.
+          Brand matching runs in the browser. You can still open a lifestyle above.
         </p>
       </noscript>
     </section>

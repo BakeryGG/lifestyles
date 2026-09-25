@@ -2,58 +2,14 @@ import type { CSSProperties } from "react";
 import { ViewTransition } from "react";
 import Link from "next/link";
 import { CategoryCard } from "./category-card";
+import { LifestyleSwitcher, type SwitcherLifestyle } from "./lifestyle-switcher";
 import { Wordmark } from "./wordmark";
 import type { TierCategoryView, TierGroupView } from "@/lib/present";
 import { DESKTOP_COLUMNS, packSections, type PlacedSection } from "@/lib/pack";
 import { sectionHeadingId } from "@/lib/section-id";
 import type { Tier } from "@/lib/schema";
 
-const segment =
-  "inline-flex h-11 min-w-0 items-center justify-center gap-1 rounded-full px-1 text-[10px] leading-none tracking-[-0.01em] whitespace-nowrap transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:px-2 min-[400px]:text-[12px] min-[520px]:min-w-[4.75rem] min-[520px]:px-3 min-[520px]:text-[13px]";
-
-type SwitcherTier = Pick<Tier, "id" | "name" | "status">;
-
-function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string }) {
-  return (
-    <nav aria-label="Lifestyle tier" className="ml-auto min-w-0 flex-1">
-      <div className="ml-auto grid w-full max-w-[16.25rem] grid-cols-3 rounded-full bg-field p-0.5 min-[520px]:w-max min-[520px]:max-w-none">
-        {tiers.map((tier) => {
-          const current = tier.id === currentId;
-          const soon = tier.status !== "live";
-          const className = `${segment} ${current ? "bg-ink text-white" : soon ? "text-muted" : "text-ink"}`;
-          const inner = (
-            <>
-              {tier.name}
-              {soon ? (
-                <>
-                  <span aria-hidden="true" className="text-[9px] leading-none tracking-normal min-[400px]:text-[10px]">
-                    Soon
-                  </span>
-                  <span className="sr-only">, coming soon</span>
-                </>
-              ) : null}
-              {current ? <span className="sr-only">, current page</span> : null}
-            </>
-          );
-          if (soon) {
-            return (
-              <span key={tier.id} aria-current={current ? "page" : undefined} className={`${className} cursor-default`}>
-                {inner}
-              </span>
-            );
-          }
-          return (
-            <Link key={tier.id} href={`/${tier.id}`} aria-current={current ? "page" : undefined} className={className}>
-              {inner}
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
-  );
-}
-
-function Header({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string }) {
+function Header({ tiers, currentId }: { tiers: SwitcherLifestyle[]; currentId: string }) {
   return (
     <header
       className="sticky top-0 z-30 bg-paper/90 backdrop-blur-md"
@@ -61,7 +17,9 @@ function Header({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string
     >
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-2 px-3 min-[400px]:px-5 sm:gap-4 sm:px-8">
         <Wordmark />
-        <TierSwitcher tiers={tiers} currentId={currentId} />
+        <nav aria-label="Lifestyles" className="flex min-w-0 flex-1 items-center">
+          <LifestyleSwitcher lifestyles={tiers} currentId={currentId} />
+        </nav>
       </div>
     </header>
   );
@@ -123,7 +81,7 @@ export function TierView({
   liveTiers,
 }: {
   tier: Pick<Tier, "id" | "name" | "description" | "status">;
-  tiers: SwitcherTier[];
+  tiers: SwitcherLifestyle[];
   groups: TierGroupView[];
   summary: string;
   liveTiers: { id: string; name: string }[];
@@ -143,7 +101,7 @@ export function TierView({
           <div className="mx-auto max-w-[1440px] px-4 pt-6 pb-2 sm:px-6 lg:px-8">
             {tier.status !== "live" ? (
               <p className="mb-3 max-w-2xl text-[14px] leading-6 text-pretty text-muted">
-                <span className="text-ink">{tier.name} is coming soon.</span> The slots below match the other tiers.
+                <span className="text-ink">{tier.name} is coming soon.</span> The slots below match the other lifestyles.
                 {liveTiers.length > 0 ? (
                   <>
                     {" "}

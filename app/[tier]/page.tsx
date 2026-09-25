@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TierView } from "@/components/tier-view";
 import { loadCatalog, srcSetFor } from "@/lib/catalog";
-import { groupsForTier, kitSummary, type TierGroupView } from "@/lib/present";
+import { groupsForTier, kitPicks, kitSummary, type TierGroupView } from "@/lib/present";
 
 export function generateStaticParams() {
   return loadCatalog().tiers.map((tier) => ({ tier: tier.id }));
@@ -48,7 +48,6 @@ export default async function TierRoute({
   const tier = catalog.tiers.find((item) => item.id === tierId);
   if (!tier) notFound();
 
-  const picks = catalog.picks.filter((pick) => pick.tier === tier.id);
   const groups = withImageSources(groupsForTier(catalog, tier.id));
   const liveTiers = catalog.tiers
     .filter((item) => item.status === "live" && item.id !== tier.id)
@@ -64,9 +63,10 @@ export default async function TierRoute({
       id: item.id,
       name: item.name,
       status: item.status,
+      group: item.group,
     })),
     groups,
-    summary: kitSummary(tier, catalog.categories.length, picks),
+    summary: kitSummary(tier, catalog.categories.length, kitPicks(catalog, tier.id)),
     liveTiers,
   };
 
@@ -77,6 +77,7 @@ export default async function TierRoute({
       section: group.section,
       number: category.number,
       pick: category.pick,
+      inheritedFromName: category.inheritedFromName,
     })),
   );
   const { TierShell } = await import("@/components/tier-shell");

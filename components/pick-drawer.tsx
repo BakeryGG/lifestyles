@@ -138,6 +138,7 @@ export function PickDrawer({
   section,
   tierName,
   pick,
+  inheritedFromName,
   closing,
   onClose,
 }: {
@@ -146,6 +147,7 @@ export function PickDrawer({
   number: number;
   tierName: string;
   pick: PresentedPick | null;
+  inheritedFromName?: string | null;
   accent: string;
   closing: boolean;
   onClose: () => void;
@@ -291,6 +293,16 @@ export function PickDrawer({
             <div
               className={
                 showAlt
+                  ? "flex flex-col gap-8"
+                  : "mx-auto flex w-full max-w-md flex-col"
+              }
+            >
+              {inheritedFromName ? (
+                <p className="text-[13px] leading-5 text-muted">Same as {inheritedFromName}</p>
+              ) : null}
+              <div
+              className={
+                showAlt
                   ? "flex flex-col gap-8 min-[600px]:grid min-[600px]:grid-cols-2 min-[600px]:grid-rows-[auto_auto_auto_auto_auto_auto_auto] min-[600px]:gap-x-6 min-[600px]:gap-y-0"
                   : "mx-auto flex w-full max-w-md flex-col"
               }
@@ -311,6 +323,7 @@ export function PickDrawer({
                   tone="muted"
                 />
               ) : null}
+              </div>
             </div>
           )}
         </div>
