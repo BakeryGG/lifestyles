@@ -5,6 +5,8 @@ import { parseCatalog, type Catalog, type CatalogIssue } from "./schema";
 const CATALOG_PATH = path.join(process.cwd(), "data", "catalog.json");
 const PLACEHOLDER = "/images/placeholder.svg";
 const VARIANT_WIDTHS = [480, 960, 1440] as const;
+/** A lone raster wider than a desktop card at 2x must ship width variants. */
+const MAX_LONE_RASTER = 1440;
 
 let cache: { mtimeMs: number; stamp: string; catalog: Catalog } | null = null;
 
@@ -97,19 +99,35 @@ export function imageFileIssues(data: unknown, publicDir = path.join(process.cwd
       const product = pick[side];
       if (!isRecord(product) || typeof product.image !== "string") continue;
       const resolved = resolveImageFile(product.image, publicDir);
-      if (!resolved.message) continue;
-      issues.push({
-        path: ["picks", index, side, "image"],
-        message: resolved.message,
-      });
+      if (resolved.message) {
+        issues.push({
+          path: ["picks", index, side, "image"],
+          message: resolved.message,
+        });
+        continue;
+      }
+      for (const message of imageAssetIssues(product.image, publicDir)) {
+        issues.push({
+          path: ["picks", index, side, "image"],
+          message,
+        });
+      }
     }
   });
 
   return issues;
 }
 
+function variantPaths(image: string): string[] {
+  const ext = path.posix.extname(image);
+  if (!ext || ext.toLowerCase() === ".svg") return [];
+  const base = image.slice(0, -ext.length);
+  return VARIANT_WIDTHS.map((width) => `${base}-${width}w${ext}`);
+}
+
 function imageStamp(data: unknown, publicDir: string): string {
   return referencedImages(data)
+    .flatMap((image) => [image, ...variantPaths(image)])
     .sort()
     .map((image) => {
       const resolved = resolveImageFile(image, publicDir);
@@ -171,31 +189,78 @@ function jpegWidth(fd: number): number | null {
   return null;
 }
 
+type WidthCandidate = { url: string; width: number };
+
 /**
  * Width variants named beside the curator file, e.g. `/images/tee-480w.jpg`
- * next to `/images/tee.jpg`. SVGs and files with no variants return undefined.
- * When variants exist, the original is included too if its pixel width can be read.
+ * next to `/images/tee.jpg`. A sibling is used only when its decoded pixel
+ * width matches the suffix. SVGs and files with no valid variants produce
+ * no srcset. The original is included at its decoded width when a sibling is valid.
  */
-export function srcSetFor(image: string, publicDir = path.join(process.cwd(), "public")): string | undefined {
+function collectWidthCandidates(
+  image: string,
+  publicDir: string,
+): { parts: WidthCandidate[]; issues: string[] } {
   const ext = path.posix.extname(image);
-  if (!ext || ext.toLowerCase() === ".svg") return undefined;
+  if (!ext || ext.toLowerCase() === ".svg") return { parts: [], issues: [] };
   const base = image.slice(0, -ext.length);
-  const parts: { url: string; width: number }[] = [];
+  const issues: string[] = [];
+  const parts: WidthCandidate[] = [];
+
   for (const width of VARIANT_WIDTHS) {
     const variant = `${base}-${width}w${ext}`;
     const resolved = resolveImageFile(variant, publicDir);
-    if (resolved.file) parts.push({ url: variant, width });
-  }
-  if (parts.length === 0) return undefined;
-  const original = resolveImageFile(image, publicDir);
-  if (original.file) {
-    const width = readImageWidth(original.file);
-    if (width && width > 0 && !parts.some((part) => part.width === width)) {
-      parts.push({ url: image, width });
+    if (!resolved.file) {
+      if (resolved.message && !resolved.message.startsWith("File not found")) {
+        issues.push(`Width variant public${variant}: ${resolved.message}`);
+      }
+      continue;
     }
+    const decoded = readImageWidth(resolved.file);
+    if (decoded == null) {
+      issues.push(
+        `Width variant public${variant} could not be measured; PNG, GIF, JPEG, and VP8X WebP are supported`,
+      );
+      continue;
+    }
+    if (decoded !== width) {
+      issues.push(`Width variant public${variant} is ${decoded}px wide, not ${width}`);
+      continue;
+    }
+    parts.push({ url: variant, width: decoded });
   }
+
+  const original = resolveImageFile(image, publicDir);
+  const originalWidth = original.file ? readImageWidth(original.file) : null;
+  if (
+    parts.length > 0 &&
+    originalWidth &&
+    originalWidth > 0 &&
+    !parts.some((part) => part.width === originalWidth)
+  ) {
+    parts.push({ url: image, width: originalWidth });
+  }
+
+  if (parts.length === 0 && originalWidth && originalWidth > MAX_LONE_RASTER) {
+    const stem = path.posix.basename(base);
+    issues.push(
+      `Image is ${originalWidth}px wide with no width variants; add ${stem}-480w${ext}, ${stem}-960w${ext}, and ${stem}-1440w${ext} or use a file at most ${MAX_LONE_RASTER}px wide`,
+    );
+  }
+
   parts.sort((a, b) => a.width - b.width);
+  return { parts, issues };
+}
+
+export function srcSetFor(image: string, publicDir = path.join(process.cwd(), "public")): string | undefined {
+  const { parts } = collectWidthCandidates(image, publicDir);
+  if (parts.length === 0) return undefined;
   return parts.map((part) => `${part.url} ${part.width}w`).join(", ");
+}
+
+/** Problems with optional width variants, or a lone raster that is wider than the slot. */
+export function imageAssetIssues(image: string, publicDir = path.join(process.cwd(), "public")): string[] {
+  return collectWidthCandidates(image, publicDir).issues;
 }
 
 /**

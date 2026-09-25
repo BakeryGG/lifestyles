@@ -80,7 +80,6 @@ export function PickController({
   const liveRef = useRef(live);
   const activeRef = useRef<string | null>(null);
   const shownRef = useRef<string | null>(null);
-  const pushedRef = useRef(false);
   const suppressRef = useRef<string | null>(null);
   const returnIdRef = useRef<string | null>(null);
   const wasShownRef = useRef<string | null>(null);
@@ -212,7 +211,15 @@ export function PickController({
     if (!id) return;
     const card = markVisibleCard(id);
     if (!card) return;
-    card.scrollIntoView({ block: "nearest", inline: "nearest" });
+    const rect = card.getBoundingClientRect();
+    const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+    const inView =
+      rect.top >= headerBottom - 1 &&
+      rect.bottom <= window.innerHeight + 1 &&
+      rect.left >= -1 &&
+      rect.right <= window.innerWidth + 1;
+    // The card's scroll-margin makes scrollIntoView nudge a card that is already on screen.
+    if (!inView) card.scrollIntoView({ block: "nearest", inline: "nearest" });
     card.focus({ preventScroll: true });
   }, [shownId]);
 
@@ -228,7 +235,6 @@ export function PickController({
 
   useEffect(() => {
     function onPop() {
-      pushedRef.current = false;
       const raw = new URLSearchParams(window.location.search).get("pick");
       if (suppressRef.current && suppressRef.current !== raw) suppressRef.current = null;
       applyFromLocation();
@@ -246,6 +252,8 @@ export function PickController({
       const current = img.getAttribute("src") ?? "";
       if (current === fallback) return;
       img.dataset.failed = "1";
+      img.srcset = "";
+      img.sizes = "";
       img.src = fallback;
     }
     window.addEventListener("error", onError, true);
@@ -268,12 +276,15 @@ export function PickController({
     const current = new URLSearchParams(window.location.search).get("pick");
     reveal(id);
     if (current === id) return;
+    const state = window.history.state as { lifestylesPushed?: boolean } | null;
+    const pushed = state?.lifestylesPushed === true;
+    // pathname already includes any base path. Replace only when this entry was not pushed
+    // (a deep link, or a switch from one). Forward restores lifestylesPushed with the entry.
     if (current) {
-      window.history.replaceState({ lifestylesPick: id }, "", hrefFor(id));
+      window.history.replaceState({ lifestylesPick: id, lifestylesPushed: pushed }, "", hrefFor(id));
       return;
     }
-    window.history.pushState({ lifestylesPick: id }, "", hrefFor(id));
-    pushedRef.current = true;
+    window.history.pushState({ lifestylesPick: id, lifestylesPushed: true }, "", hrefFor(id));
   }
 
   function closePick() {
@@ -285,8 +296,8 @@ export function PickController({
       suppressRef.current = null;
       return;
     }
-    if (pushedRef.current) {
-      pushedRef.current = false;
+    const state = window.history.state as { lifestylesPushed?: boolean } | null;
+    if (state?.lifestylesPushed) {
       window.history.back();
       return;
     }

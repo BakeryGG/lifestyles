@@ -96,12 +96,3 @@ export function packSections<T>(groups: readonly PackGroup<T>[], columns: number
 
   return placed;
 }
-
-export function sectionSlug(section: string): string {
-  const slug = section
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return slug || "section";
-}

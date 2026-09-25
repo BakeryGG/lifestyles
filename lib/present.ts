@@ -51,7 +51,7 @@ export function kitSummary(
   const money = formatPrice(total, priced[0].main.currency);
   if (priced.length >= categoryCount) return `${lead}, about ${money} total`;
   if (priced.length === 1) return `${lead}, about ${money} for the 1 pick so far`;
-  return `${lead}, about ${money} for the ${priced.length} picked so far`;
+  return `${lead}, about ${money} for the ${priced.length} picks so far`;
 }
 
 export type ShownProduct = Product & { srcSet?: string };
@@ -72,6 +72,8 @@ export type TierCategoryView = {
 
 export type TierGroupView = {
   section: string;
+  /** Index of this label in `catalog.sections`. Heading ids use it, not a slug. */
+  sectionIndex: number;
   categories: TierCategoryView[];
 };
 
@@ -82,8 +84,9 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
   const numberById = new Map(catalog.categories.map((category, index) => [category.id, index + 1]));
 
   return catalog.sections
-    .map((section) => ({
+    .map((section, sectionIndex) => ({
       section,
+      sectionIndex,
       categories: catalog.categories
         .filter((category) => category.section === section)
         .map((category) => {

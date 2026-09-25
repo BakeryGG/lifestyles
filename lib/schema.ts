@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isBuyableUrl, isHttpUrl, isPlaceholderBrand, isUnfinishedCopy } from "./copy";
+import { sectionHeadingId } from "./section-id";
 
 const slug = z
   .string()
@@ -138,6 +139,7 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
 
   const sectionExact = new Map<string, number>();
   const sectionFold = new Map<string, number>();
+  const headingIds = new Map<string, number>();
   sections.forEach((section, index) => {
     if (typeof section !== "string") return;
     const name = section.trim();
@@ -154,6 +156,16 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
     } else {
       sectionExact.set(name, index);
       sectionFold.set(fold, index);
+    }
+    const headingId = sectionHeadingId(index);
+    const idPrevious = headingIds.get(headingId);
+    if (idPrevious !== undefined) {
+      issues.push({
+        path: ["sections", index],
+        message: `Duplicate section heading id ${JSON.stringify(headingId)} (also at sections[${idPrevious}])`,
+      });
+    } else {
+      headingIds.set(headingId, index);
     }
   });
 

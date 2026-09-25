@@ -16,7 +16,8 @@ import { ReservedPlate } from "./reserved-plate";
 const FOCUSABLE =
   "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
-const DRAWER_SIZES = "(min-width: 1024px) 320px, (min-width: 600px) 42vw, 88vw";
+const DRAWER_SIZES =
+  "(min-width: 1024px) 312px, (min-width: 600px) calc((100vw - 56px) / 2), calc(100vw - 40px)";
 
 function ExternalIcon() {
   return (

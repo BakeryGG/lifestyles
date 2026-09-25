@@ -1,6 +1,8 @@
+import type { CSSProperties } from "react";
 import { CategoryCard } from "./category-card";
-import { accentColors, type TierGroupView } from "@/lib/present";
-import { DESKTOP_COLUMNS, packSections, sectionSlug } from "@/lib/pack";
+import { accentColors, type TierCategoryView, type TierGroupView } from "@/lib/present";
+import { DESKTOP_COLUMNS, packSections, type PlacedSection } from "@/lib/pack";
+import { sectionHeadingId } from "@/lib/section-id";
 import type { Tier } from "@/lib/schema";
 
 const segment =
@@ -26,7 +28,6 @@ function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: 
             return (
               <span
                 key={tier.id}
-                aria-disabled="true"
                 title="Coming soon"
                 className={`${segment} cursor-default text-muted underline decoration-dotted decoration-from-font underline-offset-4`}
                 style={current ? selectedSegment : undefined}
@@ -49,6 +50,7 @@ function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: 
               style={current ? selectedSegment : undefined}
             >
               {tier.name}
+              {current ? <span className="sr-only">, current page</span> : null}
             </a>
           );
         })}
@@ -75,21 +77,50 @@ function Header({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string
   );
 }
 
-const mainClass =
-  "scroll-mt-14 focus:outline focus:outline-2 focus:outline-offset-4 focus:outline-ink";
+const mainClass = "content-focus scroll-mt-14";
 
-function prioritiesFor(groups: TierGroupView[]): Map<string, "high" | "eager" | "lazy"> {
+function placeStyle(column: number, row: number, span?: number): CSSProperties {
+  return {
+    "--kit-col": column,
+    "--kit-span": span ?? 1,
+    "--kit-row": row,
+  } as CSSProperties;
+}
+
+/** Eager only for picked images on the desktop first row, so nothing off that row joins the LCP fetch. */
+function prioritiesFor(
+  groups: TierGroupView[],
+  packed: PlacedSection<TierCategoryView>[],
+): Map<string, "high" | "eager" | "lazy"> {
   const priorities = new Map<string, "high" | "eager" | "lazy">();
-  let eager = 0;
   for (const group of groups) {
-    for (const category of group.categories) {
-      if (category.pick && eager < 2) {
-        priorities.set(category.id, eager === 0 ? "high" : "eager");
-        eager += 1;
-      } else {
-        priorities.set(category.id, "lazy");
-      }
+    for (const category of group.categories) priorities.set(category.id, "lazy");
+  }
+
+  let firstCardRow = Number.POSITIVE_INFINITY;
+  const firstRow: { id: string; column: number; hasPick: boolean }[] = [];
+  for (const section of packed) {
+    for (const placed of section.items) {
+      firstCardRow = Math.min(firstCardRow, placed.row);
     }
+  }
+  for (const section of packed) {
+    for (const placed of section.items) {
+      if (placed.row !== firstCardRow) continue;
+      firstRow.push({
+        id: placed.item.id,
+        column: placed.column,
+        hasPick: placed.item.pick != null,
+      });
+    }
+  }
+  firstRow.sort((a, b) => a.column - b.column);
+
+  let eager = 0;
+  for (const item of firstRow) {
+    if (!item.hasPick) continue;
+    priorities.set(item.id, eager === 0 ? "high" : "eager");
+    eager += 1;
   }
   return priorities;
 }
@@ -108,11 +139,12 @@ export function TierView({
   liveTiers: { id: string; name: string }[];
 }) {
   const colors = accentColors(tier.accent);
-  const priorities = prioritiesFor(groups);
   const packed = packSections(
     groups.map((group) => ({ section: group.section, items: group.categories })),
     DESKTOP_COLUMNS,
   );
+  const priorities = prioritiesFor(groups, packed);
+  const placedBySection = new Map(packed.map((section) => [section.section, section]));
 
   return (
     <div className="min-h-full">
@@ -145,64 +177,37 @@ export function TierView({
             </div>
           </div>
           <div className="mx-auto max-w-[1440px] px-4 pt-2 pb-2 sm:px-6">
-            <div className="flex flex-col gap-6 lg:hidden" data-pack="sections">
+            <div className="kit-grid">
               {groups.map((group) => {
-                const headingId = `section-${sectionSlug(group.section)}`;
+                const placed = placedBySection.get(group.section);
+                const headingId = sectionHeadingId(group.sectionIndex);
                 return (
-                  <section key={group.section} aria-labelledby={headingId} className="min-w-0">
-                    <h2 id={headingId} className={`mb-2 ${sectionHeading}`}>
-                      {group.section}
-                    </h2>
-                    <div className="grid grid-cols-2 items-stretch gap-3">
-                      {group.categories.map((category) => (
-                        <CategoryCard
-                          key={category.id}
-                          id={category.id}
-                          name={category.name}
-                          pick={category.pick}
-                          number={category.number}
-                          priority={priorities.get(category.id) ?? "lazy"}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-            <div
-              className="hidden lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-x-4 lg:gap-y-2"
-              data-pack="desktop"
-            >
-              {packed.map((section) => {
-                const headingId = `section-lg-${sectionSlug(section.section)}`;
-                return (
-                  <section key={section.section} aria-labelledby={headingId} className="contents">
+                  <section key={group.section} aria-labelledby={headingId}>
                     <h2
                       id={headingId}
-                      style={{
-                        gridColumn: `${section.column} / span ${section.span}`,
-                        gridRow: section.headerRow,
-                      }}
-                      className={`flex items-end ${sectionHeading}`}
+                      style={placed ? placeStyle(placed.column, placed.headerRow, placed.span) : undefined}
+                      className={`kit-heading ${sectionHeading}`}
                     >
-                      {section.section}
+                      {group.section}
                     </h2>
-                    {section.items.map(({ item, column, row }) => (
-                      <div
-                        key={item.id}
-                        style={{ gridColumn: column, gridRow: row }}
-                        className="min-w-0"
-                      >
-                        {/* Lazy on purpose: the phone tree owns fetchpriority, so this hidden copy does not preload a second time. */}
-                        <CategoryCard
-                          id={item.id}
-                          name={item.name}
-                          pick={item.pick}
-                          number={item.number}
-                          priority="lazy"
-                        />
-                      </div>
-                    ))}
+                    {group.categories.map((category) => {
+                      const spot = placed?.items.find((item) => item.item.id === category.id);
+                      return (
+                        <div
+                          key={category.id}
+                          className="kit-card min-w-0"
+                          style={spot ? placeStyle(spot.column, spot.row) : undefined}
+                        >
+                          <CategoryCard
+                            id={category.id}
+                            name={category.name}
+                            pick={category.pick}
+                            number={category.number}
+                            priority={priorities.get(category.id) ?? "lazy"}
+                          />
+                        </div>
+                      );
+                    })}
                   </section>
                 );
               })}

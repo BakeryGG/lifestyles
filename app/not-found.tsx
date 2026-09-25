@@ -9,7 +9,7 @@ export default function NotFound() {
     <main
       id="content"
       tabIndex={-1}
-      className="mx-auto flex min-h-full max-w-lg scroll-mt-14 flex-col px-6 pt-24 pb-16 focus:outline focus:outline-2 focus:outline-offset-4 focus:outline-ink"
+      className="content-focus mx-auto flex min-h-full max-w-lg scroll-mt-14 flex-col px-6 pt-24 pb-16"
     >
       <h1 className="text-3xl font-semibold tracking-tight">This page is not in the catalog.</h1>
       <p className="mt-4 text-muted">That address does not match a tier.</p>

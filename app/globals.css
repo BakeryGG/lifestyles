@@ -9,7 +9,8 @@
   --color-card: #fffcf8;
   --color-well: #efeee9;
   --color-stage: #f6f5f2;
-  --color-plate: #9a948a;
+  /* Large plate numerals (weight 300, ≥44px) need 3:1 on stage and on the card wash. */
+  --color-plate: #8e897f;
 }
 
 @view-transition {
@@ -55,6 +56,62 @@
 ::selection {
   background: #e4e1da;
   color: #1c1c1a;
+}
+
+/* Skip-link target. An outset outline sits outside the viewport; keep the ring inside the page. */
+.content-focus:focus {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+
+/* One card tree. Below 1024px, sections stack in catalog order.
+   From 1024px, --kit-col / --kit-row apply the desktop pack without a second copy. */
+.kit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.75rem;
+  row-gap: 0.75rem;
+  align-items: stretch;
+}
+
+.kit-grid > section {
+  display: contents;
+}
+
+.kit-heading {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  /* 12px row-gap − 4px = the previous 8px under a heading. */
+  margin-bottom: -0.25rem;
+}
+
+.kit-grid > section + section > .kit-heading {
+  /* 12px row-gap + 12px = the previous 24px between sections. */
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 64rem) {
+  .kit-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+  }
+
+  .kit-heading,
+  .kit-grid > section + section > .kit-heading {
+    grid-column: var(--kit-col) / span var(--kit-span);
+    grid-row: var(--kit-row);
+    margin-top: 0;
+    margin-bottom: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .kit-card {
+    grid-column: var(--kit-col);
+    grid-row: var(--kit-row);
+  }
 }
 
 @keyframes lifestyles-fade {

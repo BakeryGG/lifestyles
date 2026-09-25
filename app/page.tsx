@@ -71,7 +71,7 @@ export default function HomePage() {
     <main
       id="content"
       tabIndex={-1}
-      className="mx-auto flex min-h-full w-full max-w-5xl scroll-mt-14 flex-col px-6 pt-12 pb-16 focus:outline focus:outline-2 focus:outline-offset-4 focus:outline-ink sm:pt-16 lg:pt-24"
+      className="content-focus mx-auto flex min-h-full w-full max-w-5xl scroll-mt-14 flex-col px-6 pt-12 pb-16 sm:pt-16 lg:pt-24"
     >
       <h1 className="max-w-[16ch] text-balance text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-5xl">
         {"Pick how you live. We'll tell you what to buy."}
