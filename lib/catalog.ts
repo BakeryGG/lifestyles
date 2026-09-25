@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { parseCatalog, type Catalog } from "./schema";
+import { parseCatalog, type Catalog, type CatalogIssue } from "./schema";
 
 const CATALOG_PATH = path.join(process.cwd(), "data", "catalog.json");
 
@@ -8,6 +8,50 @@ let cache: { mtimeMs: number; catalog: Catalog } | null = null;
 
 function invalid(detail: string): Error {
   return new Error(`catalog.json is invalid:\n  - (root): ${detail}`);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function imageIssueMessage(image: string, root: string): string | null {
+  if (image.includes("\0")) return "Image path escapes public/";
+  const relative = image.replace(/^[/\\]+/, "");
+  const resolved = path.resolve(root, relative);
+  const fromRoot = path.relative(root, resolved);
+  if (fromRoot.startsWith("..") || path.isAbsolute(fromRoot)) {
+    return "Image path escapes public/";
+  }
+  try {
+    if (fs.statSync(resolved).isFile()) return null;
+  } catch {
+    // Missing, or not a file.
+  }
+  const display = image.startsWith("/") ? `public${image}` : `public/${image}`;
+  return `File not found at ${display}`;
+}
+
+/** Fail the build when an image path is missing or escapes public/. */
+export function imageFileIssues(data: unknown, publicDir = path.join(process.cwd(), "public")): CatalogIssue[] {
+  if (!isRecord(data) || !Array.isArray(data.picks)) return [];
+  const root = path.resolve(publicDir);
+  const issues: CatalogIssue[] = [];
+
+  data.picks.forEach((pick, index) => {
+    if (!isRecord(pick)) return;
+    for (const side of ["main", "alt"] as const) {
+      const product = pick[side];
+      if (!isRecord(product) || typeof product.image !== "string") continue;
+      const message = imageIssueMessage(product.image, root);
+      if (!message) continue;
+      issues.push({
+        path: ["picks", index, side, "image"],
+        message,
+      });
+    }
+  });
+
+  return issues;
 }
 
 /**
@@ -45,7 +89,7 @@ export function loadCatalog(): Catalog {
   }
 
   try {
-    const catalog = parseCatalog(data);
+    const catalog = parseCatalog(data, imageFileIssues(data));
     cache = { mtimeMs: stat.mtimeMs, catalog };
     return catalog;
   } catch (error) {

@@ -1,24 +1,27 @@
-"use client";
-
-import Image from "next/image";
-import { useState } from "react";
-
-const FALLBACK = "/images/placeholder.svg";
-
-export function ProductImage({ src, alt }: { src: string; alt: string }) {
-  const [current, setCurrent] = useState(src || FALLBACK);
-
+export function ProductImage({
+  src,
+  priority = false,
+  sizes,
+  className,
+}: {
+  src: string;
+  priority?: boolean;
+  sizes: string;
+  className?: string;
+}) {
   return (
-    <Image
-      src={current || FALLBACK}
-      alt={alt}
+    // eslint-disable-next-line @next/next/no-img-element -- export has no image optimizer
+    <img
+      src={src}
+      alt=""
       width={800}
       height={600}
-      unoptimized
-      className="h-full w-full object-contain"
-      onError={() => {
-        setCurrent((previous) => (previous === FALLBACK ? previous : FALLBACK));
-      }}
+      sizes={sizes}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      decoding={priority ? "sync" : "async"}
+      data-fallback="/images/placeholder.svg"
+      className={className}
     />
   );
 }

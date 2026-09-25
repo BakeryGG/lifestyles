@@ -1,25 +1,33 @@
 import type { AltProduct, Catalog, CatalogPick, Product, Tier } from "./schema";
 
-/** Curator placeholder. The seed uses the exact brand string "TODO". */
+/**
+ * Curator placeholder. The seed uses the exact brand string "TODO"
+ * (any case, surrounding spaces ignored). Names like "Todo Wool Tee" are real.
+ */
 export function isPlaceholderBrand(brand: string | null | undefined): boolean {
   if (brand == null) return true;
   const value = brand.trim();
   return value.length === 0 || value.toUpperCase() === "TODO";
 }
 
+/** Exact "TODO" or a "TODO:" note. Does not match text that merely contains those letters. */
+export function isUnfinishedCopy(value: string | null | undefined): boolean {
+  if (value == null) return false;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return false;
+  const upper = trimmed.toUpperCase();
+  return upper === "TODO" || upper.startsWith("TODO:");
+}
+
 export function isRealProduct(product: { brand?: string | null } | null | undefined): boolean {
   return !!product && !isPlaceholderBrand(product.brand);
 }
 
-/** Returns null for blank values and curator TODO notes so they are never shown. */
+/** Hide blank copy and curator TODO notes. Real titles that contain "todo" stay visible. */
 export function displayText(value: string | null | undefined): string | null {
   if (value == null) return null;
   const trimmed = value.trim();
-  if (trimmed.length === 0) return null;
-  const upper = trimmed.toUpperCase();
-  if (upper === "TODO" || upper.startsWith("TODO:") || upper.startsWith("TODO ")) {
-    return null;
-  }
+  if (trimmed.length === 0 || isUnfinishedCopy(trimmed)) return null;
   return trimmed;
 }
 
@@ -28,10 +36,11 @@ export function visibleBrands(brands: string[]): string[] {
 }
 
 export function isBuyableUrl(url: string | null | undefined): boolean {
-  if (!url || /todo/i.test(url)) return false;
+  if (!url) return false;
   try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    const parsed = new URL(url.trim());
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+    return parsed.hostname.toLowerCase() !== "todo";
   } catch {
     return false;
   }
@@ -65,7 +74,9 @@ export function kitSummary(
   if (currencies.size !== 1) return `${lead}, prices coming`;
 
   const total = priced.reduce((sum, pick) => sum + pick.main.price, 0);
-  return `${lead}, about ${formatPrice(total, priced[0].main.currency)} total`;
+  const money = formatPrice(total, priced[0].main.currency);
+  if (priced.length >= categoryCount) return `${lead}, about ${money} total`;
+  return `${lead}, about ${money} for the ${priced.length} picked so far`;
 }
 
 export type PresentedPick = {
@@ -83,6 +94,8 @@ export type TierGroupView = {
   section: string;
   categories: TierCategoryView[];
 };
+
+export type FlatCategory = TierCategoryView & { section: string };
 
 export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[] {
   const byCategory = new Map(
@@ -112,12 +125,25 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
     .filter((group) => group.categories.length > 0);
 }
 
+export function flattenGroups(groups: TierGroupView[]): FlatCategory[] {
+  return groups.flatMap((group) =>
+    group.categories.map((category) => ({ ...category, section: group.section })),
+  );
+}
+
+/** First card of a section, or the first card of a row that section continues onto. */
+export function showsSectionLabel(sections: readonly string[], index: number, columns: number): boolean {
+  if (columns < 1 || index < 0 || index >= sections.length) return false;
+  if (index === 0 || sections[index] !== sections[index - 1]) return true;
+  return index % columns === 0;
+}
+
 export type AccentColors = {
   raw: string;
-  /** Accent darkened until white label text clears WCAG AA, for buttons and the active switcher. */
+  /** Accent darkened until white label text clears WCAG AA. Used for Buy buttons and the switcher ring. */
   buttonBg: string;
   buttonFg: string;
-  /** Soft wash of the original accent for the kit strip. */
+  /** Soft wash of the original accent. */
   tint: string;
 };
 
