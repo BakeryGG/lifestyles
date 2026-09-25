@@ -4,9 +4,6 @@ import { TierView } from "@/components/tier-view";
 import { loadCatalog, srcSetFor } from "@/lib/catalog";
 import { groupsForTier, kitSummary, type TierGroupView } from "@/lib/present";
 
-const STRIP_PICK =
-  '(function(){try{var p=new URLSearchParams(location.search);if(!p.has("pick"))return;p.delete("pick");var s=p.toString();history.replaceState(null,"",s?location.pathname+"?"+s:location.pathname);}catch(e){}})();';
-
 export function generateStaticParams() {
   return loadCatalog().tiers.map((tier) => ({ tier: tier.id }));
 }
@@ -62,7 +59,6 @@ export default async function TierRoute({
       name: tier.name,
       description: tier.description,
       status: tier.status,
-      accent: tier.accent,
     },
     tiers: catalog.tiers.map((item) => ({
       id: item.id,
@@ -73,15 +69,6 @@ export default async function TierRoute({
     summary: kitSummary(tier, catalog.categories.length, picks),
     liveTiers,
   };
-
-  if (tier.status !== "live") {
-    return (
-      <>
-        <script dangerouslySetInnerHTML={{ __html: STRIP_PICK }} />
-        <TierView {...view} />
-      </>
-    );
-  }
 
   const categories = groups.flatMap((group) =>
     group.categories.map((category) => ({

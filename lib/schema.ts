@@ -66,14 +66,30 @@ const altSchema = productSchema
   })
   .strict();
 
+const whoFor = z
+  .string()
+  .trim()
+  .min(1, "Required")
+  .max(140, "Expected at most 140 characters")
+  .refine((value) => !/[\r\n]/.test(value), "Expected a single line");
+
 const tierSchema = z
   .object({
     id: slug,
     name: text,
     description: text,
+    whoFor: whoFor.optional(),
     exampleBrands: z.array(text),
+    brandChips: z.array(text).optional(),
     status: z.enum(["live", "coming_soon"]),
     accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
+  })
+  .strict();
+
+const landingSchema = z
+  .object({
+    anchorCategory: slug,
+    compareCategories: z.array(slug).min(1, "Expected at least one category"),
   })
   .strict();
 
@@ -99,6 +115,7 @@ export const catalogSchema = z
     tiers: z.array(tierSchema).min(1, "Expected at least one tier"),
     sections: z.array(text).min(1, "Expected at least one section"),
     categories: z.array(categorySchema),
+    landing: landingSchema,
     picks: z.array(pickSchema),
   })
   .strict();
@@ -191,6 +208,38 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
       });
     }
   });
+
+  const landing = data.landing;
+  if (isRecord(landing)) {
+    const anchor = typeof landing.anchorCategory === "string" ? landing.anchorCategory : null;
+    if (anchor && !categoryIds.has(anchor)) {
+      issues.push({
+        path: ["landing", "anchorCategory"],
+        message: `Unknown category ${JSON.stringify(anchor)}`,
+      });
+    }
+    if (Array.isArray(landing.compareCategories)) {
+      const seen = new Map<string, number>();
+      landing.compareCategories.forEach((value, index) => {
+        if (typeof value !== "string" || value.length === 0) return;
+        if (!categoryIds.has(value)) {
+          issues.push({
+            path: ["landing", "compareCategories", index],
+            message: `Unknown category ${JSON.stringify(value)}`,
+          });
+        }
+        const previous = seen.get(value);
+        if (previous !== undefined) {
+          issues.push({
+            path: ["landing", "compareCategories", index],
+            message: `Duplicate category ${JSON.stringify(value)} (also at landing.compareCategories[${previous}])`,
+          });
+        } else {
+          seen.set(value, index);
+        }
+      });
+    }
+  }
 
   const pickKeys = new Map<string, number>();
   picks.forEach((pick, index) => {

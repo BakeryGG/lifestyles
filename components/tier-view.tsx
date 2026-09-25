@@ -1,57 +1,50 @@
 import type { CSSProperties } from "react";
+import { ViewTransition } from "react";
 import Link from "next/link";
 import { CategoryCard } from "./category-card";
-import { accentColors, type TierCategoryView, type TierGroupView } from "@/lib/present";
+import { Wordmark } from "./wordmark";
+import type { TierCategoryView, TierGroupView } from "@/lib/present";
 import { DESKTOP_COLUMNS, packSections, type PlacedSection } from "@/lib/pack";
 import { sectionHeadingId } from "@/lib/section-id";
 import type { Tier } from "@/lib/schema";
 
 const segment =
-  "inline-flex min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-full px-2 text-[12px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink sm:px-3 sm:text-[13px]";
-
-const sectionHeading = "border-b border-line pb-1 text-[12px] font-medium leading-4 text-muted";
+  "inline-flex h-11 min-w-0 items-center justify-center gap-1 rounded-full px-1 text-[10px] leading-none tracking-[-0.01em] whitespace-nowrap transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:px-2 min-[400px]:text-[12px] min-[520px]:min-w-[4.75rem] min-[520px]:px-3 min-[520px]:text-[13px]";
 
 type SwitcherTier = Pick<Tier, "id" | "name" | "status">;
 
-const selectedSegment = {
-  backgroundColor: "#fffcf8",
-  color: "#1c1c1a",
-  boxShadow: "inset 0 0 0 1.5px #1c1c1a",
-};
-
 function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string }) {
   return (
-    <nav aria-label="Lifestyle tier" className="ml-auto min-w-0">
-      <div className="inline-grid max-w-full grid-flow-col auto-cols-fr rounded-full bg-well p-1">
+    <nav aria-label="Lifestyle tier" className="ml-auto min-w-0 flex-1">
+      <div className="ml-auto grid w-full max-w-[16.25rem] grid-cols-3 rounded-full bg-field p-0.5 min-[520px]:w-max min-[520px]:max-w-none">
         {tiers.map((tier) => {
           const current = tier.id === currentId;
-          if (tier.status !== "live") {
+          const soon = tier.status !== "live";
+          const className = `${segment} ${current ? "bg-ink text-white" : soon ? "text-muted" : "text-ink"}`;
+          const inner = (
+            <>
+              {tier.name}
+              {soon ? (
+                <>
+                  <span aria-hidden="true" className="text-[9px] leading-none tracking-normal min-[400px]:text-[10px]">
+                    Soon
+                  </span>
+                  <span className="sr-only">, coming soon</span>
+                </>
+              ) : null}
+              {current ? <span className="sr-only">, current page</span> : null}
+            </>
+          );
+          if (soon) {
             return (
-              <span
-                key={tier.id}
-                title="Coming soon"
-                className={`${segment} cursor-default text-muted underline decoration-dotted decoration-from-font underline-offset-4`}
-                style={current ? selectedSegment : undefined}
-              >
-                {tier.name}
-                <sup className="ml-1 hidden text-[10px] font-semibold leading-none sm:inline" aria-hidden="true">
-                  Soon
-                </sup>
-                <span className="sr-only">, coming soon</span>
-                {current ? <span className="sr-only">, current page</span> : null}
+              <span key={tier.id} aria-current={current ? "page" : undefined} className={`${className} cursor-default`}>
+                {inner}
               </span>
             );
           }
           return (
-            <Link
-              key={tier.id}
-              href={`/${tier.id}`}
-              aria-current={current ? "page" : undefined}
-              className={`${segment} ${current ? "" : "text-ink"}`}
-              style={current ? selectedSegment : undefined}
-            >
-              {tier.name}
-              {current ? <span className="sr-only">, current page</span> : null}
+            <Link key={tier.id} href={`/${tier.id}`} aria-current={current ? "page" : undefined} className={className}>
+              {inner}
             </Link>
           );
         })}
@@ -62,21 +55,19 @@ function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: 
 
 function Header({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1440px] flex-nowrap items-center gap-2 px-3 sm:gap-3 sm:px-6">
-        <Link
-          href="/"
-          className="inline-flex h-11 shrink items-center text-[14px] font-semibold tracking-tight text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink sm:text-[15px]"
-        >
-          Lifestyles
-        </Link>
+    <header
+      className="sticky top-0 z-30 bg-paper/90 backdrop-blur-md"
+      style={{ viewTransitionName: "site-header" }}
+    >
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-2 px-3 min-[400px]:px-5 sm:gap-4 sm:px-8">
+        <Wordmark />
         <TierSwitcher tiers={tiers} currentId={currentId} />
       </div>
     </header>
   );
 }
 
-const mainClass = "content-focus scroll-mt-14";
+const mainClass = "content-focus scroll-mt-16";
 
 function placeStyle(column: number, row: number, span?: number): CSSProperties {
   return {
@@ -131,13 +122,12 @@ export function TierView({
   summary,
   liveTiers,
 }: {
-  tier: Pick<Tier, "id" | "name" | "description" | "status" | "accent">;
+  tier: Pick<Tier, "id" | "name" | "description" | "status">;
   tiers: SwitcherTier[];
   groups: TierGroupView[];
   summary: string;
   liveTiers: { id: string; name: string }[];
 }) {
-  const colors = accentColors(tier.accent);
   const packed = packSections(
     groups.map((group) => ({ section: group.section, items: group.categories })),
     DESKTOP_COLUMNS,
@@ -148,34 +138,34 @@ export function TierView({
   return (
     <div className="min-h-full">
       <Header tiers={tiers} currentId={tier.id} />
-      {tier.status !== "live" ? (
+      <ViewTransition name="kit" share="crossfade" default="none" enter="none" exit="none">
         <main id="content" tabIndex={-1} className={mainClass}>
-          <div className="mx-auto flex max-w-xl flex-col items-center px-6 pt-16 pb-16 text-center sm:pt-20">
-            <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{tier.name} is coming soon</h1>
-            <p className="mt-4 text-lg leading-7 text-pretty text-muted">{tier.description}</p>
-            {liveTiers.length > 0 ? (
-              <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2">
-                {liveTiers.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/${item.id}`}
-                    className="inline-flex min-h-11 items-center text-sm font-medium text-ink underline decoration-current underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
-                  >
-                    See the {item.name} kit
-                  </Link>
-                ))}
-              </div>
+          <div className="mx-auto max-w-[1440px] px-4 pt-6 pb-2 sm:px-6 lg:px-8">
+            {tier.status !== "live" ? (
+              <p className="mb-3 max-w-2xl text-[14px] leading-6 text-pretty text-muted">
+                <span className="text-ink">{tier.name} is coming soon.</span> The slots below match the other tiers.
+                {liveTiers.length > 0 ? (
+                  <>
+                    {" "}
+                    {liveTiers.map((item, index) => (
+                      <span key={item.id}>
+                        {index > 0 ? " " : null}
+                        <Link
+                          href={`/${item.id}`}
+                          className="text-ink underline decoration-line underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+                        >
+                          See the {item.name} kit
+                        </Link>
+                        .
+                      </span>
+                    ))}
+                  </>
+                ) : null}
+              </p>
             ) : null}
+            <h1 className="text-[1.25rem] leading-7 font-normal tracking-[-0.02em] text-ink">{summary}</h1>
           </div>
-        </main>
-      ) : (
-        <main id="content" tabIndex={-1} className={mainClass}>
-          <div className="border-b border-line bg-paper" style={{ boxShadow: `inset 0 2px 0 ${colors.raw}` }}>
-            <div className="mx-auto max-w-[1440px] px-4 py-2 sm:px-6">
-              <h1 className="text-base font-medium leading-6 tracking-tight text-ink">{summary}</h1>
-            </div>
-          </div>
-          <div className="mx-auto max-w-[1440px] px-4 pt-2 pb-2 sm:px-6">
+          <div className="mx-auto max-w-[1440px] px-4 pt-4 pb-16 sm:px-6 lg:px-8">
             <div className="kit-grid">
               {groups.map((group) => {
                 const placed = placedBySection.get(group.section);
@@ -185,7 +175,7 @@ export function TierView({
                     <h2
                       id={headingId}
                       style={placed ? placeStyle(placed.column, placed.headerRow, placed.span) : undefined}
-                      className={`kit-heading ${sectionHeading}`}
+                      className="kit-heading text-[13px] leading-5 tracking-[0.01em] text-muted"
                     >
                       {group.section}
                     </h2>
@@ -200,8 +190,9 @@ export function TierView({
                           <CategoryCard
                             id={category.id}
                             name={category.name}
+                            section={group.section}
                             pick={category.pick}
-                            number={category.number}
+                            hints={category.hints}
                             priority={priorities.get(category.id) ?? "lazy"}
                           />
                         </div>
@@ -213,7 +204,7 @@ export function TierView({
             </div>
           </div>
         </main>
-      )}
+      </ViewTransition>
     </div>
   );
 }

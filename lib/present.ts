@@ -19,6 +19,23 @@ export function visibleBrands(brands: string[]): string[] {
   return brands.filter((brand) => !isPlaceholderBrand(brand));
 }
 
+/** Brand chips for the suggester. `brandChips` wins when the key is present, even if empty. */
+export function tierBrandList(tier: Pick<Tier, "brandChips" | "exampleBrands">): string[] {
+  return visibleBrands(tier.brandChips ?? tier.exampleBrands);
+}
+
+/** Stable URL slug. "H&M" → "h-and-m", "Old Navy" → "old-navy". */
+export function brandSlug(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function formatPrice(price: number, currency: string): string {
   const amount = Object.is(price, -0) ? 0 : price;
   const digits = Number.isInteger(amount) ? 0 : 2;
@@ -54,6 +71,196 @@ export function kitSummary(
   return `${lead}, about ${money} for the ${priced.length} picks so far`;
 }
 
+/** Landing-card kit line. Shorter than the tier-page summary, still honest about partial prices. */
+export function landingKitLine(categoryCount: number, picks: CatalogPick[]): string {
+  const priced = picks.filter((pick) => isRealProduct(pick.main));
+  if (priced.length === 0) return "Kit prices coming";
+  const currencies = new Set(priced.map((pick) => pick.main.currency));
+  if (currencies.size !== 1) return "Kit prices coming";
+  const first = priced[0];
+  if (!first) return "Kit prices coming";
+  const total = priced.reduce((sum, pick) => sum + (Object.is(pick.main.price, -0) ? 0 : pick.main.price), 0);
+  const money = formatPrice(total, first.main.currency);
+  if (priced.length >= categoryCount) return `Full kit: about ${money}`;
+  if (priced.length === 1) return `Full kit: about ${money} for 1 pick`;
+  return `Full kit: about ${money} for ${priced.length} picks`;
+}
+
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
+/** Status pill copy, from tier names and statuses. No hard-coded tier ids. */
+export function liveStatusLine(tiers: Pick<Tier, "name" | "status">[]): string {
+  const live = tiers.filter((tier) => tier.status === "live").map((tier) => tier.name);
+  const soon = tiers.filter((tier) => tier.status !== "live").map((tier) => tier.name);
+  const liveText =
+    live.length === 0 ? "No tier is live yet" : live.length === 1 ? `${live[0]} is live` : `${joinNames(live)} are live`;
+  if (soon.length === 0) return liveText;
+  return `${liveText} · ${joinNames(soon)} coming soon`;
+}
+
+export type LandingTierCard = {
+  id: string;
+  name: string;
+  description: string;
+  whoFor: string | null;
+  status: Tier["status"];
+  brands: string[];
+  anchorLine: string;
+  kitLine: string;
+};
+
+export function landingTierCards(catalog: Catalog): LandingTierCard[] {
+  const anchor = catalog.categories.find((category) => category.id === catalog.landing.anchorCategory);
+  const anchorName = anchor?.name ?? "Pick";
+  return catalog.tiers.map((tier) => {
+    const picks = catalog.picks.filter((pick) => pick.tier === tier.id);
+    const anchorPick = picks.find((pick) => pick.category === catalog.landing.anchorCategory);
+    const anchorReal = anchorPick && isRealProduct(anchorPick.main) ? anchorPick.main : null;
+    const anchorLine = anchorReal
+      ? `Typical ${anchorName.toLowerCase()}: ${formatPrice(anchorReal.price, anchorReal.currency)}`
+      : `${anchorName} pick coming`;
+    return {
+      id: tier.id,
+      name: tier.name,
+      description: tier.description,
+      whoFor: tier.whoFor ?? null,
+      status: tier.status,
+      brands: tierBrandList(tier),
+      anchorLine,
+      kitLine: landingKitLine(catalog.categories.length, picks),
+    };
+  });
+}
+
+export type CompareCell = {
+  tierId: string;
+  empty: boolean;
+  brand: string | null;
+  name: string | null;
+  price: string | null;
+  image: string | null;
+};
+
+export type CompareRow = {
+  categoryId: string;
+  categoryName: string;
+  section: string;
+  cells: CompareCell[];
+};
+
+export function comparisonRows(catalog: Catalog): CompareRow[] {
+  return catalog.landing.compareCategories.map((categoryId) => {
+    const category = catalog.categories.find((item) => item.id === categoryId);
+    return {
+      categoryId,
+      categoryName: category?.name ?? categoryId,
+      section: category?.section ?? "",
+      cells: catalog.tiers.map((tier) => {
+        const pick = catalog.picks.find((item) => item.tier === tier.id && item.category === categoryId);
+        if (!pick || !isRealProduct(pick.main)) {
+          return { tierId: tier.id, empty: true, brand: null, name: null, price: null, image: null };
+        }
+        return {
+          tierId: tier.id,
+          empty: false,
+          brand: displayText(pick.main.brand),
+          name: displayText(pick.main.name),
+          price: formatPrice(pick.main.price, pick.main.currency),
+          image: pick.main.image,
+        };
+      }),
+    };
+  });
+}
+
+export type SuggestChip = {
+  slug: string;
+  label: string;
+  tierIds: string[];
+};
+
+/**
+ * Brands from every tier, TODO skipped, round-robin across tier order so a tier
+ * is not a visible group. The same slug on two tiers counts for both.
+ */
+export function suggestChips(catalog: Catalog): SuggestChip[] {
+  const perTier = catalog.tiers.map((tier) => ({
+    tierId: tier.id,
+    labels: tierBrandList(tier),
+  }));
+  const max = Math.max(0, ...perTier.map((tier) => tier.labels.length));
+  const ordered: { label: string; tierId: string }[] = [];
+  for (let index = 0; index < max; index += 1) {
+    for (const tier of perTier) {
+      const label = tier.labels[index];
+      if (label) ordered.push({ label, tierId: tier.tierId });
+    }
+  }
+  const bySlug = new Map<string, SuggestChip>();
+  for (const item of ordered) {
+    const slug = brandSlug(item.label);
+    if (!slug) continue;
+    const existing = bySlug.get(slug);
+    if (existing) {
+      if (!existing.tierIds.includes(item.tierId)) existing.tierIds.push(item.tierId);
+    } else {
+      bySlug.set(slug, { slug, label: item.label, tierIds: [item.tierId] });
+    }
+  }
+  return [...bySlug.values()];
+}
+
+export function parseBrandParam(value: string | null): string[] {
+  if (!value) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of value.split(",")) {
+    const slug = part.trim().toLowerCase();
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+  }
+  return out;
+}
+
+export type SuggestTierRef = { id: string; name: string; status: Tier["status"] };
+
+export type SuggestOutcome =
+  | { kind: "empty" }
+  | { kind: "match"; tier: SuggestTierRef }
+  | { kind: "soon"; tier: SuggestTierRef; fallback: SuggestTierRef | null }
+  | { kind: "tie"; tiers: SuggestTierRef[]; fallback: SuggestTierRef | null };
+
+/** Majority of selected brands. A single live tier breaks a tie; otherwise the tie is shown. */
+export function suggestOutcome(tiers: SuggestTierRef[], chips: SuggestChip[], slugs: readonly string[]): SuggestOutcome {
+  const selected = new Set(slugs);
+  const counts = new Map<string, number>(tiers.map((tier) => [tier.id, 0]));
+  for (const chip of chips) {
+    if (!selected.has(chip.slug)) continue;
+    for (const tierId of chip.tierIds) {
+      if (!counts.has(tierId)) continue;
+      counts.set(tierId, (counts.get(tierId) ?? 0) + 1);
+    }
+  }
+  const max = Math.max(0, ...counts.values());
+  if (max === 0) return { kind: "empty" };
+  const leaders = tiers.filter((tier) => counts.get(tier.id) === max);
+  const live = tiers.find((tier) => tier.status === "live") ?? null;
+  const first = leaders[0];
+  if (leaders.length === 1 && first) {
+    if (first.status !== "live") return { kind: "soon", tier: first, fallback: live };
+    return { kind: "match", tier: first };
+  }
+  const liveLeaders = leaders.filter((tier) => tier.status === "live");
+  const liveLeader = liveLeaders[0];
+  if (liveLeaders.length === 1 && liveLeader) return { kind: "match", tier: liveLeader };
+  return { kind: "tie", tiers: leaders, fallback: live };
+}
+
 export type ShownProduct = Product & { srcSet?: string };
 export type ShownAlt = AltProduct & { srcSet?: string };
 
@@ -62,12 +269,45 @@ export type PresentedPick = {
   alt: ShownAlt | null;
 };
 
+export type PriceHint = {
+  tierId: string;
+  tierName: string;
+  /** "Premium: $180" — the arrow is presentational, from `direction`. */
+  text: string;
+  direction: "upgrade" | "save" | "other";
+};
+
+/** Real main picks other tiers have for this category. Empty when every other tier is still TODO. */
+export function priceHintsFor(catalog: Catalog, tierId: string, categoryId: string): PriceHint[] {
+  const current = catalog.picks.find((pick) => pick.tier === tierId && pick.category === categoryId);
+  const currentReal = current && isRealProduct(current.main) ? current.main : null;
+  const hints: PriceHint[] = [];
+  for (const tier of catalog.tiers) {
+    if (tier.id === tierId) continue;
+    const pick = catalog.picks.find((item) => item.tier === tier.id && item.category === categoryId);
+    if (!pick || !isRealProduct(pick.main)) continue;
+    let direction: PriceHint["direction"] = "other";
+    if (currentReal && currentReal.currency === pick.main.currency) {
+      if (pick.main.price > currentReal.price) direction = "upgrade";
+      else if (pick.main.price < currentReal.price) direction = "save";
+    }
+    hints.push({
+      tierId: tier.id,
+      tierName: tier.name,
+      text: `${tier.name}: ${formatPrice(pick.main.price, pick.main.currency)}`,
+      direction,
+    });
+  }
+  return hints;
+}
+
 export type TierCategoryView = {
   id: string;
   name: string;
   /** 1-based position in catalog category order. */
   number: number;
   pick: PresentedPick | null;
+  hints: PriceHint[];
 };
 
 export type TierGroupView = {
@@ -91,14 +331,16 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
         .filter((category) => category.section === section)
         .map((category) => {
           const number = numberById.get(category.id) ?? 0;
+          const hints = priceHintsFor(catalog, tierId, category.id);
           const pick = byCategory.get(category.id);
           if (!pick || !isRealProduct(pick.main)) {
-            return { id: category.id, name: category.name, number, pick: null };
+            return { id: category.id, name: category.name, number, pick: null, hints };
           }
           return {
             id: category.id,
             name: category.name,
             number,
+            hints,
             pick: {
               main: pick.main,
               alt: isRealProduct(pick.alt) ? pick.alt : null,
@@ -107,58 +349,4 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
         }),
     }))
     .filter((group) => group.categories.length > 0);
-}
-
-export type AccentColors = {
-  raw: string;
-  /** Accent darkened until white label text clears WCAG AA. Buy buttons only. */
-  buttonBg: string;
-  buttonFg: string;
-  /** Soft wash of the original accent. */
-  tint: string;
-};
-
-function hexToRgb(hex: string): [number, number, number] {
-  return [
-    Number.parseInt(hex.slice(1, 3), 16),
-    Number.parseInt(hex.slice(3, 5), 16),
-    Number.parseInt(hex.slice(5, 7), 16),
-  ];
-}
-
-function channel(value: number): number {
-  const s = value / 255;
-  return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-}
-
-function luminance(r: number, g: number, b: number): number {
-  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
-}
-
-function contrast(a: number, b: number): number {
-  const [hi, lo] = a > b ? [a, b] : [b, a];
-  return (hi + 0.05) / (lo + 0.05);
-}
-
-function toHex(value: number): string {
-  return Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0");
-}
-
-export function accentColors(accent: string): AccentColors {
-  const raw = /^#[0-9A-Fa-f]{6}$/.test(accent) ? accent : "#1c1c1a";
-  const [r, g, b] = hexToRgb(raw);
-  let br = r;
-  let bg = g;
-  let bb = b;
-  for (let step = 0; step < 40 && contrast(luminance(br, bg, bb), 1) < 4.5; step += 1) {
-    br = Math.round(br * 0.86);
-    bg = Math.round(bg * 0.86);
-    bb = Math.round(bb * 0.86);
-  }
-  return {
-    raw,
-    buttonBg: `#${toHex(br)}${toHex(bg)}${toHex(bb)}`,
-    buttonFg: "#ffffff",
-    tint: `rgba(${r}, ${g}, ${b}, 0.14)`,
-  };
 }

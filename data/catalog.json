@@ -4,7 +4,9 @@
       "id": "budget",
       "name": "Budget",
       "description": "Smart, cheap, and good enough.",
+      "whoFor": "For people who want good-enough and cheap",
       "exampleBrands": ["H&M", "Old Navy", "Target"],
+      "brandChips": ["H&M", "Old Navy", "Target"],
       "status": "coming_soon",
       "accent": "#3B82F6"
     },
@@ -12,15 +14,18 @@
       "id": "mid",
       "name": "Mid",
       "description": "Pay a bit more where it matters.",
+      "whoFor": "For people who spend a little more where it shows",
       "exampleBrands": ["TODO", "TODO", "TODO"],
       "status": "live",
       "accent": "#10B981"
     },
     {
-      "id": "high",
-      "name": "High",
+      "id": "premium",
+      "name": "Premium",
       "description": "The best version of everything.",
+      "whoFor": "For people who want the best version of the everyday",
       "exampleBrands": ["Eight Sleep", "Vuori", "Uniqlo"],
+      "brandChips": ["Eight Sleep", "Vuori", "Uniqlo"],
       "status": "coming_soon",
       "accent": "#111827"
     }
@@ -38,6 +43,10 @@
     { "id": "headphones", "name": "Headphones", "section": "Tech" },
     { "id": "bag", "name": "Daily bag", "section": "Everyday" }
   ],
+  "landing": {
+    "anchorCategory": "tee",
+    "compareCategories": ["tee", "sneakers", "mattress", "headphones"]
+  },
   "picks": [
     {
       "tier": "mid",

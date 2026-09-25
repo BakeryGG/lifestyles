@@ -1,28 +1,51 @@
-import { displayText, formatPrice, type PresentedPick } from "@/lib/present";
+import { displayText, formatPrice, type PresentedPick, type PriceHint } from "@/lib/present";
+import { EmptyPlate } from "./empty-plate";
 import { ProductImage } from "./product-image";
-import { ReservedPlate } from "./reserved-plate";
 
-/** Slot width: 5 columns inside a 1440px frame, or 2 columns below that. */
+/** Slot width: 5 / 4 / 3 / 2 columns inside the tier frame. */
 const CARD_SIZES =
-  "(min-width: 1024px) calc((min(100vw, 1440px) - 112px) / 5), (min-width: 640px) calc((100vw - 60px) / 2), calc((100vw - 44px) / 2)";
+  "(min-width: 1280px) calc((min(100vw, 1440px) - 96px) / 5), (min-width: 1024px) calc((min(100vw, 1440px) - 88px) / 4), (min-width: 768px) calc((100vw - 64px) / 3), calc((100vw - 40px) / 2)";
+
+function ArrowUpRight() {
+  return (
+    <svg viewBox="0 0 14 14" className="h-3.5 w-3.5" aria-hidden="true" fill="none">
+      <path d="M4.25 9.75 9.75 4.25M5.5 4.25h4.25V8.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function HintLine({ hint }: { hint: PriceHint }) {
+  const word = hint.direction === "upgrade" ? "Upgrade, " : hint.direction === "save" ? "Save, " : "";
+  const arrow = hint.direction === "upgrade" ? "↑ " : hint.direction === "save" ? "↓ " : "";
+  return (
+    <span className="text-[11px] leading-4 tracking-[0.01em] text-signal">
+      {word ? <span className="sr-only">{word}</span> : null}
+      {arrow ? <span aria-hidden="true">{arrow}</span> : null}
+      {hint.text}
+    </span>
+  );
+}
 
 export function CategoryCard({
   id,
   name,
+  section,
   pick,
-  number,
+  hints,
   priority,
 }: {
   id: string;
   name: string;
+  section: string;
   pick: PresentedPick | null;
-  number: number;
+  hints: PriceHint[];
   priority: "high" | "eager" | "lazy";
 }) {
   const brand = pick ? displayText(pick.main.brand) : null;
   const productName = pick ? displayText(pick.main.name) : null;
-  const why = pick ? displayText(pick.main.why) : null;
   const price = pick ? formatPrice(pick.main.price, pick.main.currency) : null;
+  const meta = pick ? [brand, name].filter(Boolean).join(" · ") : `${section} · ${name}`;
+  const title = pick ? (productName ?? name) : "Pick coming";
 
   return (
     <button
@@ -30,49 +53,47 @@ export function CategoryCard({
       id={`card-${id}`}
       data-pick={id}
       aria-haspopup="dialog"
-      className="group relative flex h-full w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-2xl bg-card text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+      className="group flex h-full w-full min-w-0 cursor-pointer flex-col text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-10 rounded-2xl ring-1 ring-inset ring-line group-hover:ring-ink"
-      />
-      <span className="block px-3 pt-1 lg:pt-2">
-        <span className="block min-h-8 lg:min-h-4">
-          <span className="block break-words text-[12px] font-medium leading-4 text-muted">{name}</span>
-        </span>
-      </span>
-      <span className="relative mt-1 block aspect-[4/3] w-full bg-stage lg:mt-0">
+      <span className="relative block aspect-square w-full overflow-hidden rounded-2xl bg-field transition-colors duration-[380ms] ease-catalog group-hover:bg-[#efefef]">
         {pick ? (
           <ProductImage
             src={pick.main.image}
             srcSet={pick.main.srcSet}
             priority={priority}
             sizes={CARD_SIZES}
-            className="absolute inset-0 h-full w-full object-contain p-3"
+            className="absolute inset-0 h-full w-full object-contain p-6 sm:p-8"
           />
         ) : (
-          <ReservedPlate number={number} />
+          <EmptyPlate />
         )}
+        <span
+          aria-hidden="true"
+          className="absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-paper text-ink transition-colors duration-[380ms] ease-catalog group-hover:bg-ink group-hover:text-paper"
+        >
+          <ArrowUpRight />
+        </span>
       </span>
-      <span className="flex flex-col gap-y-1 px-3 pt-2 pb-2 lg:pt-1 lg:pb-1">
-        <span className="block min-h-4 min-w-0" aria-hidden={brand ? undefined : true}>
-          <span className="block break-words text-[12px] font-medium uppercase leading-4 tracking-[0.04em] text-muted">
-            {brand ?? "\u00a0"}
+      <span className="flex flex-col gap-1 px-0.5 pt-3 pb-1">
+        <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">{meta}</span>
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="min-w-0 text-[13px] leading-5 text-ink">{title}</span>
+          {price ? (
+            <span className="shrink-0 font-mono text-[13px] leading-5 text-ink">{price}</span>
+          ) : (
+            <span className="shrink-0 font-mono text-[13px] leading-5 text-muted">
+              <span aria-hidden="true">—</span>
+              <span className="sr-only">Price coming</span>
+            </span>
+          )}
+        </span>
+        {hints.length > 0 ? (
+          <span className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            {hints.map((hint) => (
+              <HintLine key={hint.tierId} hint={hint} />
+            ))}
           </span>
-        </span>
-        <span className="block min-h-10 min-w-0 lg:min-h-5">
-          <span
-            className={`block break-words text-[15px] font-semibold leading-5 ${pick ? "text-ink" : "text-muted"}`}
-          >
-            {pick ? (productName ?? "\u00a0") : "Pick coming"}
-          </span>
-        </span>
-        <span className="block min-h-4 min-w-0" aria-hidden={price ? undefined : true}>
-          <span className="block break-words text-sm leading-4 tabular-nums text-ink">{price ?? "\u00a0"}</span>
-        </span>
-        <span className="block min-h-8 min-w-0" aria-hidden={why ? undefined : true}>
-          <span className="block break-words text-[12px] leading-4 text-muted">{why ?? "\u00a0"}</span>
-        </span>
+        ) : null}
       </span>
     </button>
   );
