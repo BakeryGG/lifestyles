@@ -114,7 +114,8 @@ const productSchema = z
   })
   .strict();
 
-const itemSchema = z
+/** A main pick. `why` is optional (the drawer hides it when absent). */
+export const itemSchema = z
   .object({
     brand: text,
     name: text,
@@ -122,24 +123,38 @@ const itemSchema = z
     currency,
     url: text,
     image: imagePath,
-    why: singleLine,
+    why: singleLine.optional(),
   })
   .strict();
 
-const altSchema = itemSchema
+/** An alternative. `when` is the one-line "Pick this if…" (optional). */
+export const altSchema = itemSchema
   .extend({
-    when: singleLine,
+    when: singleLine.optional(),
   })
   .strict();
 
+export const MAX_ALTERNATIVES = 3;
+
+/**
+ * One pick per lifestyle + product. `alts` holds up to 3 alternatives in display order.
+ * The legacy single `alt` (v2) is still accepted and becomes `alts: [alt]`.
+ */
 const pickSchema = z
   .object({
     tier: slug,
     product: slug,
     main: itemSchema,
-    alt: altSchema,
+    alt: altSchema.optional(),
+    alts: z.array(altSchema).max(MAX_ALTERNATIVES, `Expected at most ${MAX_ALTERNATIVES} alternatives`).optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((pick, ctx) => {
+    if (pick.alt && pick.alts) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["alt"], message: 'Use "alts" or the legacy "alt", not both' });
+    }
+  })
+  .transform(({ alt, alts, ...rest }) => ({ ...rest, alts: alts ?? (alt ? [alt] : []) }));
 
 const landingSchema = z
   .object({
@@ -164,7 +179,7 @@ export type Category = Catalog["categories"][number];
 export type ProductType = Catalog["products"][number];
 export type CatalogPick = Catalog["picks"][number];
 export type Item = CatalogPick["main"];
-export type AltItem = CatalogPick["alt"];
+export type AltItem = CatalogPick["alts"][number];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

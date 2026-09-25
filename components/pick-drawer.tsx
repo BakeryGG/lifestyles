@@ -16,7 +16,7 @@ const FOCUSABLE =
   "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
 const DRAWER_SIZES =
-  "(min-width: 1024px) 312px, (min-width: 600px) calc((100vw - 56px) / 2), calc(100vw - 40px)";
+  "(min-width: 1024px) 272px, (min-width: 600px) 448px, calc(100vw - 40px)";
 
 function ExternalIcon() {
   return (
@@ -77,34 +77,83 @@ function Column({
   const why = displayText(product.why);
 
   return (
-    <article className="flex min-w-0 flex-col gap-3 min-[600px]:row-span-7 min-[600px]:grid min-[600px]:grid-rows-subgrid min-[600px]:gap-3">
+    <article className="flex min-w-0 flex-col gap-3">
       <div>
         <p className={`text-[12px] leading-4 ${tone === "signal" ? "text-signal" : "text-muted"}`}>{label}</p>
         {when ? <p className="mt-1 text-[13px] leading-5 text-muted">{when}</p> : null}
       </div>
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-field">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6">
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl bg-field lg:w-[17rem]">
+          <ProductImage
+            key={product.image}
+            src={product.image}
+            srcSet={product.srcSet}
+            sizes={DRAWER_SIZES}
+            className="absolute inset-0 h-full w-full object-contain p-6"
+          />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          {brand ? <p className="text-[12px] leading-4 break-words text-muted">{brand}</p> : null}
+          <h2 className="text-[1.125rem] leading-6 font-normal tracking-[-0.02em] break-words text-ink">{name}</h2>
+          <p className="font-mono text-[13px] text-ink">{formatPrice(product.price, product.currency)}</p>
+          {why ? <p className="text-[14px] leading-5 text-pretty break-words text-muted">{why}</p> : null}
+          <div className="mt-1">
+            <BuyControl product={product} />
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+const THUMB_SIZES = "80px";
+
+/** "If you want a thicker tee" -> "Pick this if you want a thicker tee". */
+function pickThisIf(when: string | null): string | null {
+  if (!when) return null;
+  const rest = when.replace(/^if\s+/i, "");
+  return `Pick this if ${rest.charAt(0).toLowerCase()}${rest.slice(1)}`;
+}
+
+function AltRow({ product, categoryName }: { product: ShownAlt; categoryName: string }) {
+  const brand = displayText(product.brand);
+  const name = displayText(product.name) ?? categoryName;
+  const when = pickThisIf(displayText(product.when));
+  const label = [brand, name].filter(Boolean).join(" ") || "this alternative";
+  return (
+    <li className="flex gap-4 py-4">
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-field">
         <ProductImage
           key={product.image}
           src={product.image}
           srcSet={product.srcSet}
-          sizes={DRAWER_SIZES}
-          className="absolute inset-0 h-full w-full object-contain p-6"
+          sizes={THUMB_SIZES}
+          className="absolute inset-0 h-full w-full object-contain p-2"
         />
       </div>
-      {brand ? (
-        <p className="text-[12px] leading-4 break-words text-muted">{brand}</p>
-      ) : (
-        <div aria-hidden="true" className="h-4" />
-      )}
-      <h2 className="text-[1.125rem] leading-6 font-normal tracking-[-0.02em] break-words text-ink">{name}</h2>
-      <p className="font-mono text-[13px] text-ink">{formatPrice(product.price, product.currency)}</p>
-      {why ? (
-        <p className="text-[14px] leading-5 text-pretty break-words text-muted">{why}</p>
-      ) : (
-        <div aria-hidden="true" />
-      )}
-      <BuyControl product={product} />
-    </article>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="min-w-0 text-[12px] leading-4 break-words text-muted">{brand ?? ""}</p>
+          <p className="shrink-0 font-mono text-[13px] leading-5 text-ink">{formatPrice(product.price, product.currency)}</p>
+        </div>
+        <h3 className="text-[15px] leading-5 font-normal break-words text-ink">{name}</h3>
+        {when ? <p className="text-[13px] leading-5 text-pretty break-words text-muted">{when}</p> : null}
+        {isBuyableUrl(product.url) ? (
+          <a
+            href={product.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-flex min-h-11 items-center gap-1.5 self-start text-[13px] text-ink underline decoration-line underline-offset-4 hover:decoration-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+          >
+            Buy
+            <ExternalIcon />
+            <span className="sr-only"> {label} (opens in new tab)</span>
+          </a>
+        ) : (
+          <span className="mt-1 inline-flex min-h-11 items-center text-[13px] text-muted">Link coming</span>
+        )}
+      </div>
+    </li>
   );
 }
 
@@ -157,10 +206,8 @@ export function PickDrawer({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   const titleId = useId();
-  const showAlt = pick?.alt != null;
-  const when = pick?.alt ? displayText(pick.alt.when) : null;
-  const canBuy =
-    (!!pick && isBuyableUrl(pick.main.url)) || (!!pick?.alt && isBuyableUrl(pick.alt.url));
+  const alts = pick?.alts ?? [];
+  const canBuy = (!!pick && isBuyableUrl(pick.main.url)) || alts.some((alt) => isBuyableUrl(alt.url));
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -290,40 +337,25 @@ export function PickDrawer({
           {pick == null ? (
             <EmptyComparison tierName={tierName} categoryName={categoryName} />
           ) : (
-            <div
-              className={
-                showAlt
-                  ? "flex flex-col gap-8"
-                  : "mx-auto flex w-full max-w-md flex-col"
-              }
-            >
+            <div className="mx-auto flex w-full max-w-md flex-col gap-8 lg:max-w-none">
               {inheritedFromName ? (
-                <p className="text-[13px] leading-5 text-muted">Same as {inheritedFromName}</p>
+                <p className="-mb-4 text-[13px] leading-5 text-muted">Same as {inheritedFromName}</p>
               ) : null}
-              <div
-              className={
-                showAlt
-                  ? "flex flex-col gap-8 min-[600px]:grid min-[600px]:grid-cols-2 min-[600px]:grid-rows-[auto_auto_auto_auto_auto_auto_auto] min-[600px]:gap-x-6 min-[600px]:gap-y-0"
-                  : "mx-auto flex w-full max-w-md flex-col"
-              }
-            >
-              <Column
-                product={pick.main}
-                categoryName={categoryName}
-                label="Our pick"
-                when={null}
-                tone="signal"
-              />
-              {showAlt && pick.alt ? (
-                <Column
-                  product={pick.alt}
-                  categoryName={categoryName}
-                  label="Alternative"
-                  when={when}
-                  tone="muted"
-                />
-              ) : null}
+              <div className="flex flex-col">
+                <Column product={pick.main} categoryName={categoryName} label="Our pick" when={null} tone="signal" />
               </div>
+              {alts.length > 0 ? (
+                <section aria-labelledby={`${titleId}-alts`} className="border-t border-line pt-6">
+                  <h2 id={`${titleId}-alts`} className="text-[13px] leading-5 tracking-[0.01em] text-muted">
+                    Alternatives
+                  </h2>
+                  <ul className="mt-3 flex flex-col divide-y divide-line">
+                    {alts.map((alt, index) => (
+                      <AltRow key={`${alt.brand}-${alt.name}-${index}`} product={alt} categoryName={categoryName} />
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
             </div>
           )}
         </div>

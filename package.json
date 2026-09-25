@@ -8,7 +8,10 @@
     "prebuild": "npm run validate",
     "build": "next build",
     "start": "serve out",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sheet:sync": "tsx scripts/sheet-to-catalog.ts --out data/catalog.json",
+    "images:import": "node scripts/import-images.mjs",
+    "test": "tsx --test test/*.test.ts"
   },
   "engines": {
     "node": ">=20.9.0"

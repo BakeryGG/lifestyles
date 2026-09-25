@@ -1,12 +1,18 @@
-name: Deploy GitHub Pages
+name: Sync sheet and deploy Pages
+
+# Setup: repo variable SHEET_ID (Settings -> Secrets and variables -> Actions -> Variables).
+# The Google Sheet must be shared "Anyone with the link can view". Until it is, the sync
+# step warns and the committed data/catalog.json is deployed unchanged.
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 * * * *"   # hourly, minute 7
   push:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write         # commit data/catalog.json
   pages: write
   id-token: write
 
@@ -15,25 +21,97 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  sync-and-build:
     runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
+      sync: ${{ steps.sync.outputs.status }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build
+
+      - run: npm test
+
+      # Converter exit codes: 0 synced (incomplete rows are skipped with warnings),
+      # 1 structural/schema problem, 2 sheet unreachable. On 1 or 2 the committed
+      # catalog.json is kept and deployed; on 1 the run is marked failed at the end.
+      - name: Sync data/catalog.json from the Google Sheet
+        id: sync
+        env:
+          SHEET_ID: ${{ vars.SHEET_ID }}
+        run: |
+          if [ -z "$SHEET_ID" ]; then
+            echo "::warning title=Sheet sync skipped::Repo variable SHEET_ID is not set; keeping committed catalog.json"
+            echo "status=skipped" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          set +e
+          npx tsx scripts/sheet-to-catalog.ts --sheet-id "$SHEET_ID" --out data/catalog.json 2> sync-stderr.txt
+          code=$?
+          set -e
+          cat sync-stderr.txt >&2
+          msg=$(tr '\n' ' ' < sync-stderr.txt | cut -c1-900)
+          case "$code" in
+            0)
+              echo "status=ok" >> "$GITHUB_OUTPUT"
+              if [ -s sync-stderr.txt ]; then echo "::notice title=Sheet sync warnings::${msg}"; fi ;;
+            2)
+              echo "::warning title=Sheet unreachable::${msg}"
+              git checkout -- data/catalog.json
+              echo "status=unreachable" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error title=Sheet has problems, keeping committed catalog.json::${msg}"
+              git checkout -- data/catalog.json
+              echo "status=invalid" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Commit catalog.json if it changed
+        id: commit
+        run: |
+          if git diff --quiet -- data/catalog.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "catalog.json unchanged"
+          else
+            git config user.name "lifestyles-sheet-sync[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/catalog.json
+            git commit -m "Sync catalog.json from Google Sheet"
+            git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+          # A push made with GITHUB_TOKEN does not trigger this workflow again, so no loop.
+
+      # Hourly runs deploy only when the sheet changed; pushes and manual runs always deploy.
+      - name: Decide whether to deploy
+        id: decide
+        run: |
+          if [ "${{ steps.commit.outputs.changed }}" = "true" ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        if: steps.decide.outputs.deploy == 'true'
+        run: npm run build
         env:
           PAGES_BASE_PATH: /${{ github.event.repository.name }}
       - uses: actions/configure-pages@v5
+        if: steps.decide.outputs.deploy == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.decide.outputs.deploy == 'true'
         with:
           path: ./out
 
   deploy:
-    needs: build
+    needs: sync-and-build
+    if: needs.sync-and-build.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -42,3 +120,13 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # The site stays up on the committed catalog, but a broken sheet should still fail the run (and email).
+  sheet-check:
+    needs: [sync-and-build, deploy]
+    if: always() && needs.sync-and-build.outputs.sync == 'invalid'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::error::The sheet has structural problems (see the sync step). The committed catalog.json was deployed instead."
+          exit 1

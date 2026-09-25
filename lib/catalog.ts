@@ -67,20 +67,43 @@ export function resolveImageFile(image: string, publicDir: string): ResolvedImag
   return { message: null, file: realFile };
 }
 
+/** main, legacy alt, and every entry of alts, with their paths inside the pick. */
+function pickItems(pick: Record<string, unknown>): { product: Record<string, unknown>; path: PropertyKey[] }[] {
+  const out: { product: Record<string, unknown>; path: PropertyKey[] }[] = [];
+  if (isRecord(pick.main)) out.push({ product: pick.main, path: ["main"] });
+  if (isRecord(pick.alt)) out.push({ product: pick.alt, path: ["alt"] });
+  if (Array.isArray(pick.alts)) {
+    pick.alts.forEach((alt, i) => {
+      if (isRecord(alt)) out.push({ product: alt, path: ["alts", i] });
+    });
+  }
+  return out;
+}
+
 function referencedImages(data: unknown): string[] {
   const images = new Set<string>([PLACEHOLDER]);
   if (!isRecord(data) || !Array.isArray(data.picks)) return [...images];
   for (const pick of data.picks) {
     if (!isRecord(pick)) continue;
-    for (const side of ["main", "alt"] as const) {
-      const product = pick[side];
-      if (isRecord(product) && typeof product.image === "string") images.add(product.image);
+    for (const { product } of pickItems(pick)) {
+      if (typeof product.image === "string") images.add(product.image);
     }
   }
   return [...images];
 }
 
-/** Fail the build when an image path is missing, escapes public/, or the placeholder is gone. */
+const warned = new Set<string>();
+function warnOnce(message: string): void {
+  if (warned.has(message)) return;
+  warned.add(message);
+  console.warn(`warning: ${message}`);
+}
+
+/**
+ * Soft image check. A missing file (or a bad width variant) is a warning, never a build
+ * failure: the pick falls back to the placeholder. Only a missing placeholder or a path
+ * that escapes public/ is an error. Mutates `data` in place (image -> placeholder).
+ */
 export function imageFileIssues(data: unknown, publicDir = path.join(process.cwd(), "public")): CatalogIssue[] {
   const issues: CatalogIssue[] = [];
   const placeholder = resolveImageFile(PLACEHOLDER, publicDir);
@@ -95,22 +118,21 @@ export function imageFileIssues(data: unknown, publicDir = path.join(process.cwd
 
   data.picks.forEach((pick, index) => {
     if (!isRecord(pick)) return;
-    for (const side of ["main", "alt"] as const) {
-      const product = pick[side];
-      if (!isRecord(product) || typeof product.image !== "string") continue;
+    for (const { product, path: itemPath } of pickItems(pick)) {
+      if (typeof product.image !== "string") continue;
+      const where = `picks[${index}].${itemPath.join(".")}.image`;
       const resolved = resolveImageFile(product.image, publicDir);
       if (resolved.message) {
-        issues.push({
-          path: ["picks", index, side, "image"],
-          message: resolved.message,
-        });
+        if (resolved.message.startsWith("File not found")) {
+          warnOnce(`${where}: ${resolved.message}; using the placeholder (run npm run images:import?)`);
+          product.image = PLACEHOLDER;
+          continue;
+        }
+        issues.push({ path: ["picks", index, ...itemPath, "image"], message: resolved.message });
         continue;
       }
       for (const message of imageAssetIssues(product.image, publicDir)) {
-        issues.push({
-          path: ["picks", index, side, "image"],
-          message,
-        });
+        warnOnce(`${where}: ${message}`);
       }
     }
   });

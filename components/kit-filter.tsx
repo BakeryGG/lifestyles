@@ -29,6 +29,7 @@ export function KitFilter() {
       const href = search ? `${window.location.pathname}?${search}` : window.location.pathname;
       if (push) window.history.pushState(window.history.state, "", href);
       else window.history.replaceState(window.history.state, "", href);
+      window.dispatchEvent(new Event("kit:view"));
     }
 
     function apply(view: string, pickedWanted: boolean) {

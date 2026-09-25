@@ -9,6 +9,25 @@ export type SwitcherLifestyle = Pick<Tier, "id" | "name" | "status" | "group">;
 const segment =
   "switcher-segment inline-flex h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-[12px] leading-none tracking-[-0.01em] whitespace-nowrap transition-colors duration-[380ms] ease-catalog focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal min-[400px]:px-3 min-[400px]:text-[13px]";
 
+/** "?cat=kitchen" while a category chip is active, so switching lifestyles keeps the filter. */
+function useCatQuery(): string {
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    const read = () => {
+      const cat = new URLSearchParams(window.location.search).get("cat");
+      setQuery(cat && /^[a-z0-9-]+$/.test(cat) ? `?cat=${cat}` : "");
+    };
+    read();
+    window.addEventListener("kit:view", read);
+    window.addEventListener("popstate", read);
+    return () => {
+      window.removeEventListener("kit:view", read);
+      window.removeEventListener("popstate", read);
+    };
+  }, []);
+  return query;
+}
+
 function SoonCue() {
   return (
     <>
@@ -22,6 +41,7 @@ function SoonCue() {
 
 function Segment({ lifestyle, current }: { lifestyle: SwitcherLifestyle; current: boolean }) {
   const soon = lifestyle.status !== "live";
+  const query = useCatQuery();
   const className = `${segment} ${current ? "bg-ink text-white" : soon ? "text-muted" : "text-ink"}`;
   const inner = (
     <>
@@ -38,7 +58,7 @@ function Segment({ lifestyle, current }: { lifestyle: SwitcherLifestyle; current
     );
   }
   return (
-    <Link href={`/${lifestyle.id}`} aria-current={current ? "page" : undefined} className={className}>
+    <Link href={`/${lifestyle.id}${query}`} aria-current={current ? "page" : undefined} className={className}>
       {inner}
     </Link>
   );
@@ -52,6 +72,7 @@ function MoreLifestyles({
   currentId: string;
 }) {
   const [open, setOpen] = useState(false);
+  const query = useCatQuery();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
   const menuId = useId();
@@ -166,7 +187,7 @@ function MoreLifestyles({
             return (
               <li key={lifestyle.id} role="none">
                 <Link
-                  href={`/${lifestyle.id}`}
+                  href={`/${lifestyle.id}${query}`}
                   role="menuitem"
                   aria-current={current ? "page" : undefined}
                   data-menu-item=""

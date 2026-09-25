@@ -1,11 +1,10 @@
 import { ViewTransition } from "react";
 import Link from "next/link";
-import { CategoryCard } from "./category-card";
+import { KitGrid, type GridGroup } from "./kit-grid";
 import { KitFilter } from "./kit-filter";
 import { LifestyleSwitcher, type SwitcherLifestyle } from "./lifestyle-switcher";
 import { Wordmark } from "./wordmark";
 import type { KitView, TierGroupView } from "@/lib/present";
-import { sectionHeadingId } from "@/lib/section-id";
 import type { Tier } from "@/lib/schema";
 
 function Header({ tiers, currentId }: { tiers: SwitcherLifestyle[]; currentId: string }) {
@@ -56,10 +55,30 @@ export function TierView({
     .filter((product) => product.pick && (defaultView === "all" || product.tags.includes(defaultView)))
     .slice(0, 3)
     .map((product) => product.id);
-  const priorityFor = (id: string): "high" | "eager" | "lazy" => {
-    const index = eagerIds.indexOf(id);
-    return index === 0 ? "high" : index > 0 ? "eager" : "lazy";
-  };
+  const gridGroups: GridGroup[] = groups.map((group) => ({
+    id: group.id,
+    section: group.section,
+    sectionIndex: group.sectionIndex,
+    cards: group.categories.map((product) => ({
+      id: product.id,
+      name: product.name,
+      tags: product.tags,
+      pick: product.pick
+        ? {
+            main: {
+              brand: product.pick.main.brand,
+              name: product.pick.main.name,
+              price: product.pick.main.price,
+              currency: product.pick.main.currency,
+              image: product.pick.main.image,
+              srcSet: product.pick.main.srcSet,
+              url: "",
+              why: "",
+            },
+          }
+        : null,
+    })),
+  }));
 
   return (
     <div className="min-h-full">
@@ -119,10 +138,12 @@ export function TierView({
                   type="button"
                   data-picked-toggle
                   aria-pressed="false"
-                  className="hidden h-11 shrink-0 items-center gap-2 rounded-full px-3 text-[13px] text-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal sm:inline-flex aria-pressed:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Only picked"
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-2 text-[13px] text-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal sm:gap-2 sm:px-3 aria-pressed:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span aria-hidden="true" className="picked-dot h-2 w-2 rounded-full border border-current" />
-                  Only picked
+                  <span className="sm:hidden">Picked</span>
+                  <span className="hidden sm:inline">Only picked</span>
                 </button>
               </div>
             </div>
@@ -131,35 +152,7 @@ export function TierView({
               <p data-picked-empty hidden className="py-10 text-[14px] text-muted">
                 Nothing picked here yet. Every product in this view still says “Pick coming”.
               </p>
-              <div className="kit-grid">
-                {groups.map((group) => {
-                  const headingId = sectionHeadingId(group.sectionIndex);
-                  return (
-                    <section key={group.id} className="kit-section" aria-labelledby={headingId}>
-                      <h2 id={headingId} className="kit-heading text-[13px] leading-5 tracking-[0.01em] text-muted">
-                        {group.section}
-                      </h2>
-                      {group.categories.map((product) => (
-                        <div
-                          key={product.id}
-                          className="kit-card min-w-0"
-                          data-tags={product.tags.join(" ")}
-                          data-empty={product.pick ? undefined : ""}
-                        >
-                          <CategoryCard
-                            id={product.id}
-                            name={product.name}
-                            section={product.primaryName}
-                            pick={product.pick}
-                            hints={product.hints}
-                            priority={priorityFor(product.id)}
-                          />
-                        </div>
-                      ))}
-                    </section>
-                  );
-                })}
-              </div>
+              <KitGrid groups={gridGroups} eagerIds={eagerIds} />
             </div>
           </div>
           <KitFilter />

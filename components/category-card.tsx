@@ -1,4 +1,4 @@
-import { displayText, formatPrice, type PresentedPick, type PriceHint } from "@/lib/present";
+import { displayText, formatPrice, type PresentedPick } from "@/lib/present";
 import { EmptyPlate } from "./empty-plate";
 import { ProductImage } from "./product-image";
 
@@ -14,31 +14,17 @@ function ArrowUpRight() {
   );
 }
 
-function HintLine({ hint }: { hint: PriceHint }) {
-  const word = hint.direction === "upgrade" ? "Upgrade, " : hint.direction === "save" ? "Save, " : "";
-  const arrow = hint.direction === "upgrade" ? "↑ " : hint.direction === "save" ? "↓ " : "";
-  return (
-    <span className="text-[11px] leading-4 tracking-[0.01em] text-signal">
-      {word ? <span className="sr-only">{word}</span> : null}
-      {arrow ? <span aria-hidden="true">{arrow}</span> : null}
-      {hint.text}
-    </span>
-  );
-}
-
 export function CategoryCard({
   id,
   name,
   section,
   pick,
-  hints,
   priority,
 }: {
   id: string;
   name: string;
   section: string;
-  pick: PresentedPick | null;
-  hints: PriceHint[];
+  pick: Pick<PresentedPick, "main"> | null;
   priority: "high" | "eager" | "lazy";
 }) {
   if (!pick) {
@@ -108,13 +94,6 @@ export function CategoryCard({
             </span>
           )}
         </span>
-        {hints.length > 0 ? (
-          <span className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
-            {hints.map((hint) => (
-              <HintLine key={hint.tierId} hint={hint} />
-            ))}
-          </span>
-        ) : null}
       </span>
     </button>
   );

@@ -157,13 +157,13 @@ A coming-soon URL renders that same grid, plus a short note: `{Name} is coming s
 
 The drawer is a side panel on desktop and a bottom sheet on mobile. It shows the main pick and the alternative. The Buy button is black, opens the retailer in a new tab, and includes an arrow plus screen-reader text `(opens in new tab)`. An empty category shows a designed Pick coming state: the sentence "The [lifestyle] pick for [category] is still being chosen.", plates labeled `Pick coming`, and no Buy button. When the open pick was inherited, a quiet line above the products reads `Same as {source name}`. Focus is trapped. Esc, the backdrop, and the close button dismiss it. Focus returns to the card. The URL stays in sync. `?pick=` is written from the page pathname, so `/lifestyles/mid/?pick=tee` works without a base path inside the catalog. An unknown `?pick=` is removed and does not open a drawer.
 
-When the compared pick is a real, priced main, the card shows a small red hint. A lifestyle with `basedOn` compares only to that base (`Mid: $28` on an Organic card that has its own pick). If the card is showing the pick it inherited from that base, there is no hint. A lifestyle without `basedOn` compares to the other lifestyles' own real mains, and skips a lifestyle whose pick is the one already on the card. A higher price in the same currency is `↑ Premium: $180` (screen readers hear `Upgrade, ` first). A lower price is `↓ Budget: $25` (`Save, `). The same price, a different currency, or no comparable price on this card is `Premium: $180` with no arrow. A TODO main adds no hint. The names and amounts come from the file.
+Cards show only their own pick and price. There is no cross-lifestyle price line on the card; the homepage "Side by side" strip is where lifestyles are compared.
 
 ### `picks`
 
 One object per product recommendation. `tier` (the lifestyle id) and `product` must refer to ids that exist. Only one pick per lifestyle and product pair. Picks are sparse: leave a row out when the product has no pick yet (it shows "Pick coming") or when the lifestyle should inherit it via `basedOn`.
 
-`main` is the product on the card. `alt` is the alternative in the drawer. Both are required on every pick, including `alt.when`.
+`main` is the product on the card. `alts` is a list of 0–3 alternatives, shown in that order under "Alternatives" in the drawer (thumbnail, brand, name, price, "Pick this if…" from `when`, and a Buy link). The section is hidden when there are none. Alternatives inherit with the pick: a `basedOn` lifestyle that inherits a main also shows that pick's alternatives. The legacy single `alt` object is still accepted and read as `alts: [alt]` (don't use both). `why` and `when` are optional.
 
 | Field | Meaning |
 | --- | --- |
@@ -172,9 +172,9 @@ One object per product recommendation. `tier` (the lifestyle id) and `product` m
 | `price` | A finite number greater than or equal to 0, not a string, with at most two decimal places. `28` or `28.5`. Do not include a currency symbol. Signed zero (`-0`) is rejected. Whole numbers format with no cents (`$28`). Any other number uses two decimal places (`$28.50`). Formatting is `Intl.NumberFormat` with locale `en-US` and the pick's currency. `0` is a real price (`$0`), not "unset". An empty card never shows `$0`; it shows an em dash. |
 | `currency` | Three uppercase letters that `Intl.supportedValuesOf("currency")` lists, such as `USD`. A lowercase code fails validation. Codes `Intl.NumberFormat` happens to accept, such as `ABC`, are rejected. Real mains written on one lifestyle must share a single currency. Inherited picks are not part of that check. A kit that mixes currencies, including through inheritance, says prices are coming instead of adding them. |
 | `url` | Retailer link. Must be an absolute `http:` or `https:` URL. `https://TODO` is allowed only while the brand is still a placeholder. A real brand with hostname `todo` fails the build (`Expected a retailer http(s) URL`). A normal URL whose path contains the letters "todo" is valid and is a Buy link. `javascript:` fails the build. |
-| `image` | Must start with `/images/`, contain only letters, numbers, `.`, `_`, `/`, and `-`, and must not contain `..`. Whitespace is not trimmed. The file must exist at `public` plus that path, or the build fails with `File not found at public/images/...`. The real path, after resolving symlinks, must stay inside `public/`. `public/images/placeholder.svg` must exist even when no pick references it. Example: `/images/tee.jpg` is the file `public/images/tee.jpg`. Do not put a deploy prefix in this field. |
-| `why` | One line, no newline characters. Required, at most 90 characters after trimming. Shown in the drawer, not on the category card. |
-| `alt.when` | Required on the alternative. One line, no newline characters, at most 90 characters after trimming. Shown under the "Alternative" label in the drawer. It does not fall back to another label because it was omitted. Validation rejects a TODO note once `alt.brand` is a real brand. |
+| `image` | Must start with `/images/`, contain only letters, numbers, `.`, `_`, `/`, and `-`, and must not contain `..`. Whitespace is not trimmed. If the file is missing under `public`, the build prints a warning (`File not found at public/images/...; using the placeholder`) and the pick shows the placeholder. It does not fail. The real path, after resolving symlinks, must stay inside `public/`. `public/images/placeholder.svg` must exist even when no pick references it. Example: `/images/tee.jpg` is the file `public/images/tee.jpg`. Do not put a deploy prefix in this field. |
+| `why` | One line, no newline characters. Optional, at most 90 characters after trimming. Shown in the drawer, not on the category card. |
+| `alts[].when` | Optional. One line, at most 90 characters. Shown as "Pick this if …" (a leading "If" is folded in). |
 
 ### How TODO works
 
@@ -187,7 +187,7 @@ A brand is a placeholder when it trims to exactly `TODO`, or starts with `TODO:`
 - `alt.brand` of `TODO` or `TODO:` hides the alternative column. The drawer shows only the main pick.
 - An alternative whose brand is real while the main brand is still a placeholder fails the build: `alternative is set while the main brand is still TODO`.
 - Unfinished copy is the exact word `TODO`, or a note that starts with `TODO:` (any case, after trimming). `Todo Wool Tee` is not unfinished. Strings that merely contain "todo" are shown.
-- If `brand` is a real brand and `name`, `why`, or `alt.when` is still unfinished, the build fails: `picks[3].main.name: is still TODO but brand is set`. A real brand whose URL is still `https://TODO` fails with `Expected a retailer http(s) URL`. A fully placeholder product (brand `TODO`, with TODO notes in the other fields) is valid. That is the seed.
+- If `brand` is a real brand and `name`, `why`, or an alternative's `when` is still unfinished, the build fails: `picks[3].main.name: is still TODO but brand is set`. A real brand whose URL is still `https://TODO` fails with `Expected a retailer http(s) URL`. A fully placeholder product (brand `TODO`, with TODO notes in the other fields) is valid. That is the seed.
 - Objects are strict. An unknown key fails with Zod's `Unrecognized key(s)` message on that object's path, instead of being stripped.
 - The lifestyle-page kit line counts every category, not a hardcoded 10: `1 thing`, otherwise `things`. The total adds `main.price` for every effective pick whose main brand is not a placeholder, including picks inherited from `basedOn`. `$0` is a real price and is included.
   - Nothing priced yet: `Your Mid kit: 10 things, prices coming`.
@@ -238,7 +238,17 @@ Set `status` to `live` when the landing card, a primary comparison header, and t
 
 ### Add an image
 
-Put the file in `public/images/` and set `image` to a path such as `/images/your-file.jpg` (see the path rules above). Do not put a deploy prefix in that field. The file must exist at `public` plus that path, or the build fails with `File not found`. A neutral placeholder is already at `public/images/placeholder.svg`. The build requires that file even after every pick has its own photo, because a missing image at runtime falls back to it. A missing file does not fall back during the build. Keep the placeholder.
+Images live in `public/images/`; set `image` to `/images/<file>` (see the path rules above). No deploy prefix in that field.
+
+The sheet's Ingest processor saves photos to `/workspace/lifestyles-sheets/images/` as `<lifestyle>-<product>-main.webp` and `<lifestyle>-<product>-alt<order>.webp`, and writes `/images/<file>` into the sheet. Before pushing, copy new files into the repo:
+
+```bash
+npm run images:import            # from /workspace/lifestyles-sheets/images
+npm run images:import -- <dir>   # or any folder (also $IMAGES_SRC)
+git add public/images && git commit -m "Add product images"
+```
+
+It copies new or changed files only and never deletes. A missing file never breaks the build or the page: the build warns and uses `public/images/placeholder.svg`, and a 404 in the browser also falls back to it. The placeholder itself is required; keep it.
 
 `output: 'export'` does not resize images. The `<img>` sets `sizes` from the real slot: five columns inside the 1440px frame from 1280px (`calc((min(100vw, 1440px) - 96px) / 5)`), four from 1024px (`calc((min(100vw, 1440px) - 88px) / 4)`), three from 768px (`calc((100vw - 64px) / 3)`), and two below that (`calc((100vw - 40px) / 2)`). The drawer uses `312px` from 1024px up, half the sheet from 600px, and the sheet width below that. `sizes` does nothing until the image has a `srcset`. To add responsive files, place width variants next to the original:
 
@@ -249,7 +259,7 @@ public/images/tee-960w.jpg
 public/images/tee-1440w.jpg
 ```
 
-The build reads each file's pixel width (PNG, GIF, JPEG, or VP8X WebP). A sibling is emitted in `srcset` only when that width matches the suffix (`tee-960w.jpg` must be 960 pixels wide). A mismatch, or a variant whose width cannot be read, fails the build and is left out of `srcset`. When at least one sibling is valid, the original is included too, at its decoded width. SVGs, including the placeholder, are a single file. Without variants, the browser downloads the file you named in `image`. That file must be at most 1440 pixels wide, or the build fails and tells you to add the three siblings or export a smaller file. A photo around 960 pixels wide covers a phone; 1440 covers a large desktop card. The card and the drawer show the image contained in a square field, not cropped. `width` and `height` on the `<img>` are 1200 and 900; the CSS box is what lays the slot out. Each product image is in the page once. Picked images on the desktop first row load eagerly, and only the first of those uses `fetchpriority="high"`. The rest load lazily. If a file 404s in the browser, `srcset` and `sizes` are cleared and the image falls back to `public/images/placeholder.svg`. Decoding is async. Do not point `image` at a symlink that leaves `public/`.
+The build reads each file's pixel width (PNG, GIF, JPEG, or VP8X WebP). A sibling is emitted in `srcset` only when that width matches the suffix (`tee-960w.jpg` must be 960 pixels wide). A mismatch, or a variant whose width cannot be read, prints a warning and is left out of `srcset`. When at least one sibling is valid, the original is included too, at its decoded width. SVGs, including the placeholder, are a single file. Without variants, the browser downloads the file you named in `image`. It should be at most 1440 pixels wide; the build warns otherwise. A photo around 960 pixels wide covers a phone; 1440 covers a large desktop card. The card and the drawer show the image contained in a square field, not cropped. `width` and `height` on the `<img>` are 1200 and 900; the CSS box is what lays the slot out. Each product image is in the page once. Picked images on the desktop first row load eagerly, and only the first of those uses `fetchpriority="high"`. The rest load lazily. If a file 404s in the browser, `srcset` and `sizes` are cleared and the image falls back to `public/images/placeholder.svg`. Decoding is async. Do not point `image` at a symlink that leaves `public/`.
 
 ## Validation
 
@@ -264,7 +274,9 @@ catalog.json is invalid:
   - tiers[3].basedOn: basedOn cycle: organic -> money-no-object -> organic
 ```
 
-Checks follow CONTRACT.md: strict objects (unknown keys fail), slugs, unique ids, tag/product/lifestyle references, one pick per lifestyle × product, `featured` never primary, `basedOn` existence and cycles, price/currency/URL/image formats, one-line `why`/`alt.when` ≤ 90 chars. Site-only extra check: every pick image must exist under `public/`.
+Checks follow CONTRACT.md: strict objects (unknown keys fail), slugs, unique ids, tag/product/lifestyle references, one pick per lifestyle × product, `featured` never primary, `basedOn` existence and cycles, price/currency/URL/image formats, one-line `why`/`when` ≤ 90 chars, at most 3 alternatives. Image files are checked softly: a missing file is a warning and falls back to the placeholder.
+
+`npm test` runs converter and schema tests (`test/*.test.ts`, Node's test runner via tsx).
 
 ## Deploy
 
@@ -272,15 +284,31 @@ The site is a static export (`output: 'export'` in `next.config.ts`). There is n
 
 `PAGES_BASE_PATH` is optional. Leave it unset (empty) for a site at the domain root. Set it to a path such as `/lifestyles` when the site is served from a subpath. The value is also exposed as `NEXT_PUBLIC_BASE_PATH`. Links and the `?pick=` and `?brands=` queries use the page pathname, so the prefix is already in the URL. Catalog image fields stay `/images/...` with no prefix; the page adds the base path when it renders. The build still checks those files under `public/` with no prefix. `public/.nojekyll` is included so GitHub Pages serves `_next/`.
 
-### GitHub Pages
+### GitHub Pages and the sheet sync
 
-`.github/workflows/pages.yml` builds and deploys on every push to `main`, and when you run the workflow by hand.
+`.github/workflows/pages.yml` ("Sync sheet and deploy Pages") runs on every push to `main`, hourly (minute 7), and by hand (Actions → Run workflow).
 
-1. In the repo settings, open Pages and set the source to **GitHub Actions**.
-2. Push to `main`, or run the "Deploy GitHub Pages" workflow.
-3. The build sets `PAGES_BASE_PATH` to `/${{ github.event.repository.name }}`, so a project site at `https://<user>.github.io/<repo>/` works whatever the repository is named.
+1. Pages source is **GitHub Actions** (repo settings → Pages).
+2. Repo variable `SHEET_ID` holds the Google Sheet id (Settings → Secrets and variables → Actions → Variables). It is set.
+3. The sheet must be shared **Anyone with the link can view**, or the sync can't read it (HTTP 401).
 
-The workflow checks out the repo, installs Node 20 with `npm ci`, runs `npm run build`, and uploads the `out/` directory. A second job deploys that artifact to the `github-pages` environment.
+Each run: `npm ci`, `npm test`, then `scripts/sheet-to-catalog.ts` reads the tabs (lifestyles, categories, products, picks, alternatives, settings) and rewrites `data/catalog.json`. If it changed, the bot commits it to `main`. Then `npm run build` with `PAGES_BASE_PATH=/<repo>` and deploy. Hourly runs deploy only when the catalog changed; pushes and manual runs always deploy.
+
+| Converter exit | Meaning | Workflow |
+| --- | --- | --- |
+| 0 | Catalog written. Incomplete rows (a main missing its price or url, an incomplete alternative) are skipped with warnings and keep showing "Pick coming". | Commits if changed, deploys. |
+| 1 | Structural problem: unknown ids, missing columns, bad settings. catalog.json untouched. | Deploys the committed catalog, then fails the run so GitHub emails. |
+| 2 | Sheet unreachable (401/403/404, login page, network). catalog.json untouched. | Warning "Sheet unreachable…", deploys the committed catalog. |
+
+Run it locally:
+
+```bash
+SHEET_ID=<id> npm run sheet:sync                                  # from the live sheet
+npx tsx scripts/sheet-to-catalog.ts --csv-dir <dir> --out data/catalog.json   # from <tab>.csv files
+npx tsx scripts/sheet-to-catalog.ts --sheet-id <id> --check       # validate only
+```
+
+The picks tab holds one row per lifestyle + product (`lifestyle, product, main_brand, main_name, main_price, main_currency, main_url, main_image, main_why`). Alternatives go on the `alternatives` tab (`tier, product, order (1-3), brand, name, price, currency, url, image, alt_when, price_checked`). Legacy `alt_*` columns on the picks tab still work and count as order 0. Full contract: `lifestyles-sheets/CONTRACT.md`.
 
 **Custom domain.** If Pages is serving the repository at the apex of a domain (`https://example.com/`) rather than under `/<repo>/`, clear the base path: change the workflow env `PAGES_BASE_PATH` to an empty string (or delete it) and run the workflow again. A project site needs the prefix; a custom domain at the root does not.
 

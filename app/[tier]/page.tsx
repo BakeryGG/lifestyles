@@ -29,9 +29,7 @@ function withImageSources(groups: TierGroupView[]): TierGroupView[] {
       pick: category.pick
         ? {
             main: { ...category.pick.main, srcSet: srcSetFor(category.pick.main.image) },
-            alt: category.pick.alt
-              ? { ...category.pick.alt, srcSet: srcSetFor(category.pick.alt.image) }
-              : null,
+            alts: category.pick.alts.map((alt) => ({ ...alt, srcSet: srcSetFor(alt.image) })),
           }
         : null,
     })),

@@ -324,7 +324,8 @@ export type ShownAlt = AltProduct & { srcSet?: string };
 
 export type PresentedPick = {
   main: ShownProduct;
-  alt: ShownAlt | null;
+  /** Real alternatives only (placeholder brands dropped), at most 3, display order. */
+  alts: ShownAlt[];
 };
 
 export type PriceHint = {
@@ -405,7 +406,6 @@ export type TierCategoryView = {
   pick: PresentedPick | null;
   /** Set when the shown pick is inherited. The drawer may say "Same as {name}". */
   inheritedFromName: string | null;
-  hints: PriceHint[];
 };
 
 export type TierGroupView = {
@@ -431,17 +431,16 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
       categories: products
         .filter((product) => product.primaryCategory === tag.id)
         .map((product): TierCategoryView => {
-          const hints = priceHintsFor(catalog, tierId, product.id);
           const entry = resolved.get(product.id);
           const pick = entry?.pick;
-          const base = { id: product.id, name: product.name, tags: product.categories, primaryName: tag.name, hints };
+          const base = { id: product.id, name: product.name, tags: product.categories, primaryName: tag.name };
           if (!pick || !isRealProduct(pick.main)) {
             return { ...base, pick: null, inheritedFromName: null };
           }
           return {
             ...base,
             inheritedFromName: entry?.inheritedFrom ? (nameById.get(entry.inheritedFrom) ?? null) : null,
-            pick: { main: pick.main, alt: isRealProduct(pick.alt) ? pick.alt : null },
+            pick: { main: pick.main, alts: pick.alts.filter((alt) => isRealProduct(alt)).slice(0, 3) },
           };
         }),
     }))
