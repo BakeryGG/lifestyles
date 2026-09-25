@@ -36,7 +36,7 @@ npm run lint
 
 All content lives in [`data/catalog.json`](data/catalog.json). Change a pick, lifestyle, category, or section there. You do not edit React components to add a lifestyle, a section, or a category. `npm run dev` picks the file up on reload. `npm start` serves the last export in `out/` and does not, until you run `npm run build` again.
 
-The file has five top-level fields: `tiers`, `sections`, `categories`, `landing`, and `picks`.
+The file has five top-level fields, in this order: `tiers`, `categories` (tags), `products` (product types), `landing`, and `picks`. The shape is the Google-Sheet converter contract (lib/schema.ts mirrors its schema-v2 exactly), so converter output drops straight in.
 
 ### `tiers`
 
@@ -79,14 +79,14 @@ Price hints: a lifestyle with `basedOn` is compared only to that base. If this c
 
 ### `landing`
 
-Required object. Both fields are slugs of categories that exist.
+Required object (the sheet's `settings` tab). Both fields name products that exist.
 
 | Field | Meaning |
 | --- | --- |
-| `anchorCategory` | One category slug. Drives the "Typical {category name}: $X" line on each lifestyle card, from that lifestyle's effective pick. The category name is lowercased, so "Everyday tee" becomes `Typical everyday tee: $28`. If the effective main is missing or still TODO, the card says `{Category name} pick coming` in the name's stored capitalization, such as `Everyday tee pick coming`. |
-| `compareCategories` | At least one category slug. Order is the comparison-table row order. Duplicates fail. |
+| `anchorProduct` | One product id. Drives the "Typical {product}: $X" line on each lifestyle card, from that lifestyle's effective pick, or `{Product} pick coming`. |
+| `compareProducts` | At least one product id. Order is the comparison-table row order. |
 
-An unknown id fails with a readable line, for example `landing.compareCategories[0]: Unknown category "nope"` and `landing.anchorCategory: Unknown category "nope"`. A repeated slug fails with `Duplicate category "tee" (also at landing.compareCategories[0])`.
+An unknown id fails with a readable line, for example `landing.compareProducts[4]: Unknown product "nope"`.
 
 ### Landing page
 
@@ -97,7 +97,7 @@ An unknown id fails with a readable line, for example `landing.compareCategories
 3. Subcopy: `One pick for everything, at your level.`
 4. Primary lifestyle cards, in file order, as one grid of large equal cards (one column on a phone, two from 640px, three from 1024px when there are more than two). A count of one or two does not stretch into empty columns. Each card shows the name, then `whoFor` or else `description`, then the brand list or "Brands coming", then the typical anchor price or "{Category name} pick coming", then the full-kit line from effective picks. A live card links to `/{id}`. A coming-soon card is not a link and says "Coming soon".
 5. Secondary lifestyles, when any exist, in a smaller section under the heading `Or pick a way of living`. The section is omitted when there are none. Same card facts, smaller type. Coming-soon cards are muted and not links.
-6. A comparison table of the primary lifestyles (secondaries are left out). If no lifestyle is primary, the table uses every lifestyle. Rows are `landing.compareCategories`. Coming-soon primary columns stay in the table, muted, with a "Soon" cue, so a single live column still sits beside the others. A cell is the effective pick's thumbnail, brand, name, and mono price, or `Pick coming`. Live column headers link to that lifestyle. Coming-soon headers are not links. The table is a labelled region, scrolls sideways, and keeps the category column stuck. Arrow keys scroll it when the region is focused.
+6. A comparison table of the primary lifestyles (secondaries are left out). If no lifestyle is primary, the table uses every lifestyle. Rows are `landing.compareProducts`. Coming-soon primary columns stay in the table, muted, with a "Soon" cue, so a single live column still sits beside the others. A cell is the effective pick's thumbnail, brand, name, and mono price, or `Pick coming`. Live column headers link to that lifestyle. Coming-soon headers are not links. The table is a labelled region, scrolls sideways, and keeps the category column stuck. Arrow keys scroll it when the region is focused.
 7. A brand suggester. See below.
 
 The full-kit line on the card is not the tier-page sentence. See [How TODO works](#how-todo-works).
@@ -116,19 +116,28 @@ Without JavaScript the chips still show. A `noscript` note says matching runs in
 
 `?brands=` is built from the page pathname, so a base path such as `/lifestyles` is already in the URL. Do not put that prefix in the catalog.
 
-### `sections`
+### `categories` (tags)
 
-Ordered list of group names, for example `"Wear"`. Each name is required after trimming and must be unique, including names that differ only by case (`"Wear"` and `"wear"` are a duplicate). A section with no categories is skipped. Each section is one heading and its own cards. The heading id is `section-` plus that section's index in this array (`section-0`), not a slug of the label, so `"Home"` and `"Home!"` do not share an id. A duplicate heading id fails the build.
-
-Every lifestyle uses the same slots: the same categories, the same order, grouped by section. The grid is one tree. Two columns on phones, three from 768px, four from 1024px. From 1280px the same cells pack into five columns: the earliest section anchors a row, and a later section can fill a leftover gap when it fits on that same row. A section longer than five cards wraps inside its own block. Below 1280px the sections stay in catalog order, each heading on its own row. Nothing in the components hard-codes section names, lifestyle ids, or counts. Adding a section is still only a JSON edit.
-
-### `categories`
+Categories act like tags. A product can carry several.
 
 | Field | Meaning |
 | --- | --- |
-| `id` | Unique slug, same rules as a tier id. Used in the share URL as `?pick={id}`. |
-| `name` | The category label, such as "Everyday tee". On a filled card the meta row is `{Brand} · {name}`. On an empty card it is `{Section} · {name}`. |
-| `section` | Must match a name in `sections` exactly, including case, after trimming. |
+| `id` | Unique slug. Used in the URL as `?cat={id}`. |
+| `name` | Chip and section-heading label, e.g. "Kitchen". |
+| `order` | Integer; lower sorts first (chips, and section order in the All view). |
+| `description` | Optional. |
+
+The special tag `featured` (order 0) is curated by hand: add `featured` to a product's `categories`. When any product carries it, **Featured is the default view** of every lifestyle page ("Your Mid kit: 10 featured picks, …"); otherwise the default is All. `featured` is never a product's `primaryCategory`.
+
+### `products` (product types)
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Unique slug. Used in the share URL as `?pick={id}` and by picks. |
+| `name` | Product type label, e.g. "Everyday tee". |
+| `primaryCategory` | The tag it is grouped under in the All view. Must exist and must be in `categories`. |
+| `categories` | Tag ids (at least one, always including `primaryCategory`). The product shows under every one of those chips. |
+| `order` | Integer sort order within its group. |
 
 ### Lifestyle page
 
@@ -140,7 +149,9 @@ Secondary lifestyles sit in a compact menu on the button "More lifestyles" (the 
 
 Coming-soon primaries in the segmented control are a `span`, not a link, not a tab stop, and not `aria-disabled`. The visible word "Soon" is hidden from assistive tech. Visually hidden text adds `, coming soon`. The current segment, live or not, has `aria-current="page"` and visually hidden `, current page`. Coming-soon items in the More menu use the same "Soon" cue, are not links, and are `aria-disabled` menu items so they are not in the tab order. Every target is at least 44px.
 
-Under the header is the kit summary line (`Your {name} kit: …`), counted from effective picks, including inherited ones. Then the category grid.
+Under the header is the kit summary line for the current view, counted from effective picks (including inherited ones): `Your Mid kit: 10 featured picks, prices coming`, `Your Mid kit: 3 of 250 picks picked, about $X`, or `Kitchen: 44 picks, about $X`.
+
+Below it is a sticky, horizontally scrolling chip bar: Featured (when used), All, then every tag with products, each with its count. Chips are links (`?cat={id}`); a tiny client script swaps a `data-view` attribute on the server-rendered grid, so all 250 cards are static HTML and filtering costs no hydration. `?cat=` combines with `?pick=`; an unknown `?cat` is removed. "All" groups every product under its `primaryCategory` heading. "Only picked" (`?picked=1`, desktop) hides "Pick coming" tiles; it is disabled in a view with nothing picked, so it never empties the page silently. Products without a real pick render as small, quiet "Pick coming" tiles so real picks stand out; they still open the drawer.
 
 A coming-soon URL renders that same grid, plus a short note: `{Name} is coming soon. The slots below match the other lifestyles.` When another lifestyle is live, the note links to it (`See the {Name} kit`). `?pick=` still opens the drawer, including an empty category.
 
@@ -150,7 +161,7 @@ When the compared pick is a real, priced main, the card shows a small red hint. 
 
 ### `picks`
 
-One object per product recommendation. `tier` (the lifestyle id) and `category` must refer to ids that exist. Only one pick per lifestyle and category pair. Leave it out when the lifestyle should inherit that category.
+One object per product recommendation. `tier` (the lifestyle id) and `product` must refer to ids that exist. Only one pick per lifestyle and product pair. Picks are sparse: leave a row out when the product has no pick yet (it shows "Pick coming") or when the lifestyle should inherit it via `basedOn`.
 
 `main` is the product on the card. `alt` is the alternative in the drawer. Both are required on every pick, including `alt.when`.
 
@@ -191,21 +202,13 @@ A brand is a placeholder when it trims to exactly `TODO`, or starts with `TODO:`
   - Some but not all, more than one: `Full kit: about $X for 3 picks`.
 - Two currencies on real mains fail the build instead of hiding either total.
 
-### Add a section
+### Add a category tag
 
-1. Append a unique, non-empty name to `sections`. Place it where it should appear on the tier page.
-2. Point categories at that name with an exact `section` match.
+Append `{ "id": "garden", "name": "Garden", "order": 55 }` to `categories`, then add `garden` to the `categories` array of the products that belong there. No component changes.
 
-No component changes. A section that no category uses is left off the page.
+### Add a product
 
-### Add a category
-
-1. Add a name to `sections` if it needs a new group.
-2. Append a category object with a new `id`, `name`, and `section`.
-3. Optionally append a pick for each lifestyle that should show a product of its own. A lifestyle with no real main shows "Pick coming", unless `basedOn` has an effective pick for that category, in which case the page shows that inherited pick. The card still opens from `?pick=`.
-4. To show it on the landing table, append its id to `landing.compareCategories`. To use it for the typical-price line, set `landing.anchorCategory`. Both must name a category that exists.
-
-No component changes. The grid, the count in the kit line, and the `?pick=` links follow the file.
+Append `{ "id": "hose", "name": "Garden hose", "primaryCategory": "garden", "categories": ["garden", "outdoors"], "order": 560 }` to `products`. Optionally add picks for it. To show it on the landing table, add its id to `landing.compareProducts`. No component changes.
 
 ### Add a lifestyle
 
@@ -250,39 +253,18 @@ The build reads each file's pixel width (PNG, GIF, JPEG, or VP8X WebP). A siblin
 
 ## Validation
 
-`npm run validate` (and `npm run build`, via `prebuild`) parses the file with zod, then checks references, unfinished copy, URLs, currencies, and image files. A bad file stops the build. Each problem is one line: the JSON path, then the message. Reference and content problems are listed even when other fields have the wrong type.
+`npm run build` runs `npm run validate` first. A bad file stops the build with one line per problem, for example:
 
 ```text
 catalog.json is invalid:
-  - picks[0].main.price: Expected number, received string
-  - categories[3].section: Unknown section "Garden"
-  - picks[2].tier: Unknown tier "luxury"
-  - tiers[1].id: Duplicate tier id "mid" (also at tiers[0].id)
-  - sections[1]: Duplicate section "Wear" (also at sections[0])
-  - picks[1]: Duplicate pick for tier "mid" and category "tee" (also at picks[0])
-  - picks[3].main.name: is still TODO but brand is set
-  - picks[0].main.url: Expected an http(s) URL
-  - picks[0].main.image: File not found at public/images/missing.jpg
-  - picks[0].main.image: Image is 2000px wide with no width variants; add tee-480w.jpg, tee-960w.jpg, and tee-1440w.jpg or use a file at most 1440px wide
-  - picks[0].main.image: Width variant public/images/tee-960w.jpg is 2000px wide, not 960
-  - picks: Tier "mid" uses more than one currency (EUR, USD)
-  - tiers[0].whoFor: Expected at most 140 characters
-  - tiers[3].basedOn: Unknown tier "nope"
-  - tiers[1].basedOn: cannot reference itself
-  - tiers[3].basedOn: cycle organic → mid → organic
-  - landing.anchorCategory: Unknown category "nope"
-  - landing.compareCategories[0]: Unknown category "nope"
-  - landing.compareCategories[1]: Duplicate category "tee" (also at landing.compareCategories[0])
+  - products[3].primaryCategory: Unknown category "kitchn" (known: featured, clothing, ...)
+  - products[3].categories: categories must include primaryCategory
+  - landing.compareProducts[4]: Unknown product "nope"
+  - picks[0].product: Unknown product "ghost"
+  - tiers[3].basedOn: basedOn cycle: organic -> money-no-object -> organic
 ```
 
-If the file cannot be read or is not JSON, the path is `(root)` and the message is the parser error:
-
-```text
-catalog.json is invalid:
-  - (root): Expected property name or '}' in JSON at position 1
-```
-
-Checked failures include missing or whitespace-only required fields (they fail after trim with `Required`), wrong types, unknown object keys (`Unrecognized key(s) in object: …`), a price that is not a finite number greater than or equal to 0, signed zero, a price with more than two decimal places, a currency that is not three uppercase letters listed by `Intl.supportedValuesOf("currency")`, an image path that does not start with `/images/` or that contains `..`, a missing image file (`File not found`), a missing `public/images/placeholder.svg`, an image path or symlink that resolves outside `public/`, `why` or `alt.when` longer than 90 characters after trim or containing a newline, `whoFor` longer than 140 characters after trim or containing a newline (`Expected at most 140 characters`, `Expected a single line`), a `brandChips` entry that is empty after trim, an accent that is not `#` plus six hex digits (validated, not painted), a status other than `live` or `coming_soon`, a slug that is not lowercase (whitespace is not trimmed into a valid slug), a URL that is not `http:` or `https:` (`javascript:` fails; `https://TODO` is allowed on a placeholder brand and rejected on a real brand; a path that merely contains "todo" is still valid), a real brand whose name, why, or `alt.when` is still `TODO` or a `TODO:` note, an alternative set while the main brand is still TODO, more than one currency among a tier's real mains, duplicate tier ids, duplicate section names (including case-only differences), duplicate section heading ids, duplicate category ids, duplicate picks for the same tier and category, a category whose section does not exist, a pick whose tier or category does not exist, `landing.anchorCategory` or a `landing.compareCategories` entry that is not an existing category, a duplicate in `landing.compareCategories`, an empty `compareCategories` list (`Expected at least one category`), a `group` other than `primary` or `secondary`, a `basedOn` that is not an existing lifestyle id (`Unknown tier "nope"`), a `basedOn` that names its own lifestyle (`cannot reference itself`), a `basedOn` cycle (`cycle organic → mid → organic`, reported on each lifestyle in the cycle with the walk that returns to a repeated id), a raster wider than 1440px with no width variants, and a width variant whose pixel width does not match its `-480w` / `-960w` / `-1440w` suffix.
+Checks follow CONTRACT.md: strict objects (unknown keys fail), slugs, unique ids, tag/product/lifestyle references, one pick per lifestyle × product, `featured` never primary, `basedOn` existence and cycles, price/currency/URL/image formats, one-line `why`/`alt.when` ≤ 90 chars. Site-only extra check: every pick image must exist under `public/`.
 
 ## Deploy
 

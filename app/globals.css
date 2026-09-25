@@ -358,3 +358,8 @@
     animation-delay: 0s !important;
   }
 }
+
+/* Quiet "Pick coming" tiles keep their compact height beside tall picked cards. */
+.kit-card[data-empty] {
+  align-self: start;
+}
