@@ -1,3 +1,5 @@
+import { withBasePath, withBasePathSrcSet } from "@/lib/base-path";
+
 export function ProductImage({
   src,
   srcSet,
@@ -16,8 +18,8 @@ export function ProductImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element -- static export has no image optimizer
     <img
-      src={src}
-      srcSet={srcSet}
+      src={withBasePath(src)}
+      srcSet={withBasePathSrcSet(srcSet)}
       alt=""
       width={1200}
       height={900}
@@ -25,7 +27,7 @@ export function ProductImage({
       loading={eager ? "eager" : "lazy"}
       fetchPriority={priority === "high" ? "high" : "auto"}
       decoding="async"
-      data-fallback="/images/placeholder.svg"
+      data-fallback={withBasePath("/images/placeholder.svg")}
       className={className}
     />
   );

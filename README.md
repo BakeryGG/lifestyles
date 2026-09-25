@@ -119,7 +119,7 @@ Set `status` to `live` when the landing card should link to `/{id}` and the tier
 
 ### Add an image
 
-Put the file in `public/images/` and set `image` to a path such as `/images/your-file.jpg` (see the path rules above). The file must exist at `public` plus that path, or the build fails with `File not found`. A neutral placeholder is already at `public/images/placeholder.svg`. The build requires that file even after every pick has its own photo, because a missing image at runtime falls back to it. A missing file does not fall back during the build. Keep the placeholder.
+Put the file in `public/images/` and set `image` to a path such as `/images/your-file.jpg` (see the path rules above). Do not put a deploy prefix in that field. The file must exist at `public` plus that path, or the build fails with `File not found`. A neutral placeholder is already at `public/images/placeholder.svg`. The build requires that file even after every pick has its own photo, because a missing image at runtime falls back to it. A missing file does not fall back during the build. Keep the placeholder.
 
 `output: 'export'` does not resize images. The `<img>` sets `sizes` from the real slot: five columns inside the 1440px frame on a wide screen (`calc((min(100vw, 1440px) - 112px) / 5)`), two columns below that. The drawer uses `312px` from 1024px up, half the sheet from 600px, and the sheet width below that. `sizes` does nothing until the image has a `srcset`. To add responsive files, place width variants next to the original:
 
@@ -161,14 +161,29 @@ catalog.json is invalid:
 
 Checked failures include missing or whitespace-only required fields (they fail after trim with `Required`), wrong types, unknown object keys (`Unrecognized key(s) in object: …`), a price that is not a finite number greater than or equal to 0, signed zero, a price with more than two decimal places, a currency that is not three uppercase letters listed by `Intl.supportedValuesOf("currency")`, an image path that does not start with `/images/` or that contains `..`, a missing image file (`File not found`), a missing `public/images/placeholder.svg`, an image path or symlink that resolves outside `public/`, `why` or `alt.when` longer than 90 characters after trim or containing a newline, an accent that is not `#` plus six hex digits, a status other than `live` or `coming_soon`, a slug that is not lowercase (whitespace is not trimmed into a valid slug), a URL that is not `http:` or `https:` (`javascript:` fails; `https://TODO` is allowed on a placeholder brand and rejected on a real brand; a path that merely contains "todo" is still valid), a real brand whose name, why, or `alt.when` is still `TODO` or a `TODO:` note, an alternative set while the main brand is still TODO, more than one currency among a tier's real mains, duplicate tier ids, duplicate section names (including case-only differences), duplicate section heading ids, duplicate category ids, duplicate picks for the same tier and category, a category whose section does not exist, a pick whose tier or category does not exist, a raster wider than 1440px with no width variants, and a width variant whose pixel width does not match its `-480w` / `-960w` / `-1440w` suffix.
 
-## Deploy on Vercel
+## Deploy
 
-The project is a static export (`output: 'export'` in `next.config.ts`) and needs no server, database, or environment variables.
+The site is a static export (`output: 'export'` in `next.config.ts`). There is no server and no database. `trailingSlash: true` writes each route as a directory (`mid/index.html`), so `/mid` and `/mid/` both resolve. A shared pick link keeps its query (`/mid/?pick=tee`).
 
-- Import the repo at [vercel.com/new](https://vercel.com/new). Framework preset: Next.js. Leave the build command as `npm run build`. Do not set an output directory. Vercel serves the export with zero extra config.
-- Or from the repo root: `npx vercel`.
+`PAGES_BASE_PATH` is optional. Leave it unset (empty) for a site at the domain root. Set it to a path such as `/lifestyles` when the site is served from a subpath. The value is also exposed as `NEXT_PUBLIC_BASE_PATH`. Catalog image fields stay `/images/...` with no prefix; the page adds the base path when it renders. The build still checks those files under `public/` with no prefix. `public/.nojekyll` is included so GitHub Pages serves `_next/`.
 
-No analytics snippet, no extra config.
+### GitHub Pages
+
+`.github/workflows/pages.yml` builds and deploys on every push to `main`, and when you run the workflow by hand.
+
+1. In the repo settings, open Pages and set the source to **GitHub Actions**.
+2. Push to `main`, or run the "Deploy GitHub Pages" workflow.
+3. The build sets `PAGES_BASE_PATH` to `/${{ github.event.repository.name }}`, so a project site at `https://<user>.github.io/<repo>/` works whatever the repository is named.
+
+The workflow checks out the repo, installs Node 20 with `npm ci`, runs `npm run build`, and uploads the `out/` directory. A second job deploys that artifact to the `github-pages` environment.
+
+**Custom domain.** If Pages is serving the repository at the apex of a domain (`https://example.com/`) rather than under `/<repo>/`, clear the base path: change the workflow env `PAGES_BASE_PATH` to an empty string (or delete it) and run the workflow again. A project site needs the prefix; a custom domain at the root does not.
+
+### Vercel
+
+Leave `PAGES_BASE_PATH` unset. Import the repo at [vercel.com/new](https://vercel.com/new). Framework preset: Next.js. Leave the build command as `npm run build`. Do not set an output directory. Vercel serves the export with zero extra config. Or from the repo root: `npx vercel`.
+
+No analytics snippet.
 
 ## Lighthouse
 

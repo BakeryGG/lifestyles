@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { loadCatalog } from "@/lib/catalog";
 import { visibleBrands } from "@/lib/present";
 import type { Tier } from "@/lib/schema";
@@ -58,9 +59,9 @@ function TierChoice({ tier }: { tier: Tier }) {
   }
 
   return (
-    <a href={`/${tier.id}`} className={className} style={{ boxShadow: `inset 0 2px 0 ${tier.accent}` }}>
+    <Link href={`/${tier.id}`} className={className} style={{ boxShadow: `inset 0 2px 0 ${tier.accent}` }}>
       {body}
-    </a>
+    </Link>
   );
 }
 

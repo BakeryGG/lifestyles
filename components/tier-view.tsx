@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { CategoryCard } from "./category-card";
 import { accentColors, type TierCategoryView, type TierGroupView } from "@/lib/present";
 import { DESKTOP_COLUMNS, packSections, type PlacedSection } from "@/lib/pack";
@@ -42,7 +43,7 @@ function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: 
             );
           }
           return (
-            <a
+            <Link
               key={tier.id}
               href={`/${tier.id}`}
               aria-current={current ? "page" : undefined}
@@ -51,7 +52,7 @@ function TierSwitcher({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: 
             >
               {tier.name}
               {current ? <span className="sr-only">, current page</span> : null}
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -63,14 +64,12 @@ function Header({ tiers, currentId }: { tiers: SwitcherTier[]; currentId: string
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-[1440px] flex-nowrap items-center gap-2 px-3 sm:gap-3 sm:px-6">
-        {/* Plain anchor: a full load lets the cross-document view transition run. */}
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-        <a
+        <Link
           href="/"
           className="inline-flex h-11 shrink items-center text-[14px] font-semibold tracking-tight text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink sm:text-[15px]"
         >
           Lifestyles
-        </a>
+        </Link>
         <TierSwitcher tiers={tiers} currentId={currentId} />
       </div>
     </header>
@@ -157,13 +156,13 @@ export function TierView({
             {liveTiers.length > 0 ? (
               <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2">
                 {liveTiers.map((item) => (
-                  <a
+                  <Link
                     key={item.id}
                     href={`/${item.id}`}
                     className="inline-flex min-h-11 items-center text-sm font-medium text-ink underline decoration-current underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
                   >
                     See the {item.name} kit
-                  </a>
+                  </Link>
                 ))}
               </div>
             ) : null}

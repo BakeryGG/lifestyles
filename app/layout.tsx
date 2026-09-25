@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
+import { withBasePath } from "@/lib/base-path";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s · Lifestyles",
   },
   description: "Pick how you live. We'll tell you what to buy.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: withBasePath("/favicon.svg") },
 };
 
 export const viewport: Viewport = {
