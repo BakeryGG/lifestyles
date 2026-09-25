@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import type { PresentedPick } from "@/lib/present";
 import { PickDrawer } from "./pick-drawer";
@@ -8,6 +8,8 @@ import { PickDrawer } from "./pick-drawer";
 type DrawerCategory = {
   id: string;
   name: string;
+  section: string;
+  number: number;
   pick: PresentedPick | null;
 };
 
@@ -19,6 +21,29 @@ function hrefFor(pick: string | null): string {
   else params.delete("pick");
   const search = params.toString();
   return search ? `${window.location.pathname}?${search}` : window.location.pathname;
+}
+
+function escapeId(id: string): string {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") return CSS.escape(id);
+  return id.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+}
+
+function markVisibleCard(id: string): HTMLElement | null {
+  const nodes = Array.from(document.querySelectorAll<HTMLElement>(`button[data-pick="${escapeId(id)}"]`));
+  const visible = nodes.find((node) => node.getClientRects().length > 0) ?? null;
+  for (const node of nodes) {
+    if (node === visible) node.id = `card-${id}`;
+    else node.removeAttribute("id");
+  }
+  return visible;
+}
+
+function markAllCards() {
+  const ids = new Set<string>();
+  document.querySelectorAll<HTMLElement>("button[data-pick]").forEach((node) => {
+    if (node.dataset.pick) ids.add(node.dataset.pick);
+  });
+  ids.forEach((id) => markVisibleCard(id));
 }
 
 function DeepLink({ onPick }: { onPick: () => void }) {
@@ -55,10 +80,11 @@ export function PickController({
   const liveRef = useRef(live);
   const activeRef = useRef<string | null>(null);
   const shownRef = useRef<string | null>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
   const pushedRef = useRef(false);
   const suppressRef = useRef<string | null>(null);
-  const wasOpenRef = useRef<string | null>(null);
+  const returnIdRef = useRef<string | null>(null);
+  const wasShownRef = useRef<string | null>(null);
+  const closingRef = useRef(false);
   const exitTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -76,6 +102,8 @@ export function PickController({
   const reveal = useCallback(
     (id: string) => {
       clearExit();
+      closingRef.current = false;
+      returnIdRef.current = id;
       shownRef.current = id;
       activeRef.current = id;
       setShownId(id);
@@ -90,18 +118,23 @@ export function PickController({
     setActiveId(null);
     if (!shownRef.current) {
       setClosing(false);
+      closingRef.current = false;
       return;
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       shownRef.current = null;
+      closingRef.current = false;
       setShownId(null);
       setClosing(false);
       return;
     }
+    if (closingRef.current) return;
+    closingRef.current = true;
     setClosing(true);
     clearExit();
     exitTimer.current = window.setTimeout(() => {
       shownRef.current = null;
+      closingRef.current = false;
       setShownId(null);
       setClosing(false);
       exitTimer.current = null;
@@ -109,10 +142,12 @@ export function PickController({
   }, [clearExit]);
 
   const applyFromLocation = useCallback(() => {
-    const raw = new URLSearchParams(window.location.search).get("pick");
-    const known = raw != null && idsRef.current.has(raw);
-    if (!liveRef.current || (raw != null && !known)) {
-      if (raw) window.history.replaceState(null, "", hrefFor(null));
+    const params = new URLSearchParams(window.location.search);
+    const hasPick = params.has("pick");
+    const raw = params.get("pick");
+    const known = raw != null && raw.length > 0 && idsRef.current.has(raw);
+    if (!liveRef.current || (hasPick && !known)) {
+      if (hasPick) window.history.replaceState(null, "", hrefFor(null));
       suppressRef.current = null;
       conceal();
       return;
@@ -124,29 +159,72 @@ export function PickController({
     }
     if (suppressRef.current === raw) return;
     suppressRef.current = null;
-    triggerRef.current = triggerRef.current ?? document.getElementById(`card-${raw}`);
     reveal(raw);
   }, [conceal, reveal]);
 
-  useEffect(() => {
-    const previous = wasOpenRef.current;
-    wasOpenRef.current = activeId;
-    if (previous && !activeId) {
-      const target = triggerRef.current ?? document.getElementById(`card-${previous}`);
-      target?.focus({ preventScroll: true });
-      triggerRef.current = null;
-    }
-  }, [activeId]);
+  useLayoutEffect(() => {
+    markAllCards();
+  });
+
+  useLayoutEffect(() => {
+    if (!shownId) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const scrollbar = window.innerWidth - html.clientWidth;
+    const previous = {
+      htmlOverflow: html.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      paddingRight: body.style.paddingRight,
+      overscroll: body.style.overscrollBehavior,
+    };
+    html.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.paddingRight = `${scrollbar}px`;
+    body.style.overscrollBehavior = "none";
+    return () => {
+      html.style.overflow = previous.htmlOverflow;
+      body.style.position = previous.position;
+      body.style.top = previous.top;
+      body.style.left = previous.left;
+      body.style.right = previous.right;
+      body.style.width = previous.width;
+      body.style.paddingRight = previous.paddingRight;
+      body.style.overscrollBehavior = previous.overscroll;
+      window.scrollTo(0, scrollY);
+    };
+  }, [shownId]);
+
+  useLayoutEffect(() => {
+    const previous = wasShownRef.current;
+    wasShownRef.current = shownId;
+    if (shownId || !previous) return;
+    const id = returnIdRef.current;
+    returnIdRef.current = null;
+    if (!id) return;
+    const card = markVisibleCard(id);
+    if (!card) return;
+    card.scrollIntoView({ block: "nearest", inline: "nearest" });
+    card.focus({ preventScroll: true });
+  }, [shownId]);
 
   useEffect(() => {
-    if (!activeId) return;
+    if (!shownId) return;
     const skip = document.querySelector<HTMLElement>("[data-skip-link]");
     if (!skip || skip.hasAttribute("inert")) return;
     skip.setAttribute("inert", "");
     return () => {
       skip.removeAttribute("inert");
     };
-  }, [activeId]);
+  }, [shownId]);
 
   useEffect(() => {
     function onPop() {
@@ -176,10 +254,17 @@ export function PickController({
 
   useEffect(() => () => clearExit(), [clearExit]);
 
-  function openPick(id: string, trigger: HTMLElement) {
+  useEffect(() => {
+    function onResize() {
+      markAllCards();
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  function openPick(id: string) {
     if (!liveRef.current || !idsRef.current.has(id)) return;
     suppressRef.current = null;
-    triggerRef.current = trigger;
     const current = new URLSearchParams(window.location.search).get("pick");
     reveal(id);
     if (current === id) return;
@@ -215,7 +300,7 @@ export function PickController({
     if (!(button instanceof HTMLButtonElement)) return;
     const id = button.dataset.pick;
     if (!id) return;
-    openPick(id, button);
+    openPick(id);
   }
 
   const shown = categories.find((category) => category.id === shownId) ?? null;
@@ -225,13 +310,15 @@ export function PickController({
       <Suspense fallback={null}>
         <DeepLink onPick={applyFromLocation} />
       </Suspense>
-      <div inert={activeId ? true : undefined} onClick={onClick}>
+      <div inert={shownId ? true : undefined} onClick={onClick}>
         {children}
       </div>
       {shown ? (
         <PickDrawer
           key={shown.id}
           categoryName={shown.name}
+          section={shown.section}
+          number={shown.number}
           tierName={tierName}
           pick={shown.pick}
           accent={accent}

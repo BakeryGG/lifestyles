@@ -1,25 +1,30 @@
 export function ProductImage({
   src,
-  priority = false,
+  srcSet,
+  priority = "lazy",
   sizes,
   className,
 }: {
   src: string;
-  priority?: boolean;
+  srcSet?: string;
+  /** `high` is the single LCP candidate. `eager` loads now without high priority. */
+  priority?: "high" | "eager" | "lazy";
   sizes: string;
   className?: string;
 }) {
+  const eager = priority === "high" || priority === "eager";
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- export has no image optimizer
+    // eslint-disable-next-line @next/next/no-img-element -- static export has no image optimizer
     <img
       src={src}
+      srcSet={srcSet}
       alt=""
-      width={800}
-      height={600}
+      width={1200}
+      height={900}
       sizes={sizes}
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : "auto"}
-      decoding={priority ? "sync" : "async"}
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={priority === "high" ? "high" : "auto"}
+      decoding="async"
       data-fallback="/images/placeholder.svg"
       className={className}
     />

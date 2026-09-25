@@ -1,23 +1,7 @@
+import { isBuyableUrl, isPlaceholderBrand, isUnfinishedCopy } from "./copy";
 import type { AltProduct, Catalog, CatalogPick, Product, Tier } from "./schema";
 
-/**
- * Curator placeholder. The seed uses the exact brand string "TODO"
- * (any case, surrounding spaces ignored). Names like "Todo Wool Tee" are real.
- */
-export function isPlaceholderBrand(brand: string | null | undefined): boolean {
-  if (brand == null) return true;
-  const value = brand.trim();
-  return value.length === 0 || value.toUpperCase() === "TODO";
-}
-
-/** Exact "TODO" or a "TODO:" note. Does not match text that merely contains those letters. */
-export function isUnfinishedCopy(value: string | null | undefined): boolean {
-  if (value == null) return false;
-  const trimmed = value.trim();
-  if (trimmed.length === 0) return false;
-  const upper = trimmed.toUpperCase();
-  return upper === "TODO" || upper.startsWith("TODO:");
-}
+export { isBuyableUrl, isPlaceholderBrand, isUnfinishedCopy };
 
 export function isRealProduct(product: { brand?: string | null } | null | undefined): boolean {
   return !!product && !isPlaceholderBrand(product.brand);
@@ -35,28 +19,18 @@ export function visibleBrands(brands: string[]): string[] {
   return brands.filter((brand) => !isPlaceholderBrand(brand));
 }
 
-export function isBuyableUrl(url: string | null | undefined): boolean {
-  if (!url) return false;
-  try {
-    const parsed = new URL(url.trim());
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
-    return parsed.hostname.toLowerCase() !== "todo";
-  } catch {
-    return false;
-  }
-}
-
 export function formatPrice(price: number, currency: string): string {
-  const digits = Number.isInteger(price) ? 0 : 2;
+  const amount = Object.is(price, -0) ? 0 : price;
+  const digits = Number.isInteger(amount) ? 0 : 2;
   try {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
       minimumFractionDigits: digits,
       maximumFractionDigits: digits,
-    }).format(price);
+    }).format(amount);
   } catch {
-    return `${price} ${currency}`;
+    return `${amount} ${currency}`;
   }
 }
 
@@ -73,20 +47,26 @@ export function kitSummary(
   const currencies = new Set(priced.map((pick) => pick.main.currency));
   if (currencies.size !== 1) return `${lead}, prices coming`;
 
-  const total = priced.reduce((sum, pick) => sum + pick.main.price, 0);
+  const total = priced.reduce((sum, pick) => sum + (Object.is(pick.main.price, -0) ? 0 : pick.main.price), 0);
   const money = formatPrice(total, priced[0].main.currency);
   if (priced.length >= categoryCount) return `${lead}, about ${money} total`;
+  if (priced.length === 1) return `${lead}, about ${money} for the 1 pick so far`;
   return `${lead}, about ${money} for the ${priced.length} picked so far`;
 }
 
+export type ShownProduct = Product & { srcSet?: string };
+export type ShownAlt = AltProduct & { srcSet?: string };
+
 export type PresentedPick = {
-  main: Product;
-  alt: AltProduct | null;
+  main: ShownProduct;
+  alt: ShownAlt | null;
 };
 
 export type TierCategoryView = {
   id: string;
   name: string;
+  /** 1-based position in catalog category order. */
+  number: number;
   pick: PresentedPick | null;
 };
 
@@ -95,12 +75,11 @@ export type TierGroupView = {
   categories: TierCategoryView[];
 };
 
-export type FlatCategory = TierCategoryView & { section: string };
-
 export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[] {
   const byCategory = new Map(
     catalog.picks.filter((pick) => pick.tier === tierId).map((pick) => [pick.category, pick]),
   );
+  const numberById = new Map(catalog.categories.map((category, index) => [category.id, index + 1]));
 
   return catalog.sections
     .map((section) => ({
@@ -108,13 +87,15 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
       categories: catalog.categories
         .filter((category) => category.section === section)
         .map((category) => {
+          const number = numberById.get(category.id) ?? 0;
           const pick = byCategory.get(category.id);
           if (!pick || !isRealProduct(pick.main)) {
-            return { id: category.id, name: category.name, pick: null };
+            return { id: category.id, name: category.name, number, pick: null };
           }
           return {
             id: category.id,
             name: category.name,
+            number,
             pick: {
               main: pick.main,
               alt: isRealProduct(pick.alt) ? pick.alt : null,
@@ -125,22 +106,9 @@ export function groupsForTier(catalog: Catalog, tierId: string): TierGroupView[]
     .filter((group) => group.categories.length > 0);
 }
 
-export function flattenGroups(groups: TierGroupView[]): FlatCategory[] {
-  return groups.flatMap((group) =>
-    group.categories.map((category) => ({ ...category, section: group.section })),
-  );
-}
-
-/** First card of a section, or the first card of a row that section continues onto. */
-export function showsSectionLabel(sections: readonly string[], index: number, columns: number): boolean {
-  if (columns < 1 || index < 0 || index >= sections.length) return false;
-  if (index === 0 || sections[index] !== sections[index - 1]) return true;
-  return index % columns === 0;
-}
-
 export type AccentColors = {
   raw: string;
-  /** Accent darkened until white label text clears WCAG AA. Used for Buy buttons and the switcher ring. */
+  /** Accent darkened until white label text clears WCAG AA. Buy buttons only. */
   buttonBg: string;
   buttonFg: string;
   /** Soft wash of the original accent. */

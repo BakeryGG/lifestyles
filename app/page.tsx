@@ -1,9 +1,6 @@
-import Link from "next/link";
 import { loadCatalog } from "@/lib/catalog";
 import { visibleBrands } from "@/lib/present";
 import type { Tier } from "@/lib/schema";
-
-const kicker = "text-[11px] font-medium uppercase leading-4 tracking-[0.08em]";
 
 function Brands({ brands }: { brands: string[] }) {
   if (brands.length === 0) {
@@ -28,8 +25,8 @@ function TierChoice({ tier }: { tier: Tier }) {
   const brands = visibleBrands(tier.exampleBrands);
   const live = tier.status === "live";
   const className = live
-    ? "flex h-full min-h-64 w-full flex-col rounded-2xl bg-card p-6 ring-1 ring-inset ring-line hover:ring-ink/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink lg:p-8"
-    : "flex h-full min-h-64 w-full cursor-default flex-col rounded-2xl bg-well p-6 text-muted ring-1 ring-inset ring-line lg:p-8";
+    ? "group flex h-full w-full flex-col rounded-2xl bg-card p-6 ring-1 ring-inset ring-line hover:ring-ink/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink lg:min-h-64 lg:p-8"
+    : "flex h-full w-full cursor-default flex-col rounded-2xl bg-well p-6 text-muted ring-1 ring-inset ring-line lg:min-h-64 lg:p-8";
 
   const body = (
     <>
@@ -39,11 +36,11 @@ function TierChoice({ tier }: { tier: Tier }) {
         </h2>
         <p className="mt-3 text-[15px] leading-6 text-pretty text-muted">{tier.description}</p>
       </div>
-      <div className="mt-auto pt-10">
+      <div className="mt-6 lg:mt-auto lg:pt-8">
         <p className={`text-[13px] leading-5 ${live ? "text-ink" : "text-muted"}`}>
           <Brands brands={brands} />
         </p>
-        <p className={`mt-6 min-h-5 ${live ? "text-[15px] font-medium text-ink underline decoration-current underline-offset-4" : `${kicker} text-muted`}`}>
+        <p className={`mt-4 min-h-5 text-[13px] font-medium leading-5 ${live ? "text-ink group-hover:underline" : "text-muted"}`}>
           {live ? (
             <>
               See the kit <span aria-hidden="true">→</span>
@@ -61,9 +58,9 @@ function TierChoice({ tier }: { tier: Tier }) {
   }
 
   return (
-    <Link href={`/${tier.id}`} className={className} style={{ boxShadow: `inset 0 2px 0 ${tier.accent}` }}>
+    <a href={`/${tier.id}`} className={className} style={{ boxShadow: `inset 0 2px 0 ${tier.accent}` }}>
       {body}
-    </Link>
+    </a>
   );
 }
 
@@ -74,13 +71,13 @@ export default function HomePage() {
     <main
       id="content"
       tabIndex={-1}
-      className="mx-auto flex min-h-full w-full max-w-5xl scroll-mt-14 flex-col px-6 pt-16 pb-16 outline-none sm:pt-24 lg:pt-28"
+      className="mx-auto flex min-h-full w-full max-w-5xl scroll-mt-14 flex-col px-6 pt-12 pb-16 focus:outline focus:outline-2 focus:outline-offset-4 focus:outline-ink sm:pt-16 lg:pt-24"
     >
-      <h1 className="max-w-[14ch] text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-ink sm:text-5xl">
+      <h1 className="max-w-[16ch] text-balance text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-5xl">
         {"Pick how you live. We'll tell you what to buy."}
       </h1>
-      <p className="mt-5 max-w-xl text-lg leading-7 text-pretty text-muted">One pick for everything, at your level.</p>
-      <ul className="mt-12 grid list-none grid-cols-1 items-stretch gap-4 sm:mt-14 md:grid-cols-3 lg:gap-6">
+      <p className="mt-4 max-w-xl text-lg leading-7 text-pretty text-muted">One pick for everything, at your level.</p>
+      <ul className="mt-8 grid list-none grid-cols-1 items-stretch gap-4 sm:mt-12 lg:mt-14 lg:grid-cols-3 lg:gap-6">
         {catalog.tiers.map((tier) => (
           <li key={tier.id} className="flex">
             <TierChoice tier={tier} />

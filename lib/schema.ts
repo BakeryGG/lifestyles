@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isBuyableUrl, isHttpUrl, isPlaceholderBrand, isUnfinishedCopy } from "./copy";
 
 const slug = z
   .string()
@@ -9,13 +10,16 @@ const slug = z
 
 const text = z.string().trim().min(1, "Required");
 
+const singleLine = text
+  .max(90, "Expected at most 90 characters")
+  .refine((value) => !/[\r\n]/.test(value), "Expected a single line");
+
 const currency = z
   .string()
   .regex(/^[A-Z]{3}$/, "Expected a 3-letter ISO currency code")
   .refine((code) => {
     try {
-      new Intl.NumberFormat("en-US", { style: "currency", currency: code }).format(0);
-      return true;
+      return Intl.supportedValuesOf("currency").includes(code);
     } catch {
       return false;
     }
@@ -27,51 +31,76 @@ const imagePath = z
   .regex(/^\/images\/[A-Za-z0-9._/-]+$/, "Expected an image path starting with /images/")
   .refine((value) => !value.includes(".."), "Expected an image path without '..'");
 
-const productSchema = z.object({
-  brand: text,
-  name: text,
-  price: z
-    .number()
-    .refine((value) => Number.isFinite(value), "Expected a finite number")
-    .refine((value) => value >= 0, "Expected a number greater than or equal to 0"),
-  currency,
-  url: text,
-  image: imagePath,
-  why: text.max(90, "Expected at most 90 characters"),
+function priceIssue(value: number): string | null {
+  if (!Number.isFinite(value)) return "Expected a finite number";
+  if (Object.is(value, -0)) return "Signed zero is not a valid price";
+  if (value < 0) return "Expected a number greater than or equal to 0";
+  const scaled = value * 100;
+  const cents = Math.round(scaled);
+  if (Math.abs(scaled - cents) > 1e-6) return "Expected a price with at most 2 decimal places";
+  return null;
+}
+
+const price = z.number().superRefine((value, ctx) => {
+  const message = priceIssue(value);
+  if (!message) return;
+  ctx.addIssue({ code: z.ZodIssueCode.custom, message });
 });
 
-const altSchema = productSchema.extend({
-  when: text.max(90, "Expected at most 90 characters"),
-});
+const productSchema = z
+  .object({
+    brand: text,
+    name: text,
+    price,
+    currency,
+    url: text,
+    image: imagePath,
+    why: singleLine,
+  })
+  .strict();
 
-const tierSchema = z.object({
-  id: slug,
-  name: text,
-  description: text,
-  exampleBrands: z.array(text),
-  status: z.enum(["live", "coming_soon"]),
-  accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
-});
+const altSchema = productSchema
+  .extend({
+    when: singleLine,
+  })
+  .strict();
 
-const categorySchema = z.object({
-  id: slug,
-  name: text,
-  section: text,
-});
+const tierSchema = z
+  .object({
+    id: slug,
+    name: text,
+    description: text,
+    exampleBrands: z.array(text),
+    status: z.enum(["live", "coming_soon"]),
+    accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Expected a hex color like #10B981"),
+  })
+  .strict();
 
-const pickSchema = z.object({
-  tier: text,
-  category: text,
-  main: productSchema,
-  alt: altSchema,
-});
+const categorySchema = z
+  .object({
+    id: slug,
+    name: text,
+    section: text,
+  })
+  .strict();
 
-export const catalogSchema = z.object({
-  tiers: z.array(tierSchema).min(1, "Expected at least one tier"),
-  sections: z.array(text).min(1, "Expected at least one section"),
-  categories: z.array(categorySchema),
-  picks: z.array(pickSchema),
-});
+const pickSchema = z
+  .object({
+    tier: text,
+    category: text,
+    main: productSchema,
+    alt: altSchema,
+  })
+  .strict();
+
+export const catalogSchema = z
+  .object({
+    tiers: z.array(tierSchema).min(1, "Expected at least one tier"),
+    sections: z.array(text).min(1, "Expected at least one section"),
+    categories: z.array(categorySchema),
+    picks: z.array(pickSchema),
+  })
+  .strict();
 
 export type CatalogIssue = { path: PropertyKey[]; message: string };
 
@@ -84,28 +113,6 @@ function trimmedString(value: unknown): string | null {
   return value.trim();
 }
 
-/** Exact "TODO", or a curator note that starts with "TODO:". Not "Todo Wool Tee". */
-export function isUnfinishedCopy(value: string): boolean {
-  const upper = value.trim().toUpperCase();
-  return upper === "TODO" || upper.startsWith("TODO:");
-}
-
-/** Blank, or the exact word TODO. "Todo Wool Tee" is a real brand. */
-export function isPlaceholderBrand(value: string): boolean {
-  const trimmed = value.trim();
-  return trimmed.length === 0 || trimmed.toUpperCase() === "TODO";
-}
-
-export function isHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-/** Reference checks run even when other fields have the wrong type. */
 export function referenceIssues(data: unknown): CatalogIssue[] {
   if (!isRecord(data)) return [];
   const issues: CatalogIssue[] = [];
@@ -117,7 +124,6 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
   const tierIds = new Map<string, number>();
   tiers.forEach((tier, index) => {
     if (!isRecord(tier) || typeof tier.id !== "string" || tier.id.length === 0) return;
-    // Slugs are not trimmed. A whitespace id stays invalid and fails the slug regex.
     const id = tier.id;
     const previous = tierIds.get(id);
     if (previous !== undefined) {
@@ -130,19 +136,24 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
     }
   });
 
-  const sectionNames = new Map<string, number>();
+  const sectionExact = new Map<string, number>();
+  const sectionFold = new Map<string, number>();
   sections.forEach((section, index) => {
     if (typeof section !== "string") return;
     const name = section.trim();
     if (!name) return;
-    const previous = sectionNames.get(name);
+    const fold = name.toLowerCase();
+    const exactPrevious = sectionExact.get(name);
+    const foldPrevious = sectionFold.get(fold);
+    const previous = exactPrevious ?? foldPrevious;
     if (previous !== undefined) {
       issues.push({
         path: ["sections", index],
         message: `Duplicate section ${JSON.stringify(name)} (also at sections[${previous}])`,
       });
     } else {
-      sectionNames.set(name, index);
+      sectionExact.set(name, index);
+      sectionFold.set(fold, index);
     }
   });
 
@@ -161,7 +172,7 @@ export function referenceIssues(data: unknown): CatalogIssue[] {
         categoryIds.set(id, index);
       }
     }
-    if (typeof category.section === "string" && category.section.trim() && !sectionNames.has(category.section.trim())) {
+    if (typeof category.section === "string" && category.section.trim() && !sectionExact.has(category.section.trim())) {
       issues.push({
         path: ["categories", index, "section"],
         message: `Unknown section ${JSON.stringify(category.section.trim())}`,
@@ -229,6 +240,11 @@ function productContentIssues(
       path: [...path, "url"],
       message: "Expected an http(s) URL",
     });
+  } else if (real && url && !isBuyableUrl(url)) {
+    issues.push({
+      path: [...path, "url"],
+      message: "Expected a retailer http(s) URL",
+    });
   }
   const currencyCode = trimmedString(product.currency);
   return { brand, currency: currencyCode, real };
@@ -243,7 +259,13 @@ export function contentIssues(data: unknown): CatalogIssue[] {
   data.picks.forEach((pick, index) => {
     if (!isRecord(pick)) return;
     const main = productContentIssues(pick.main, ["picks", index, "main"], issues, ["name", "why"]);
-    productContentIssues(pick.alt, ["picks", index, "alt"], issues, ["name", "why", "when"]);
+    const alt = productContentIssues(pick.alt, ["picks", index, "alt"], issues, ["name", "why", "when"]);
+    if (alt.real && !main.real) {
+      issues.push({
+        path: ["picks", index, "alt", "brand"],
+        message: "alternative is set while the main brand is still TODO",
+      });
+    }
     if (!main.real || !main.currency) return;
     const tier = trimmedString(pick.tier);
     if (!tier) return;

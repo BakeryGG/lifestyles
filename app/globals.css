@@ -5,10 +5,25 @@
   --color-paper: #f4f3f0;
   --color-ink: #1c1c1a;
   --color-muted: #5c5852;
-  --color-line: #e4e1da;
+  --color-line: #8a8680;
   --color-card: #fffcf8;
   --color-well: #efeee9;
   --color-stage: #f6f5f2;
+  --color-plate: #9a948a;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
 }
 
 @layer base {
@@ -144,6 +159,12 @@
   .motion-fade-exit,
   .pick-panel,
   .pick-panel-exit {
+    animation: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(root) {
     animation: none !important;
   }
 }

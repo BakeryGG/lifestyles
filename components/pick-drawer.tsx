@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import {
   accentColors,
   displayText,
   formatPrice,
   isBuyableUrl,
   type PresentedPick,
+  type ShownAlt,
+  type ShownProduct,
 } from "@/lib/present";
-import type { Product } from "@/lib/schema";
 import { ProductImage } from "./product-image";
+import { ReservedPlate } from "./reserved-plate";
 
 const FOCUSABLE =
   "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
-const kickerClass = "text-[11px] font-medium uppercase leading-4 tracking-[0.08em] text-muted";
+const DRAWER_SIZES = "(min-width: 1024px) 320px, (min-width: 600px) 42vw, 88vw";
 
 function ExternalIcon() {
   return (
@@ -35,9 +37,11 @@ function ExternalIcon() {
 function BuyControl({
   product,
   colors,
+  variant,
 }: {
-  product: Product;
+  product: ShownProduct | ShownAlt;
   colors: { buttonBg: string; buttonFg: string };
+  variant: "solid" | "outline";
 }) {
   const brand = displayText(product.brand);
   const name = displayText(product.name);
@@ -49,13 +53,17 @@ function BuyControl({
       </span>
     );
   }
+  const className =
+    variant === "solid"
+      ? "inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full px-4 text-[15px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+      : "inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full bg-transparent px-4 text-[15px] font-medium text-ink ring-1 ring-inset ring-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
   return (
     <a
       href={product.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full px-4 text-[15px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-      style={{ backgroundColor: colors.buttonBg, color: colors.buttonFg }}
+      className={className}
+      style={variant === "solid" ? { backgroundColor: colors.buttonBg, color: colors.buttonFg } : undefined}
     >
       Buy
       <ExternalIcon />
@@ -69,38 +77,80 @@ function BuyControl({
 
 function Column({
   product,
-  kicker,
-  reserveKicker,
+  categoryName,
+  label,
+  when,
   colors,
+  variant,
 }: {
-  product: Product;
-  kicker: string | null;
-  reserveKicker: boolean;
+  product: ShownProduct | ShownAlt;
+  categoryName: string;
+  label: string;
+  when: string | null;
   colors: { buttonBg: string; buttonFg: string };
+  variant: "solid" | "outline";
 }) {
   const brand = displayText(product.brand);
-  const name = displayText(product.name);
+  const name = displayText(product.name) ?? categoryName;
   const why = displayText(product.why);
 
   return (
-    <div className="flex min-w-0 flex-col">
-      {reserveKicker ? (
-        <p className="mb-3 line-clamp-2 min-h-10 text-[13px] leading-5 text-muted">{kicker ?? "\u00a0"}</p>
-      ) : null}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-stage">
+    <article className="flex min-w-0 flex-col gap-2 min-[600px]:grid min-[600px]:grid-rows-subgrid min-[600px]:row-span-7 min-[600px]:gap-2">
+      <div>
+        <p className="text-[12px] font-medium leading-4 text-ink">{label}</p>
+        {when ? <p className="mt-1 text-[13px] leading-5 text-pretty text-muted">{when}</p> : null}
+      </div>
+      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-stage min-[600px]:h-auto min-[600px]:aspect-[4/3]">
         <ProductImage
           key={product.image}
           src={product.image}
-          sizes="(min-width: 1024px) 20vw, 92vw"
-          className="absolute inset-0 h-full w-full object-contain p-3"
+          srcSet={product.srcSet}
+          sizes={DRAWER_SIZES}
+          className="absolute inset-0 h-full w-full object-contain p-2 min-[600px]:p-3"
         />
       </div>
-      <p className={`mt-4 h-4 truncate ${kickerClass}`}>{brand ?? "\u00a0"}</p>
-      <h2 className="mt-1 line-clamp-2 min-h-14 text-xl font-medium tracking-tight text-ink">{name ?? "\u00a0"}</h2>
-      <p className="mt-2 h-6 text-[15px] tabular-nums text-ink">{formatPrice(product.price, product.currency)}</p>
-      <p className="mt-2 line-clamp-3 min-h-[4.5rem] text-[15px] leading-6 text-muted">{why ?? "\u00a0"}</p>
-      <div className="mt-auto pt-5">
-        <BuyControl product={product} colors={colors} />
+      {brand ? (
+        <p className="text-[12px] font-medium uppercase leading-4 tracking-[0.04em] text-muted">{brand}</p>
+      ) : (
+        <div aria-hidden="true" className="h-4" />
+      )}
+      <h2 className="text-lg font-semibold leading-6 tracking-tight break-words text-ink lg:text-xl">{name}</h2>
+      <p className="text-[15px] leading-6 tabular-nums text-ink">{formatPrice(product.price, product.currency)}</p>
+      {why ? (
+        <p className="text-[15px] leading-6 text-pretty break-words text-muted">{why}</p>
+      ) : (
+        <div aria-hidden="true" />
+      )}
+      <div className="pt-2">
+        <BuyControl product={product} colors={colors} variant={variant} />
+      </div>
+    </article>
+  );
+}
+
+function EmptyComparison({
+  tierName,
+  categoryName,
+  number,
+}: {
+  tierName: string;
+  categoryName: string;
+  number: number;
+}) {
+  return (
+    <div>
+      <p className="max-w-md text-[15px] leading-6 text-pretty text-muted">
+        The {tierName} pick for {categoryName} is still being chosen.
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+        {(["Our pick", "Alternative"] as const).map((label) => (
+          <div key={label} className="min-w-0">
+            <p className="mb-2 text-[12px] font-medium leading-4 text-ink">{label}</p>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-stage">
+              <ReservedPlate number={number} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -108,6 +158,8 @@ function Column({
 
 export function PickDrawer({
   categoryName,
+  section,
+  number,
   tierName,
   pick,
   accent,
@@ -115,6 +167,8 @@ export function PickDrawer({
   onClose,
 }: {
   categoryName: string;
+  section: string;
+  number: number;
   tierName: string;
   pick: PresentedPick | null;
   accent: string;
@@ -129,34 +183,15 @@ export function PickDrawer({
   const colors = accentColors(accent);
   const showAlt = pick?.alt != null;
   const when = pick?.alt ? displayText(pick.alt.when) : null;
+  const canBuy =
+    (!!pick && isBuyableUrl(pick.main.url)) || (!!pick?.alt && isBuyableUrl(pick.alt.url));
+  const empty = pick == null;
 
   useEffect(() => {
     onCloseRef.current = onClose;
   });
 
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const scrollY = window.scrollY;
-    const scrollbar = window.innerWidth - html.clientWidth;
-    const previous = {
-      htmlOverflow: html.style.overflow,
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
-      paddingRight: body.style.paddingRight,
-      overscroll: body.style.overscrollBehavior,
-    };
-    html.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
-    body.style.paddingRight = `${scrollbar}px`;
-    body.style.overscrollBehavior = "none";
+  useLayoutEffect(() => {
     closeRef.current?.focus({ preventScroll: true });
 
     function scrollByKey(key: string) {
@@ -217,6 +252,7 @@ export function PickDrawer({
       }
       const first = list[0];
       const last = list[list.length - 1];
+      if (!first || !last) return;
       const active = document.activeElement;
       if (event.shiftKey) {
         if (active === first || !hostRef.current?.contains(active)) {
@@ -230,19 +266,12 @@ export function PickDrawer({
     }
 
     document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      html.style.overflow = previous.htmlOverflow;
-      body.style.position = previous.position;
-      body.style.top = previous.top;
-      body.style.left = previous.left;
-      body.style.right = previous.right;
-      body.style.width = previous.width;
-      body.style.paddingRight = previous.paddingRight;
-      body.style.overscrollBehavior = previous.overscroll;
-      window.scrollTo(0, scrollY);
-    };
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  const panelPosition = empty
+    ? "lg:top-0 lg:bottom-auto lg:h-auto lg:max-h-full"
+    : "lg:inset-y-0 lg:h-full lg:max-h-none";
 
   return (
     <div ref={hostRef} data-pick-dialog="" className="fixed inset-0 z-50">
@@ -254,21 +283,24 @@ export function PickDrawer({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`pick-panel absolute inset-x-0 bottom-0 flex max-h-[min(92dvh,100%)] flex-col rounded-t-2xl bg-card shadow-[0_-16px_48px_rgba(28,28,26,0.14)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:max-h-none lg:w-[min(40rem,42vw)] lg:rounded-none lg:shadow-[-20px_0_48px_rgba(28,28,26,0.12)] ${closing ? "pick-panel-exit" : ""}`}
+        className={`pick-panel absolute inset-x-0 bottom-0 flex h-auto max-h-[85vh] flex-col rounded-t-2xl bg-card shadow-[0_-16px_48px_rgba(28,28,26,0.14)] lg:left-auto lg:right-0 lg:w-[min(44rem,calc(100vw-4rem))] lg:rounded-none lg:shadow-[-20px_0_48px_rgba(28,28,26,0.12)] ${panelPosition} ${closing ? "pick-panel-exit" : ""}`}
       >
-        <div className="flex shrink-0 justify-center pt-2.5 lg:hidden" aria-hidden="true">
-          <div className="h-1 w-9 rounded-full bg-line" />
+        <div className="flex shrink-0 justify-center pt-2 lg:hidden" aria-hidden="true">
+          <div className="h-1 w-8 rounded-full bg-line" />
         </div>
-        <div className="flex shrink-0 items-center justify-between gap-4 px-5 py-3 lg:px-8 lg:pt-6">
-          <h1 id={titleId} className="text-lg font-semibold tracking-tight text-ink">
-            {categoryName}
-          </h1>
+        <div className="flex shrink-0 items-start justify-between gap-4 px-5 py-3 lg:px-8 lg:pt-6">
+          <div className="min-w-0 pt-1">
+            <p className="text-[12px] font-medium leading-4 text-muted">{section}</p>
+            <h1 id={titleId} className="text-lg font-semibold leading-6 tracking-tight text-ink">
+              {categoryName}
+            </h1>
+          </div>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-well focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink ring-1 ring-inset ring-line hover:bg-well focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -277,19 +309,38 @@ export function PickDrawer({
         </div>
         <div
           ref={scrollerRef}
-          tabIndex={0}
-          aria-label="Pick details"
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink lg:px-8 lg:pb-10"
+          tabIndex={canBuy ? -1 : 0}
+          role={canBuy ? undefined : "region"}
+          aria-label={canBuy ? undefined : "Pick details"}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink lg:px-8 lg:pb-8"
         >
           {pick == null ? (
-            <p className="max-w-sm pt-2 text-[17px] leading-7 text-muted">
-              The {tierName} pick for {categoryName} is still being chosen.
-            </p>
+            <EmptyComparison tierName={tierName} categoryName={categoryName} number={number} />
           ) : (
-            <div className={`grid gap-8 ${showAlt ? "lg:grid-cols-2" : "mx-auto w-full max-w-md"}`}>
-              <Column product={pick.main} kicker={null} reserveKicker={showAlt} colors={colors} />
+            <div
+              className={
+                showAlt
+                  ? "flex flex-col gap-6 min-[600px]:grid min-[600px]:grid-cols-2 min-[600px]:grid-rows-[auto_auto_auto_auto_auto_auto_auto] min-[600px]:gap-x-4 min-[600px]:gap-y-0"
+                  : "mx-auto flex w-full max-w-md flex-col"
+              }
+            >
+              <Column
+                product={pick.main}
+                categoryName={categoryName}
+                label="Our pick"
+                when={null}
+                colors={colors}
+                variant="solid"
+              />
               {showAlt && pick.alt ? (
-                <Column product={pick.alt} kicker={when} reserveKicker colors={colors} />
+                <Column
+                  product={pick.alt}
+                  categoryName={categoryName}
+                  label="Alternative"
+                  when={when}
+                  colors={colors}
+                  variant="outline"
+                />
               ) : null}
             </div>
           )}

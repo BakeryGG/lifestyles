@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PickController } from "@/components/pick-controller";
 import { TierView } from "@/components/tier-view";
-import { loadCatalog } from "@/lib/catalog";
-import { flattenGroups, groupsForTier, kitSummary } from "@/lib/present";
+import { loadCatalog, srcSetFor } from "@/lib/catalog";
+import { groupsForTier, kitSummary, type TierGroupView } from "@/lib/present";
 
 export function generateStaticParams() {
   return loadCatalog().tiers.map((tier) => ({ tier: tier.id }));
@@ -22,6 +22,23 @@ export async function generateMetadata({
   return { title: tier.name, description: tier.description };
 }
 
+function withImageSources(groups: TierGroupView[]): TierGroupView[] {
+  return groups.map((group) => ({
+    ...group,
+    categories: group.categories.map((category) => ({
+      ...category,
+      pick: category.pick
+        ? {
+            main: { ...category.pick.main, srcSet: srcSetFor(category.pick.main.image) },
+            alt: category.pick.alt
+              ? { ...category.pick.alt, srcSet: srcSetFor(category.pick.alt.image) }
+              : null,
+          }
+        : null,
+    })),
+  }));
+}
+
 export default async function TierRoute({
   params,
 }: {
@@ -33,7 +50,7 @@ export default async function TierRoute({
   if (!tier) notFound();
 
   const picks = catalog.picks.filter((pick) => pick.tier === tier.id);
-  const categories = flattenGroups(groupsForTier(catalog, tier.id));
+  const groups = withImageSources(groupsForTier(catalog, tier.id));
   const liveTiers = catalog.tiers
     .filter((item) => item.status === "live" && item.id !== tier.id)
     .map((item) => ({ id: item.id, name: item.name }));
@@ -43,11 +60,15 @@ export default async function TierRoute({
       live={tier.status === "live"}
       tierName={tier.name}
       accent={tier.accent}
-      categories={categories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        pick: category.pick,
-      }))}
+      categories={groups.flatMap((group) =>
+        group.categories.map((category) => ({
+          id: category.id,
+          name: category.name,
+          section: group.section,
+          number: category.number,
+          pick: category.pick,
+        })),
+      )}
     >
       <TierView
         tier={{
@@ -62,7 +83,7 @@ export default async function TierRoute({
           name: item.name,
           status: item.status,
         }))}
-        categories={categories}
+        groups={groups}
         summary={kitSummary(tier, catalog.categories.length, picks)}
         liveTiers={liveTiers}
       />

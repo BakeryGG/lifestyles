@@ -1,83 +1,76 @@
 import { displayText, formatPrice, type PresentedPick } from "@/lib/present";
 import { ProductImage } from "./product-image";
+import { ReservedPlate } from "./reserved-plate";
 
-const kicker = "text-[11px] font-medium uppercase leading-4 tracking-[0.08em] text-muted";
-
-function labelClass(label: { base: boolean; md: boolean; lg: boolean; xl: boolean }): string {
-  return [
-    label.base ? "visible" : "invisible",
-    label.md ? "md:visible" : "md:invisible",
-    label.lg ? "lg:visible" : "lg:invisible",
-    label.xl ? "xl:visible" : "xl:invisible",
-  ].join(" ");
-}
+const CARD_SIZES = "(min-width: 1024px) 18vw, 45vw";
 
 export function CategoryCard({
   id,
   name,
-  section,
   pick,
+  number,
   priority,
-  label,
 }: {
   id: string;
   name: string;
-  section: string;
   pick: PresentedPick | null;
-  priority: boolean;
-  label: { base: boolean; md: boolean; lg: boolean; xl: boolean };
+  number: number;
+  priority: "high" | "eager" | "lazy";
 }) {
   const brand = pick ? displayText(pick.main.brand) : null;
   const productName = pick ? displayText(pick.main.name) : null;
   const why = pick ? displayText(pick.main.why) : null;
+  const price = pick ? formatPrice(pick.main.price, pick.main.currency) : null;
 
   return (
-    <div className="flex h-full min-w-0 flex-col">
-      <div className="mb-1 flex min-h-4 items-end border-b border-line">
-        <h2 className={`${kicker} ${labelClass(label)}`}>{section}</h2>
-      </div>
-      <button
-        type="button"
-        id={`card-${id}`}
-        data-pick={id}
-        aria-haspopup="dialog"
-        className="flex min-h-0 w-full min-w-0 flex-1 cursor-pointer flex-col rounded-2xl bg-card text-left ring-1 ring-inset ring-line hover:ring-ink/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-      >
-        <span className="relative block aspect-[4/3] w-full bg-stage">
-          {pick ? (
-            <ProductImage
-              src={pick.main.image}
-              priority={priority}
-              sizes="(min-width: 1280px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 30vw, 46vw"
-              className="absolute inset-0 h-full w-full object-contain p-3"
-            />
-          ) : (
-            <span
-              className="absolute inset-3 flex items-center justify-center rounded-md ring-1 ring-inset ring-line"
-              aria-hidden="true"
-            >
-              <span className="h-px w-8 bg-line" />
-            </span>
-          )}
+    <button
+      type="button"
+      data-pick={id}
+      aria-haspopup="dialog"
+      className="group relative flex h-full w-full min-w-0 cursor-pointer flex-col overflow-hidden rounded-2xl bg-card text-left scroll-mt-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+    >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 rounded-2xl ring-1 ring-inset ring-line group-hover:ring-ink"
+      />
+      <span className="block px-3 pt-1 lg:pt-2">
+        <span className="block h-8 overflow-hidden lg:h-4">
+          <span className="line-clamp-2 text-[12px] font-medium leading-4 text-muted lg:line-clamp-1">{name}</span>
         </span>
-        <span className="block px-3 pt-2 pb-2.5">
-          <span className="block min-h-5 text-[15px] font-medium leading-5 tracking-tight text-ink">
-            {name}
-          </span>
-          <span className="mt-1 grid grid-rows-[1rem_1.25rem_1.25rem_2rem] gap-y-0.5">
-            <span className={`${kicker} block truncate`}>{brand ?? "\u00a0"}</span>
-            <span
-              className={`block truncate text-[14px] font-medium leading-5 ${pick ? "text-ink" : "text-muted"}`}
-            >
-              {pick ? (productName ?? "\u00a0") : "Pick coming"}
-            </span>
-            <span className="block truncate text-[13px] leading-5 tabular-nums text-ink">
-              {pick ? formatPrice(pick.main.price, pick.main.currency) : "\u00a0"}
-            </span>
-            <span className="line-clamp-2 text-[12px] leading-4 text-muted">{why ?? "\u00a0"}</span>
+      </span>
+      <span className="relative mt-1 block aspect-[4/3] w-full bg-stage lg:mt-0">
+        {pick ? (
+          <ProductImage
+            src={pick.main.image}
+            srcSet={pick.main.srcSet}
+            priority={priority}
+            sizes={CARD_SIZES}
+            className="absolute inset-0 h-full w-full object-contain p-3"
+          />
+        ) : (
+          <ReservedPlate number={number} />
+        )}
+      </span>
+      <span className="grid grid-rows-[1rem_2.5rem_1rem_2rem] gap-y-1 px-3 pt-2 pb-2 lg:grid-rows-[1rem_1.25rem_1rem_2rem] lg:pt-1 lg:pb-1">
+        <span className="block min-w-0 overflow-hidden" aria-hidden={brand ? undefined : true}>
+          <span className="block truncate text-[12px] font-medium uppercase leading-4 tracking-[0.04em] text-muted">
+            {brand ?? "\u00a0"}
           </span>
         </span>
-      </button>
-    </div>
+        <span className="block min-w-0 overflow-hidden">
+          <span
+            className={`line-clamp-2 text-[15px] font-semibold leading-5 lg:line-clamp-1 ${pick ? "text-ink" : "text-muted"}`}
+          >
+            {pick ? (productName ?? "\u00a0") : "Pick coming"}
+          </span>
+        </span>
+        <span className="block min-w-0 overflow-hidden" aria-hidden={price ? undefined : true}>
+          <span className="block truncate text-sm leading-4 tabular-nums text-ink">{price ?? "\u00a0"}</span>
+        </span>
+        <span className="block min-w-0 overflow-hidden" aria-hidden={why ? undefined : true}>
+          <span className="line-clamp-2 text-[12px] leading-4 text-muted">{why ?? "\u00a0"}</span>
+        </span>
+      </span>
+    </button>
   );
 }
