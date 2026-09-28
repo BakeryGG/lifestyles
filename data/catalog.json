@@ -2695,6 +2695,15 @@
           "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
           "image": "/images/mid-laptop-alt2.webp",
           "when": "you want a cheaper Mac for about half the price"
+        },
+        {
+          "brand": "Apple",
+          "name": "MacBook Pro, 14-inch, M5 Pro Chip, 18-core CPU, 20-core GPU, Space Black, Nano-texture display, 64GB memory, 1TB storage",
+          "price": 3849,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-pro/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-64gb-memory-1tb-storage",
+          "image": "/images/mid-laptop-alt3.webp",
+          "when": "you want to splurge on a noticeably nicer version"
         }
       ]
     },
@@ -2747,6 +2756,30 @@
           "url": "https://www.amazon.com/dp/B00GYB1QGG",
           "image": "/images/premium-detergent-alt1.webp",
           "when": "you prefer a liquid detergent over pods"
+        }
+      ]
+    },
+    {
+      "tier": "premium",
+      "product": "laptop",
+      "main": {
+        "brand": "Apple",
+        "name": "MacBook Pro, 14-inch, M5 Pro Chip, 18-core CPU, 20-core GPU, Space Black, Nano-texture display, 64GB memory, 1TB storage",
+        "price": 3849,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-mac/macbook-pro/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-64gb-memory-1tb-storage",
+        "image": "/images/premium-laptop-main.webp",
+        "why": "14-inch MacBook Pro with M5 Pro, nano-texture display, 64GB memory and 1TB storage."
+      },
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Air, 13-inch, M5 Chip, 10-core CPU, 8-core GPU, Starlight, 16GB memory, 512GB storage",
+          "price": 1299,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-air/13-inch-starlight-m5-chip-10-core-cpu-8-core-gpu-16gb-memory-512gb-storage",
+          "image": "/images/premium-laptop-alt1.webp",
+          "when": "you want a lighter, lower-cost 13-inch Mac"
         }
       ]
     }
