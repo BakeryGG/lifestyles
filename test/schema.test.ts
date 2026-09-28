@@ -5,19 +5,25 @@ import path from "node:path";
 import test from "node:test";
 import { imageFileIssues } from "../lib/catalog.ts";
 import { collectCatalogIssues, formatCatalogError, parseCatalog } from "../lib/schema.ts";
-import { seedCatalog, testPick } from "./helpers.ts";
+import { committedCatalog, seedCatalog, testPick } from "./helpers.ts";
 
 const messages = (data: unknown) => collectCatalogIssues(data).map((i) => i.message).join("\n");
 
 test("committed data/catalog.json passes the schema", () => {
-  assert.deepEqual(collectCatalogIssues(seedCatalog()), []);
+  assert.deepEqual(collectCatalogIssues(committedCatalog()), []);
 });
 
-test("featured tag exists and the seed has no invented picks", () => {
-  const catalog = seedCatalog();
+test("featured tag exists and the committed catalog has no invented picks", () => {
+  const catalog = committedCatalog();
   assert.ok(catalog.categories.some((c) => c.id === "featured"));
   assert.ok(catalog.products.some((p) => p.categories.includes("featured")));
-  assert.equal(catalog.picks.length, 0);
+  const fake = /example\.com|\bdemo\b|\bfake\b|test brand|placeholder/i;
+  for (const pick of catalog.picks) {
+    for (const item of [pick.main, ...pick.alts]) {
+      assert.doesNotMatch(`${item.brand} ${item.name} ${item.url} ${item.image}`, fake, `${pick.tier}/${pick.product} looks like demo/test data`);
+      assert.match(item.url, /^https:\/\//, `${pick.tier}/${pick.product} needs a real https URL`);
+    }
+  }
 });
 
 test("a well-formed pick is accepted", () => {

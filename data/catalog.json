@@ -2607,5 +2607,34 @@
       "headphones"
     ]
   },
-  "picks": []
+  "picks": [
+    {
+      "tier": "mid",
+      "product": "tee",
+      "main": {
+        "brand": "Uniqlo",
+        "name": "SUPIMA® Cotton T-Shirt",
+        "price": 24.9,
+        "currency": "USD",
+        "url": "https://www.uniqlo.com/us/en/products/E455365-000/00",
+        "image": "/images/mid-tee-main.webp",
+        "why": "100% SUPIMA cotton with a premium texture."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "tee",
+      "main": {
+        "brand": "Uniqlo",
+        "name": "SUPIMA® Cotton T-Shirt",
+        "price": 24.9,
+        "currency": "USD",
+        "url": "https://www.uniqlo.com/us/en/products/E455365-000/00",
+        "image": "/images/premium-tee-main.webp",
+        "why": "100% SUPIMA cotton with a premium texture."
+      },
+      "alts": []
+    }
+  ]
 }

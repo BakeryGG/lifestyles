@@ -8,9 +8,14 @@ import type { CatalogPick, CatalogShape, SheetRows } from "../scripts/lib/conver
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-/** The committed seed catalog (no picks). Fresh copy each call. */
-export function seedCatalog(): CatalogShape {
+/** The committed data/catalog.json as-is (may contain real picks). Fresh copy each call. */
+export function committedCatalog(): CatalogShape {
   return JSON.parse(readFileSync(path.join(ROOT, "data/catalog.json"), "utf8")) as CatalogShape;
+}
+
+/** The committed catalog's structure (tiers, tags, products, landing) with no picks. Fresh copy each call. */
+export function seedCatalog(): CatalogShape {
+  return { ...committedCatalog(), picks: [] };
 }
 
 /** Obviously fake pick for tests only. Never committed to data/. */
