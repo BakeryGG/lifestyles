@@ -2675,6 +2675,30 @@
       ]
     },
     {
+      "tier": "mid",
+      "product": "laptop",
+      "main": {
+        "brand": "Apple",
+        "name": "MacBook Air, 13-inch, M5 Chip, 10-core CPU, 8-core GPU, Starlight, 16GB memory, 512GB storage",
+        "price": 1299,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-mac/macbook-air/13-inch-starlight-m5-chip-10-core-cpu-8-core-gpu-16gb-memory-512gb-storage",
+        "image": "/images/mid-laptop-main.webp",
+        "why": "13-inch MacBook Air with the M5 chip, 16GB memory and 512GB storage."
+      },
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/mid-laptop-alt2.webp",
+          "when": "you want a cheaper Mac for about half the price"
+        }
+      ]
+    },
+    {
       "tier": "premium",
       "product": "tee",
       "main": {
