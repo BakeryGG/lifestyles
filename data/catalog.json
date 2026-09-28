@@ -2623,6 +2623,30 @@
       "alts": []
     },
     {
+      "tier": "budget",
+      "product": "laptop",
+      "main": {
+        "brand": "Lenovo",
+        "name": "IdeaPad 3i Chromebook 15.6\" Full HD Laptop, Intel Celeron N4500, 4GB memory, 64GB eMMC, Arctic Grey",
+        "price": 179.99,
+        "currency": "USD",
+        "url": "https://www.bestbuy.com/product/lenovo-ideapad-3i-chromebook-15-6-full-hd-laptop-intel-celeron-2021-4gb-memory-with-64gb-emmc-storage-arctic-grey/JJGSQF6VCX",
+        "image": "/images/budget-laptop-main.webp",
+        "why": "Currently unavailable at Best Buy; discontinued model, clearance price."
+      },
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/budget-laptop-alt1.webp",
+          "when": "you want a Mac instead of a Chromebook"
+        }
+      ]
+    },
+    {
       "tier": "mid",
       "product": "tee",
       "main": {
@@ -2687,6 +2711,15 @@
         "why": "13-inch MacBook Air with the M5 chip, 16GB memory and 512GB storage."
       },
       "alts": [
+        {
+          "brand": "Lenovo",
+          "name": "IdeaPad 3i Chromebook 15.6\" Full HD Laptop, Intel Celeron N4500, 4GB memory, 64GB eMMC, Arctic Grey",
+          "price": 179.99,
+          "currency": "USD",
+          "url": "https://www.bestbuy.com/product/lenovo-ideapad-3i-chromebook-15-6-full-hd-laptop-intel-celeron-2021-4gb-memory-with-64gb-emmc-storage-arctic-grey/JJGSQF6VCX",
+          "image": "/images/mid-laptop-alt1.webp",
+          "when": "you only need a basic Chromebook (now unavailable at Best Buy; discontinued)"
+        },
         {
           "brand": "Apple",
           "name": "MacBook Neo, Citrus, 256GB",
