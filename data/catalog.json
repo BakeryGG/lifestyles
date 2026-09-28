@@ -2708,6 +2708,20 @@
       ]
     },
     {
+      "tier": "mid",
+      "product": "bag",
+      "main": {
+        "brand": "LTTStore",
+        "name": "Commuter Backpack - 22L External / 20L internal capacity",
+        "price": 169.99,
+        "currency": "USD",
+        "url": "https://www.lttstore.com/products/commuter-backpack",
+        "image": "/images/mid-bag-main.webp",
+        "why": "22L external / 20L internal; fits up to 16-inch laptops; 19 pockets."
+      },
+      "alts": []
+    },
+    {
       "tier": "premium",
       "product": "tee",
       "main": {
@@ -2782,6 +2796,20 @@
           "when": "you want a lighter, lower-cost 13-inch Mac"
         }
       ]
+    },
+    {
+      "tier": "premium",
+      "product": "bag",
+      "main": {
+        "brand": "LTTStore",
+        "name": "Commuter Backpack - 22L External / 20L internal capacity",
+        "price": 169.99,
+        "currency": "USD",
+        "url": "https://www.lttstore.com/products/commuter-backpack",
+        "image": "/images/premium-bag-main.webp",
+        "why": "22L external / 20L internal; fits up to 16-inch laptops; 19 pockets."
+      },
+      "alts": []
     }
   ]
 }
