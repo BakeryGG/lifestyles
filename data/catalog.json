@@ -2609,6 +2609,20 @@
   },
   "picks": [
     {
+      "tier": "budget",
+      "product": "detergent",
+      "main": {
+        "brand": "Tide",
+        "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+        "price": 28.1,
+        "currency": "USD",
+        "url": "https://www.amazon.com/dp/B00GYB1QGG",
+        "image": "/images/budget-detergent-main.webp",
+        "why": "Helps remove 99% of everyday stains; made for HE washers."
+      },
+      "alts": []
+    },
+    {
       "tier": "mid",
       "product": "tee",
       "main": {
@@ -2623,6 +2637,44 @@
       "alts": []
     },
     {
+      "tier": "mid",
+      "product": "running-shoes",
+      "main": {
+        "brand": "HOKA",
+        "name": "Mach 7",
+        "price": 145,
+        "currency": "USD",
+        "url": "https://www.hoka.com/en/us/mens-road/mach-7/1171904.html",
+        "image": "/images/mid-running-shoes-main.webp",
+        "why": "Lightweight trainer with supercritical EVA foam for responsive cushioning."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "detergent",
+      "main": {
+        "brand": "Tide",
+        "name": "4-in-1 Ultra Oxi Pods Laundry Detergent Pacs, 32 Count",
+        "price": 12.97,
+        "currency": "USD",
+        "url": "https://www.amazon.com/dp/B078JC3ZDG",
+        "image": "/images/mid-detergent-main.webp",
+        "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
+      },
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/mid-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
+    },
+    {
       "tier": "premium",
       "product": "tee",
       "main": {
@@ -2635,6 +2687,44 @@
         "why": "100% SUPIMA cotton with a premium texture."
       },
       "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "running-shoes",
+      "main": {
+        "brand": "HOKA",
+        "name": "Mach 7",
+        "price": 145,
+        "currency": "USD",
+        "url": "https://www.hoka.com/en/us/mens-road/mach-7/1171904.html",
+        "image": "/images/premium-running-shoes-main.webp",
+        "why": "Lightweight trainer with supercritical EVA foam for responsive cushioning."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "detergent",
+      "main": {
+        "brand": "Tide",
+        "name": "4-in-1 Ultra Oxi Pods Laundry Detergent Pacs, 32 Count",
+        "price": 12.97,
+        "currency": "USD",
+        "url": "https://www.amazon.com/dp/B078JC3ZDG",
+        "image": "/images/premium-detergent-main.webp",
+        "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
+      },
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/premium-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
     }
   ]
 }
