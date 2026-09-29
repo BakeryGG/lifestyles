@@ -134,7 +134,7 @@ The special tag `featured` (order 0) is curated by hand: add `featured` to a pro
 | Field | Meaning |
 | --- | --- |
 | `id` | Unique slug. Used in the share URL as `?pick={id}` and by picks. |
-| `name` | Product type label, e.g. "Everyday tee". |
+| `name` | Product type label, e.g. "T-shirt". |
 | `primaryCategory` | The tag it is grouped under in the All view. Must exist and must be in `categories`. |
 | `categories` | Tag ids (at least one, always including `primaryCategory`). The product shows under every one of those chips. |
 | `order` | Integer sort order within its group. |

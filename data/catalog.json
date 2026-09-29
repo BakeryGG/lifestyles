@@ -193,7 +193,7 @@
   "products": [
     {
       "id": "tee",
-      "name": "Everyday tee",
+      "name": "T-shirt",
       "primaryCategory": "clothing",
       "categories": [
         "clothing",
@@ -221,7 +221,7 @@
     },
     {
       "id": "layer",
-      "name": "Hoodie / layer",
+      "name": "Hoodie",
       "primaryCategory": "clothing",
       "categories": [
         "clothing",
@@ -260,7 +260,7 @@
     },
     {
       "id": "pants",
-      "name": "Jeans / pants",
+      "name": "Jeans",
       "primaryCategory": "clothing",
       "categories": [
         "clothing",
@@ -289,7 +289,7 @@
     },
     {
       "id": "dress",
-      "name": "Everyday dress",
+      "name": "Dress",
       "primaryCategory": "clothing",
       "categories": [
         "clothing"
@@ -345,7 +345,7 @@
     },
     {
       "id": "sneakers",
-      "name": "Everyday sneakers",
+      "name": "Sneakers",
       "primaryCategory": "clothing",
       "categories": [
         "clothing",
@@ -499,7 +499,7 @@
     },
     {
       "id": "mattress",
-      "name": "Mattress / bed",
+      "name": "Mattress",
       "primaryCategory": "bedroom",
       "categories": [
         "bedroom",
@@ -759,7 +759,7 @@
     },
     {
       "id": "chefs-knife",
-      "name": "Chef's knife or set",
+      "name": "Knife set",
       "primaryCategory": "kitchen",
       "categories": [
         "kitchen"
@@ -936,7 +936,7 @@
     },
     {
       "id": "coffee",
-      "name": "Coffee setup",
+      "name": "Coffee beans",
       "primaryCategory": "coffee",
       "categories": [
         "coffee",
@@ -1330,7 +1330,7 @@
     },
     {
       "id": "washer-dryer",
-      "name": "Washer / dryer",
+      "name": "Washer and dryer",
       "primaryCategory": "appliances",
       "categories": [
         "appliances",
@@ -1685,7 +1685,7 @@
     },
     {
       "id": "daily-vitamins",
-      "name": "Daily vitamins",
+      "name": "Multivitamin",
       "primaryCategory": "wellness",
       "categories": [
         "wellness"
@@ -1845,7 +1845,7 @@
     },
     {
       "id": "headphones",
-      "name": "Headphones",
+      "name": "Noise-cancelling headphones",
       "primaryCategory": "tech",
       "categories": [
         "tech",
@@ -1856,7 +1856,7 @@
     },
     {
       "id": "earbuds",
-      "name": "Earbuds",
+      "name": "Wireless earbuds",
       "primaryCategory": "tech",
       "categories": [
         "tech",
@@ -2068,7 +2068,7 @@
     },
     {
       "id": "bag",
-      "name": "Daily bag",
+      "name": "Backpack",
       "primaryCategory": "travel",
       "categories": [
         "travel",
