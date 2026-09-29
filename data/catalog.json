@@ -759,7 +759,7 @@
     },
     {
       "id": "chefs-knife",
-      "name": "Chef's knife",
+      "name": "Chef's knife or set",
       "primaryCategory": "kitchen",
       "categories": [
         "kitchen"
@@ -2676,6 +2676,20 @@
     },
     {
       "tier": "mid",
+      "product": "chefs-knife",
+      "main": {
+        "brand": "WIZEKA",
+        "name": "Knife Set with Block, 15 Pieces, High Carbon Stainless Steel, Black/Silver",
+        "price": 139,
+        "currency": "USD",
+        "url": "https://www.amazon.com/dp/B0CDNYGWN5",
+        "image": "/images/mid-chefs-knife-main.webp",
+        "why": "German 1.4116 steel at 58HRC with a hand-polished 14° edge; block included."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
       "product": "detergent",
       "main": {
         "brand": "Tide",
@@ -2742,6 +2756,63 @@
     },
     {
       "tier": "mid",
+      "product": "headphones",
+      "main": {
+        "brand": "Bose",
+        "name": "QuietComfort Headphones (2nd Gen), Black",
+        "price": 359,
+        "currency": "USD",
+        "url": "https://www.bose.com/p/headphones/bose-quietcomfort-headphones-2nd-gen/QC2G-HEADPHONEARN.html?dwvar_QC2G-HEADPHONEARN_color=BLACK",
+        "image": "/images/mid-headphones-main.webp",
+        "why": "Bose noise-cancelling over-ears, one step below the QuietComfort Ultra."
+      },
+      "alts": [
+        {
+          "brand": "Sony",
+          "name": "WH-1000XM6 Wireless Noise Canceling Headphones, Black",
+          "price": 459.99,
+          "currency": "USD",
+          "url": "https://electronics.sony.com/audio/headphones/headband/p/wh1000xm6-b",
+          "image": "/images/mid-headphones-alt1.webp",
+          "when": "you'd rather have Sony's flagship than Bose's step-down model"
+        }
+      ]
+    },
+    {
+      "tier": "mid",
+      "product": "earbuds",
+      "main": {
+        "brand": "Apple",
+        "name": "AirPods Pro 3",
+        "price": 249,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-airpods/airpods-pro-3",
+        "image": "/images/mid-earbuds-main.webp",
+        "why": "Apple's noise-cancelling earbuds; the easy pick if you use an iPhone."
+      },
+      "alts": [
+        {
+          "brand": "Nothing",
+          "name": "Ear (3), Black",
+          "price": 149,
+          "currency": "USD",
+          "url": "https://us.nothing.tech/products/ear-3?Colour=Black",
+          "image": "/images/mid-earbuds-alt1.webp",
+          "when": "you want the best mic quality for calls"
+        },
+        {
+          "brand": "Google",
+          "name": "Pixel Buds Pro 2, Hazel",
+          "price": 229,
+          "currency": "USD",
+          "url": "https://store.google.com/us/product/pixel_buds_pro_2?hl=en-US",
+          "image": "/images/mid-earbuds-alt2.webp",
+          "when": "you want the best Android integration"
+        }
+      ]
+    },
+    {
+      "tier": "mid",
       "product": "bag",
       "main": {
         "brand": "LTTStore",
@@ -2779,6 +2850,20 @@
         "url": "https://www.hoka.com/en/us/mens-road/mach-7/1171904.html",
         "image": "/images/premium-running-shoes-main.webp",
         "why": "Lightweight trainer with supercritical EVA foam for responsive cushioning."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "chefs-knife",
+      "main": {
+        "brand": "WIZEKA",
+        "name": "Knife Set with Block, 15 Pieces, High Carbon Stainless Steel, Black/Silver",
+        "price": 139,
+        "currency": "USD",
+        "url": "https://www.amazon.com/dp/B0CDNYGWN5",
+        "image": "/images/premium-chefs-knife-main.webp",
+        "why": "German 1.4116 steel at 58HRC with a hand-polished 14° edge; block included."
       },
       "alts": []
     },
@@ -2827,6 +2912,63 @@
           "url": "https://www.apple.com/shop/buy-mac/macbook-air/13-inch-starlight-m5-chip-10-core-cpu-8-core-gpu-16gb-memory-512gb-storage",
           "image": "/images/premium-laptop-alt1.webp",
           "when": "you want a lighter, lower-cost 13-inch Mac"
+        }
+      ]
+    },
+    {
+      "tier": "premium",
+      "product": "headphones",
+      "main": {
+        "brand": "Bose",
+        "name": "QuietComfort Ultra Headphones (2nd Gen), Black",
+        "price": 449,
+        "currency": "USD",
+        "url": "https://www.bose.com/p/headphones/bose-quietcomfort-ultra-headphones-2nd-gen/QCUH2-HEADPHONEARN.html?dwvar_QCUH2-HEADPHONEARN_color=BLACK",
+        "image": "/images/premium-headphones-main.webp",
+        "why": "Bose's top noise-cancelling over-ears, with Immersive Audio and all-day comfort."
+      },
+      "alts": [
+        {
+          "brand": "Sony",
+          "name": "WH-1000XM6 Wireless Noise Canceling Headphones, Black",
+          "price": 459.99,
+          "currency": "USD",
+          "url": "https://electronics.sony.com/audio/headphones/headband/p/wh1000xm6-b",
+          "image": "/images/premium-headphones-alt1.webp",
+          "when": "you prefer Sony over Bose for about the same price"
+        }
+      ]
+    },
+    {
+      "tier": "premium",
+      "product": "earbuds",
+      "main": {
+        "brand": "Apple",
+        "name": "AirPods Pro 3",
+        "price": 249,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-airpods/airpods-pro-3",
+        "image": "/images/premium-earbuds-main.webp",
+        "why": "Apple's noise-cancelling earbuds; the easy pick if you use an iPhone."
+      },
+      "alts": [
+        {
+          "brand": "Nothing",
+          "name": "Ear (3), Black",
+          "price": 149,
+          "currency": "USD",
+          "url": "https://us.nothing.tech/products/ear-3?Colour=Black",
+          "image": "/images/premium-earbuds-alt1.webp",
+          "when": "you want the best mic quality for calls"
+        },
+        {
+          "brand": "Google",
+          "name": "Pixel Buds Pro 2, Hazel",
+          "price": 229,
+          "currency": "USD",
+          "url": "https://store.google.com/us/product/pixel_buds_pro_2?hl=en-US",
+          "image": "/images/premium-earbuds-alt2.webp",
+          "when": "you want the best Android integration"
         }
       ]
     },
