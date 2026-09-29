@@ -260,7 +260,7 @@
     },
     {
       "id": "pants",
-      "name": "Jeans",
+      "name": "Pants",
       "primaryCategory": "clothing",
       "categories": [
         "clothing",
@@ -290,6 +290,15 @@
     {
       "id": "dress",
       "name": "Dress",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1011
+    },
+    {
+      "id": "joggers",
+      "name": "Joggers",
       "primaryCategory": "clothing",
       "categories": [
         "clothing"
@@ -2643,7 +2652,17 @@
         "image": "/images/budget-laptop-main.webp",
         "why": "Currently unavailable at Best Buy; discontinued model, clearance price."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/budget-laptop-alt1.webp",
+          "when": "you want a Mac instead of a Chromebook"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2656,6 +2675,20 @@
         "url": "https://www.uniqlo.com/us/en/products/E455365-000/00",
         "image": "/images/mid-tee-main.webp",
         "why": "100% SUPIMA cotton with a premium texture."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "pants",
+      "main": {
+        "brand": "Rhone",
+        "name": "Men's Commuter Pro Pant, Slim Fit, Black",
+        "price": 148,
+        "currency": "USD",
+        "url": "https://www.rhone.com/products/mens-commuter-pro-pant-slim-fit/?variant=45873128046784",
+        "image": "/images/mid-pants-main.webp",
+        "why": "Four-way stretch commuter pant that releases wrinkles. Machine washable."
       },
       "alts": []
     },
@@ -2699,7 +2732,17 @@
         "image": "/images/mid-detergent-main.webp",
         "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/mid-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2746,7 +2789,35 @@
         "image": "/images/mid-laptop-main.webp",
         "why": "13-inch MacBook Air with the M5 chip, 16GB memory and 512GB storage."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Lenovo",
+          "name": "IdeaPad 3i Chromebook 15.6\" Full HD Laptop, Intel Celeron N4500, 4GB memory, 64GB eMMC, Arctic Grey",
+          "price": 179.99,
+          "currency": "USD",
+          "url": "https://www.bestbuy.com/product/lenovo-ideapad-3i-chromebook-15-6-full-hd-laptop-intel-celeron-2021-4gb-memory-with-64gb-emmc-storage-arctic-grey/JJGSQF6VCX",
+          "image": "/images/mid-laptop-alt1.webp",
+          "when": "you only need a basic Chromebook (now unavailable at Best Buy; discontinued)"
+        },
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/mid-laptop-alt2.webp",
+          "when": "you want a cheaper Mac for about half the price"
+        },
+        {
+          "brand": "Apple",
+          "name": "MacBook Pro, 14-inch, M5 Pro Chip, 18-core CPU, 20-core GPU, Space Black, Nano-texture display, 64GB memory, 1TB storage",
+          "price": 3849,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-pro/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-64gb-memory-1tb-storage",
+          "image": "/images/mid-laptop-alt3.webp",
+          "when": "you want to splurge on a noticeably nicer version"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2835,6 +2906,20 @@
     },
     {
       "tier": "premium",
+      "product": "pants",
+      "main": {
+        "brand": "Rhone",
+        "name": "Men's Commuter Pro Pant, Slim Fit, Black",
+        "price": 148,
+        "currency": "USD",
+        "url": "https://www.rhone.com/products/mens-commuter-pro-pant-slim-fit/?variant=45873128046784",
+        "image": "/images/premium-pants-main.webp",
+        "why": "Four-way stretch commuter pant that releases wrinkles. Machine washable."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
       "product": "running-shoes",
       "main": {
         "brand": "HOKA",
@@ -2873,7 +2958,17 @@
         "image": "/images/premium-detergent-main.webp",
         "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/premium-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
     },
     {
       "tier": "premium",
@@ -2920,7 +3015,17 @@
         "image": "/images/premium-laptop-main.webp",
         "why": "14-inch MacBook Pro with M5 Pro, nano-texture display, 64GB memory and 1TB storage."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Air, 13-inch, M5 Chip, 10-core CPU, 8-core GPU, Starlight, 16GB memory, 512GB storage",
+          "price": 1299,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-air/13-inch-starlight-m5-chip-10-core-cpu-8-core-gpu-16gb-memory-512gb-storage",
+          "image": "/images/premium-laptop-alt1.webp",
+          "when": "you want a lighter, lower-cost 13-inch Mac"
+        }
+      ]
     },
     {
       "tier": "premium",
@@ -2981,6 +3086,20 @@
     },
     {
       "tier": "premium",
+      "product": "office-chair",
+      "main": {
+        "brand": "Herman Miller",
+        "name": "Embody Chair, Graphite frame, Sync Black",
+        "price": 2395,
+        "currency": "USD",
+        "url": "https://store.hermanmiller.com/office-chairs-ergonomic-chairs/embody-chair/100147358.html?lang=en_US",
+        "image": "/images/premium-office-chair-main.webp",
+        "why": "Default build: fully adjustable arms, 2.5-inch hard-floor or carpet casters."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
       "product": "bag",
       "main": {
         "brand": "LTTStore",
@@ -3025,6 +3144,34 @@
           "when": "you want the most features in a foldable"
         }
       ]
+    },
+    {
+      "tier": "mid",
+      "product": "joggers",
+      "main": {
+        "brand": "Vuori",
+        "name": "Ponto Performance Pant, Charcoal Heather, 30-inch inseam",
+        "price": 110,
+        "currency": "USD",
+        "url": "https://vuoriclothing.com/products/ponto-performance-pant-charcoal-heather",
+        "image": "/images/mid-joggers-main.webp",
+        "why": "Light, stretchy jogger in Vuori's DreamKnit fabric."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "joggers",
+      "main": {
+        "brand": "Vuori",
+        "name": "Ponto Performance Pant, Charcoal Heather, 30-inch inseam",
+        "price": 110,
+        "currency": "USD",
+        "url": "https://vuoriclothing.com/products/ponto-performance-pant-charcoal-heather",
+        "image": "/images/premium-joggers-main.webp",
+        "why": "Light, stretchy jogger in Vuori's DreamKnit fabric."
+      },
+      "alts": []
     }
   ]
 }
