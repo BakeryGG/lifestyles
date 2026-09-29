@@ -182,8 +182,7 @@ html {
   background: linear-gradient(270deg, #ffffff 15%, rgb(255 255 255 / 0));
 }
 
-/* One card tree. Below 1280px, sections stack in catalog order.
-   From 1280px, --kit-col / --kit-row pack the desktop grid. */
+/* One card tree. Two, then three, then four columns. Desktop stays at four. */
 .kit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -256,11 +255,6 @@ html {
   }
 }
 
-@media (min-width: 80rem) {
-  .kit-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}
 
 @keyframes lifestyles-fade {
   from {

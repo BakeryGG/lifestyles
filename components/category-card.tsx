@@ -1,10 +1,10 @@
-import { displayText, formatPrice, type PresentedPick } from "@/lib/present";
+import { displayText, formatPrice, shortCardName, type PresentedPick } from "@/lib/present";
 import { EmptyPlate } from "./empty-plate";
 import { ProductImage } from "./product-image";
 
-/** Slot width: 6 / 4 / 3 / 2 columns inside the tier frame. */
+/** Slot width: 2 / 3 / 4 columns. Desktop stays at 4. */
 const CARD_SIZES =
-  "(min-width: 1280px) calc((min(100vw, 1440px) - 104px) / 6), (min-width: 1024px) calc((min(100vw, 1440px) - 88px) / 4), (min-width: 768px) calc((100vw - 64px) / 3), calc((100vw - 40px) / 2)";
+  "(min-width: 1024px) calc((min(100vw, 1440px) - 88px) / 4), (min-width: 768px) calc((100vw - 64px) / 3), calc((100vw - 40px) / 2)";
 
 function ArrowUpRight() {
   return (
@@ -29,9 +29,9 @@ export function CategoryCard({
 }) {
   const brand = pick ? displayText(pick.main.brand) : null;
   const productName = pick ? displayText(pick.main.name) : null;
+  const shortName = productName ? shortCardName(productName) : null;
   const price = pick ? formatPrice(pick.main.price, pick.main.currency) : null;
-  const meta = pick ? [brand, name].filter(Boolean).join(" · ") : `${section} · ${name}`;
-  const title = pick ? (productName ?? name) : "Pick coming";
+  const subline = [brand, shortName].filter(Boolean).join(" ");
 
   return (
     <button
@@ -39,43 +39,38 @@ export function CategoryCard({
       id={`card-${id}`}
       data-pick={id}
       aria-haspopup="dialog"
-      className="group flex h-full w-full min-w-0 cursor-pointer flex-col text-left focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
+      className="group flex h-full w-full min-w-0 cursor-pointer flex-col rounded-2xl border border-line bg-paper p-3 text-center focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
-      <span className="relative block aspect-square w-full overflow-hidden rounded-2xl bg-field transition-colors duration-[380ms] ease-catalog group-hover:bg-[#efefef]">
+      <span className="relative block aspect-square w-full overflow-hidden">
         {pick ? (
           <ProductImage
             src={pick.main.image}
             srcSet={pick.main.srcSet}
             priority={priority}
             sizes={CARD_SIZES}
-            className="absolute inset-0 h-full w-full object-contain p-6 sm:p-8"
+            className="absolute inset-0 h-full w-full object-contain p-4 sm:p-5"
           />
         ) : (
           <EmptyPlate />
         )}
         <span
           aria-hidden="true"
-          className="absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-paper text-ink transition-colors duration-[380ms] ease-catalog group-hover:bg-ink group-hover:text-paper"
+          className="absolute top-1.5 right-1.5 flex h-8 w-8 items-center justify-center rounded-full border border-line bg-paper text-ink transition-colors duration-[380ms] ease-catalog group-hover:bg-ink group-hover:text-paper"
         >
           <ArrowUpRight />
         </span>
       </span>
-      <span className="flex flex-col gap-1 px-0.5 pt-3 pb-1">
+      <span className="flex flex-col items-center gap-1 px-1 pt-3 pb-1">
+        <span className="text-[15px] leading-5 font-medium tracking-[-0.01em] text-ink">{name}</span>
         {pick ? (
           <>
-            <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">{meta}</span>
-            <span className="flex items-baseline justify-between gap-3">
-              <span className="min-w-0 text-[13px] leading-5 text-ink">{title}</span>
-              {price ? <span className="shrink-0 font-mono text-[13px] leading-5 text-ink">{price}</span> : null}
-            </span>
+            {subline ? <span className="text-[12px] leading-4 text-pretty text-muted">{subline}</span> : null}
+            {price ? <span className="mt-0.5 font-mono text-[13px] leading-5 text-ink">{price}</span> : null}
           </>
         ) : (
-          <>
-            <span className="text-[13px] leading-5 text-ink">{name}</span>
-            <span className="text-[12px] leading-4 tracking-[0.01em] text-muted">
-              <span className="sr-only">{section}, </span>Pick coming
-            </span>
-          </>
+          <span className="text-[12px] leading-4 text-muted">
+            <span className="sr-only">{section}, </span>Pick coming
+          </span>
         )}
       </span>
     </button>

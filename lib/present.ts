@@ -37,15 +37,39 @@ export function brandSlug(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+
+/** Card subline: brand plus a short name, not the full spec string. */
+export function shortCardName(name: string): string {
+  let text = name.trim().replace(/\s+/g, " ");
+  const dash = text.indexOf(" - ");
+  const comma = text.indexOf(",");
+  let cut = text.length;
+  if (comma > 0) cut = Math.min(cut, comma);
+  if (dash > 0) cut = Math.min(cut, dash);
+  text = text.slice(0, cut).replace(/\s*\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+  if (/[®™]/.test(text)) {
+    const words = text.split(" ");
+    const marked = words.findIndex((word) => /[®™]/.test(word));
+    if (marked >= 0) text = words.slice(0, marked + 1).join(" ");
+  }
+  const max = 42;
+  if (text.length > max) {
+    const at = text.lastIndexOf(" ", max);
+    text = (at > 8 ? text.slice(0, at) : text.slice(0, max)).trim();
+  }
+  return text;
+}
+
+/** Shown prices are whole dollars. The sheet keeps the exact price. */
 export function formatPrice(price: number, currency: string): string {
-  const amount = Object.is(price, -0) ? 0 : price;
-  const digits = Number.isInteger(amount) ? 0 : 2;
+  const raw = Object.is(price, -0) ? 0 : price;
+  const amount = Math.round(raw);
   try {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
   } catch {
     return `${amount} ${currency}`;
