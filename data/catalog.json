@@ -1824,6 +1824,15 @@
       "order": 14001
     },
     {
+      "id": "foldable-phone",
+      "name": "Foldable phone",
+      "primaryCategory": "tech",
+      "categories": [
+        "tech"
+      ],
+      "order": 14001
+    },
+    {
       "id": "laptop",
       "name": "Laptop",
       "primaryCategory": "tech",
@@ -2714,6 +2723,39 @@
     },
     {
       "tier": "mid",
+      "product": "phone",
+      "main": {
+        "brand": "Apple",
+        "name": "iPhone 17, 256GB, Black, Unlocked",
+        "price": 929,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-iphone/iphone-17",
+        "image": "/images/mid-phone-main.webp",
+        "why": "Apple's current base iPhone; the base iPhone 18 isn't on sale yet."
+      },
+      "alts": [
+        {
+          "brand": "Google",
+          "name": "Pixel 11, 256GB, Obsidian, Unlocked",
+          "price": 899,
+          "currency": "USD",
+          "url": "https://store.google.com/us/product/pixel_11?hl=en-US",
+          "image": "/images/mid-phone-alt1.webp",
+          "when": "you want the best camera"
+        },
+        {
+          "brand": "Samsung",
+          "name": "Galaxy S26, 256GB, Black, Unlocked",
+          "price": 899.99,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B0G4SW96R4",
+          "image": "/images/mid-phone-alt2.webp",
+          "when": "you want the best all-around features"
+        }
+      ]
+    },
+    {
+      "tier": "mid",
       "product": "laptop",
       "main": {
         "brand": "Apple",
@@ -2893,6 +2935,39 @@
     },
     {
       "tier": "premium",
+      "product": "phone",
+      "main": {
+        "brand": "Apple",
+        "name": "iPhone 18 Pro, 256GB, Black, Unlocked",
+        "price": 1299,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-iphone/iphone-18-pro",
+        "image": "/images/premium-phone-main.webp",
+        "why": "Apple's 6.3-inch Pro iPhone for 2026, with 256GB of storage."
+      },
+      "alts": [
+        {
+          "brand": "Google",
+          "name": "Pixel 11 Pro, 256GB, Obsidian, Unlocked",
+          "price": 1099,
+          "currency": "USD",
+          "url": "https://store.google.com/us/product/pixel_11_pro?hl=en-US",
+          "image": "/images/premium-phone-alt1.webp",
+          "when": "you want the best camera"
+        },
+        {
+          "brand": "Samsung",
+          "name": "Galaxy S26 Ultra, 256GB, Black, Unlocked",
+          "price": 1164.31,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B0G4SWDH8P",
+          "image": "/images/premium-phone-alt2.webp",
+          "when": "you want the best all-around features"
+        }
+      ]
+    },
+    {
+      "tier": "premium",
       "product": "laptop",
       "main": {
         "brand": "Apple",
@@ -2985,6 +3060,39 @@
         "why": "22L external / 20L internal; fits up to 16-inch laptops; 19 pockets."
       },
       "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "foldable-phone",
+      "main": {
+        "brand": "Apple",
+        "name": "iPhone Duo, 256GB, Night Sky",
+        "price": 1999,
+        "currency": "USD",
+        "url": "https://www.apple.com/shop/buy-iphone/iphone-duo",
+        "image": "/images/premium-foldable-phone-main.webp",
+        "why": "Apple's foldable iPhone. Pre-orders open Oct 16; available Oct 23."
+      },
+      "alts": [
+        {
+          "brand": "Google",
+          "name": "Pixel 11 Pro Fold, 256GB, Obsidian, Unlocked",
+          "price": 1899,
+          "currency": "USD",
+          "url": "https://store.google.com/us/product/pixel_11_pro_fold?hl=en-US",
+          "image": "/images/premium-foldable-phone-alt1.webp",
+          "when": "you want Google's best camera in a foldable"
+        },
+        {
+          "brand": "Samsung",
+          "name": "Galaxy Z Fold8 Ultra, 256GB, Graphite, Unlocked",
+          "price": 2099.99,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B0H12KX1X4",
+          "image": "/images/premium-foldable-phone-alt2.webp",
+          "when": "you want the most features in a foldable"
+        }
+      ]
     }
   ]
 }
