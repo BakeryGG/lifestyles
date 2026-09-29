@@ -39,7 +39,7 @@ export function CategoryCard({
       id={`card-${id}`}
       data-pick={id}
       aria-haspopup="dialog"
-      className="group flex h-full w-full min-w-0 cursor-pointer flex-col rounded-2xl border border-line bg-paper p-3 text-center focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
+      className="group flex h-full w-full min-w-0 cursor-pointer flex-col rounded-2xl border border-line bg-card p-3 text-center focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
       <span className="relative block aspect-square w-full overflow-hidden">
         {pick ? (

@@ -9,7 +9,8 @@
   --color-muted: #6b6b6b;
   --color-line: #e6e6e6;
   --color-field: #f5f5f5;
-  --color-card: #ffffff;
+  /* Product cards only. Page stays --color-paper. Same gray the signal red was checked against. */
+  --color-card: #f5f5f5;
   /* #D01010 is #E10600 darkened just enough for AA text on white and on #F5F5F5. */
   --color-signal: #d01010;
 }
