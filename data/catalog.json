@@ -2072,6 +2072,16 @@
       "order": 15005
     },
     {
+      "id": "pc-headset",
+      "name": "PC headset",
+      "primaryCategory": "home-office",
+      "categories": [
+        "home-office",
+        "tech"
+      ],
+      "order": 15005
+    },
+    {
       "id": "laptop-stand",
       "name": "Laptop stand",
       "primaryCategory": "home-office",
@@ -3396,6 +3406,34 @@
         "url": "https://bombas.com/products/mens-cotton-modal-boxer-3-pack?variant=black&size=l",
         "image": "/images/premium-boxers-main.webp",
         "why": "Black cotton-modal boxer 3-pack, size L."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "pc-headset",
+      "main": {
+        "brand": "HyperX",
+        "name": "Cloud III Wireless, Black-Red",
+        "price": 149.99,
+        "currency": "USD",
+        "url": "https://hyperx.com/products/hyperx-cloud-iii-wireless-gaming-headset",
+        "image": "/images/mid-pc-headset-main.webp",
+        "why": "Discontinued on hyperx.com; out of stock at the $149.99 MSRP."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "pc-headset",
+      "main": {
+        "brand": "HyperX",
+        "name": "Cloud III Wireless, Black-Red",
+        "price": 149.99,
+        "currency": "USD",
+        "url": "https://hyperx.com/products/hyperx-cloud-iii-wireless-gaming-headset",
+        "image": "/images/premium-pc-headset-main.webp",
+        "why": "Discontinued on hyperx.com; out of stock at the $149.99 MSRP."
       },
       "alts": []
     }
