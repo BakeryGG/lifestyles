@@ -2965,6 +2965,20 @@
     },
     {
       "tier": "mid",
+      "product": "mouse",
+      "main": {
+        "brand": "Logitech G",
+        "name": "PRO X SUPERLIGHT 2, Black",
+        "price": 159.99,
+        "currency": "USD",
+        "url": "https://www.logitechg.com/en-us/shop/p/pro-x2-superlight-wireless-mouse.910-006628",
+        "image": "/images/mid-mouse-main.webp",
+        "why": "60g LIGHTSPEED wireless mouse with the HERO 2 sensor."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
       "product": "bag",
       "main": {
         "brand": "LTTStore",
@@ -3211,6 +3225,20 @@
           "when": "you want to step down"
         }
       ]
+    },
+    {
+      "tier": "premium",
+      "product": "mouse",
+      "main": {
+        "brand": "Logitech G",
+        "name": "PRO X SUPERLIGHT 2, Black",
+        "price": 159.99,
+        "currency": "USD",
+        "url": "https://www.logitechg.com/en-us/shop/p/pro-x2-superlight-wireless-mouse.910-006628",
+        "image": "/images/premium-mouse-main.webp",
+        "why": "60g LIGHTSPEED wireless mouse with the HERO 2 sensor."
+      },
+      "alts": []
     },
     {
       "tier": "premium",
