@@ -325,8 +325,35 @@
       "order": 1013
     },
     {
+      "id": "boxers",
+      "name": "Boxers",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1013
+    },
+    {
       "id": "socks",
       "name": "Socks",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1014
+    },
+    {
+      "id": "long-socks",
+      "name": "Long socks",
+      "primaryCategory": "clothing",
+      "categories": [
+        "clothing"
+      ],
+      "order": 1014
+    },
+    {
+      "id": "ankle-socks",
+      "name": "Ankle socks",
       "primaryCategory": "clothing",
       "categories": [
         "clothing"
@@ -2661,6 +2688,30 @@
         "image": "/images/budget-laptop-main.webp",
         "why": "Currently unavailable at Best Buy; discontinued model, clearance price."
       },
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/budget-laptop-alt1.webp",
+          "when": "you want a Mac instead of a Chromebook"
+        }
+      ]
+    },
+    {
+      "tier": "budget",
+      "product": "keyboard",
+      "main": {
+        "brand": "Keychron",
+        "name": "C3 Pro, Red Backlight, Mechanical Red Switch",
+        "price": 34.99,
+        "currency": "USD",
+        "url": "https://www.keychron.com/products/keychron-c3-pro-qmk-via-wired-mechanical-keyboard?variant=40574854037593",
+        "image": "/images/budget-keyboard-main.webp",
+        "why": "Red backlight, Keychron red switch, TKL. Sold out on keychron.com."
+      },
       "alts": []
     },
     {
@@ -2731,7 +2782,17 @@
         "image": "/images/mid-detergent-main.webp",
         "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/mid-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2792,7 +2853,35 @@
         "image": "/images/mid-laptop-main.webp",
         "why": "13-inch MacBook Air with the M5 chip, 16GB memory and 512GB storage."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Lenovo",
+          "name": "IdeaPad 3i Chromebook 15.6\" Full HD Laptop, Intel Celeron N4500, 4GB memory, 64GB eMMC, Arctic Grey",
+          "price": 179.99,
+          "currency": "USD",
+          "url": "https://www.bestbuy.com/product/lenovo-ideapad-3i-chromebook-15-6-full-hd-laptop-intel-celeron-2021-4gb-memory-with-64gb-emmc-storage-arctic-grey/JJGSQF6VCX",
+          "image": "/images/mid-laptop-alt1.webp",
+          "when": "you only need a basic Chromebook (now unavailable at Best Buy; discontinued)"
+        },
+        {
+          "brand": "Apple",
+          "name": "MacBook Neo, Citrus, 256GB",
+          "price": 699,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-neo/citrus-256gb",
+          "image": "/images/mid-laptop-alt2.webp",
+          "when": "you want a cheaper Mac for about half the price"
+        },
+        {
+          "brand": "Apple",
+          "name": "MacBook Pro, 14-inch, M5 Pro Chip, 18-core CPU, 20-core GPU, Space Black, Nano-texture display, 64GB memory, 1TB storage",
+          "price": 3849,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-pro/14-inch-space-black-nano-texture-display-apple-m5-pro-chip-18-core-cpu-20-core-gpu-64gb-memory-1tb-storage",
+          "image": "/images/mid-laptop-alt3.webp",
+          "when": "you want to splurge on a noticeably nicer version"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2850,6 +2939,20 @@
           "when": "you want the best Android integration"
         }
       ]
+    },
+    {
+      "tier": "mid",
+      "product": "keyboard",
+      "main": {
+        "brand": "Wobkey",
+        "name": "Rainy75, Anodized Black Lite, Violet switch",
+        "price": 129.99,
+        "currency": "USD",
+        "url": "https://www.wobkey.com/products/rainy75?variant=44455597244651",
+        "image": "/images/mid-keyboard-main.webp",
+        "why": "Anodized Black Lite: no RGB, gradient glass, 3500mAh, Violet switch."
+      },
+      "alts": []
     },
     {
       "tier": "mid",
@@ -2933,7 +3036,17 @@
         "image": "/images/premium-detergent-main.webp",
         "why": "4-in-1 pacs with built-in pre-treaters; dissolve in hot or cold water."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Tide",
+          "name": "Liquid Laundry Detergent, Ultra Stain Release, 46 Ounce",
+          "price": 28.1,
+          "currency": "USD",
+          "url": "https://www.amazon.com/dp/B00GYB1QGG",
+          "image": "/images/premium-detergent-alt1.webp",
+          "when": "you prefer a liquid detergent over pods"
+        }
+      ]
     },
     {
       "tier": "premium",
@@ -2994,7 +3107,17 @@
         "image": "/images/premium-laptop-main.webp",
         "why": "14-inch MacBook Pro with M5 Pro, nano-texture display, 64GB memory and 1TB storage."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Apple",
+          "name": "MacBook Air, 13-inch, M5 Chip, 10-core CPU, 8-core GPU, Starlight, 16GB memory, 512GB storage",
+          "price": 1299,
+          "currency": "USD",
+          "url": "https://www.apple.com/shop/buy-mac/macbook-air/13-inch-starlight-m5-chip-10-core-cpu-8-core-gpu-16gb-memory-512gb-storage",
+          "image": "/images/premium-laptop-alt1.webp",
+          "when": "you want a lighter, lower-cost 13-inch Mac"
+        }
+      ]
     },
     {
       "tier": "premium",
@@ -3177,6 +3300,90 @@
         "url": "https://www.dyson.com/vacuum-cleaners/cordless/v16-piston/black-copper.html",
         "image": "/images/premium-cordless-vacuum-main.webp",
         "why": "Black and copper cordless stick vacuum, the Piston Animal."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "long-socks",
+      "main": {
+        "brand": "Bombas",
+        "name": "Solids Half-Calf Sock 4-Pack, Black, M",
+        "price": 54,
+        "currency": "USD",
+        "url": "https://bombas.com/products/mens-solids-half-calf-sock-4-pack?variant=black&size=m",
+        "image": "/images/mid-long-socks-main.webp",
+        "why": "Black half-calf 4-pack, size M. On sale; regular price is $60."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "long-socks",
+      "main": {
+        "brand": "Bombas",
+        "name": "Solids Half-Calf Sock 4-Pack, Black, M",
+        "price": 54,
+        "currency": "USD",
+        "url": "https://bombas.com/products/mens-solids-half-calf-sock-4-pack?variant=black&size=m",
+        "image": "/images/premium-long-socks-main.webp",
+        "why": "Black half-calf 4-pack, size M. On sale; regular price is $60."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "ankle-socks",
+      "main": {
+        "brand": "Bombas",
+        "name": "Solids Ankle Sock 4-Pack, Black, L",
+        "price": 50.4,
+        "currency": "USD",
+        "url": "https://bombas.com/products/men-s-solid-ankle-four-pack?variant=black&size=l",
+        "image": "/images/mid-ankle-socks-main.webp",
+        "why": "Black ankle 4-pack, size L. On sale; regular price is $56."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "ankle-socks",
+      "main": {
+        "brand": "Bombas",
+        "name": "Solids Ankle Sock 4-Pack, Black, L",
+        "price": 50.4,
+        "currency": "USD",
+        "url": "https://bombas.com/products/men-s-solid-ankle-four-pack?variant=black&size=l",
+        "image": "/images/premium-ankle-socks-main.webp",
+        "why": "Black ankle 4-pack, size L. On sale; regular price is $56."
+      },
+      "alts": []
+    },
+    {
+      "tier": "mid",
+      "product": "boxers",
+      "main": {
+        "brand": "Bombas",
+        "name": "Cotton Modal Boxer 3-Pack, Black, L",
+        "price": 84,
+        "currency": "USD",
+        "url": "https://bombas.com/products/mens-cotton-modal-boxer-3-pack?variant=black&size=l",
+        "image": "/images/mid-boxers-main.webp",
+        "why": "Black cotton-modal boxer 3-pack, size L."
+      },
+      "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "boxers",
+      "main": {
+        "brand": "Bombas",
+        "name": "Cotton Modal Boxer 3-Pack, Black, L",
+        "price": 84,
+        "currency": "USD",
+        "url": "https://bombas.com/products/mens-cotton-modal-boxer-3-pack?variant=black&size=l",
+        "image": "/images/premium-boxers-main.webp",
+        "why": "Black cotton-modal boxer 3-pack, size L."
       },
       "alts": []
     }
