@@ -2702,7 +2702,26 @@
         "image": "/images/budget-keyboard-main.webp",
         "why": "Red backlight, Keychron red switch, TKL. Sold out on keychron.com."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Wobkey",
+          "name": "Rainy75, Anodized Black Lite, Violet switch",
+          "price": 129.99,
+          "currency": "USD",
+          "url": "https://www.wobkey.com/products/rainy75?variant=44455597244651",
+          "image": "/images/budget-keyboard-alt1.webp",
+          "when": "you want to step up to the other brand"
+        },
+        {
+          "brand": "Keychron",
+          "name": "Q3 Ultra 8K, Fully Assembled Knob, White, Silk POM Red",
+          "price": 229.99,
+          "currency": "USD",
+          "url": "https://www.keychron.com/products/keychron-q3-ultra-8k-wireless-custom-mechanical-keyboard?variant=42834696437849",
+          "image": "/images/budget-keyboard-alt2.webp",
+          "when": "you want to step up further"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -2904,7 +2923,35 @@
         "image": "/images/mid-keyboard-main.webp",
         "why": "Anodized Black Lite: no RGB, gradient glass, 3500mAh, Violet switch."
       },
-      "alts": []
+      "alts": [
+        {
+          "brand": "Keychron",
+          "name": "C3 Pro, Red Backlight, Mechanical Red Switch",
+          "price": 34.99,
+          "currency": "USD",
+          "url": "https://www.keychron.com/products/keychron-c3-pro-qmk-via-wired-mechanical-keyboard?variant=40574854037593",
+          "image": "/images/mid-keyboard-alt1.webp",
+          "when": "you want to step down"
+        },
+        {
+          "brand": "NuPhy",
+          "name": "Halo96 V2, Sakura Fizz, Lemon",
+          "price": 139.95,
+          "currency": "USD",
+          "url": "https://nuphy.com/products/halo96-v2-qmk-via-wireless-custom-mechanical-keyboard?variant=41305840713837",
+          "image": "/images/mid-keyboard-alt2.webp",
+          "when": "you want to step up to the other brand"
+        },
+        {
+          "brand": "Keychron",
+          "name": "Q3 Ultra 8K, Fully Assembled Knob, White, Silk POM Red",
+          "price": 229.99,
+          "currency": "USD",
+          "url": "https://www.keychron.com/products/keychron-q3-ultra-8k-wireless-custom-mechanical-keyboard?variant=42834696437849",
+          "image": "/images/mid-keyboard-alt3.webp",
+          "when": "you want to step up further"
+        }
+      ]
     },
     {
       "tier": "mid",
@@ -3121,6 +3168,39 @@
         "why": "Default build: fully adjustable arms, 2.5-inch hard-floor or carpet casters."
       },
       "alts": []
+    },
+    {
+      "tier": "premium",
+      "product": "keyboard",
+      "main": {
+        "brand": "Keychron",
+        "name": "Q3 Ultra 8K, Fully Assembled Knob, White, Silk POM Red",
+        "price": 229.99,
+        "currency": "USD",
+        "url": "https://www.keychron.com/products/keychron-q3-ultra-8k-wireless-custom-mechanical-keyboard?variant=42834696437849",
+        "image": "/images/premium-keyboard-main.webp",
+        "why": "Fully assembled knob, white, Silk POM red switch."
+      },
+      "alts": [
+        {
+          "brand": "Wobkey",
+          "name": "Rainy75, Anodized Black Lite, Violet switch",
+          "price": 129.99,
+          "currency": "USD",
+          "url": "https://www.wobkey.com/products/rainy75?variant=44455597244651",
+          "image": "/images/premium-keyboard-alt1.webp",
+          "when": "you want the other brand"
+        },
+        {
+          "brand": "Keychron",
+          "name": "C3 Pro, Red Backlight, Mechanical Red Switch",
+          "price": 34.99,
+          "currency": "USD",
+          "url": "https://www.keychron.com/products/keychron-c3-pro-qmk-via-wired-mechanical-keyboard?variant=40574854037593",
+          "image": "/images/premium-keyboard-alt2.webp",
+          "when": "you want to step down"
+        }
+      ]
     },
     {
       "tier": "premium",
